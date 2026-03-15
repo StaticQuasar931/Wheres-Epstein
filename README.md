@@ -13,18 +13,20 @@ Plain HTML, CSS, and JavaScript hidden-object game built for normal websites.
 
 ## Asset folders
 
-This build expects your current folder names exactly as they already exist:
+This build expects these asset locations:
 
 - `Assets/Bakgrounds/`
-- `Assets/Waldos/`
+- `Assets/waldopreviews/`
+- `Assets/startscreen.png`
 
 Background scene images are loaded from `Assets/Bakgrounds/`.
-Target preview images are loaded from `Assets/Waldos/`.
+Target preview images are loaded from `Assets/waldopreviews/`.
+The main menu artwork is loaded from `Assets/startscreen.png`.
 
 ## Add a new level
 
 1. Put the large scene image into `Assets/Bakgrounds/`.
-2. Put the cropped target preview image into `Assets/Waldos/`.
+2. Put the cropped target preview image into `Assets/waldopreviews/`.
 3. Open `scripts/levels.js`.
 4. Add a new object to the `LEVELS` array with:
    - `name`
@@ -33,6 +35,12 @@ Target preview images are loaded from `Assets/Waldos/`.
    - `hitbox`
    - optional `camera`
    - optional `timeLimit`
+
+## Naming convention
+
+- Backgrounds: `Assets/Bakgrounds/level1.png` through `Assets/Bakgrounds/level10.png`
+- Previews: `Assets/waldopreviews/level1.jpg` through `Assets/waldopreviews/level10.jpg`
+- Start screen art: `Assets/startscreen.png`
 
 ## Edit the click area
 

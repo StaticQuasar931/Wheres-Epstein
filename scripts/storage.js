@@ -1,12 +1,13 @@
 // Where's Epstein?
 // Where's Epstein?
 
-const STORAGE_KEY = "wheres-epstein-save-v1";
+const STORAGE_KEY = "wheres-epstein-save-v2";
 
 const DEFAULT_SAVE = {
   settings: {
-    wrongClickTimePenalty: 5,
-    wrongClickScorePenalty: 75,
+    theme: "dark",
+    density: "comfortable",
+    motion: "full",
   },
   legit: {
     bestScore: 0,

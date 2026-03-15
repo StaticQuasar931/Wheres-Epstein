@@ -4,47 +4,81 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Where's Epstein?</title>
-  <meta name="description" content="A browser-based hidden-object game with zoom, touch support, and a hidden testing mode.">
+  <meta name="description" content="A browser-based hidden-object game with zoom, touch support, keyboard pan, and a hidden testing mode.">
   <link rel="stylesheet" href="styles/main.css">
 </head>
-<body>
+<body data-theme="dark" data-density="comfortable" data-motion="full">
   <div class="app-shell">
     <header class="topbar">
-      <div>
+      <div class="brand-lockup">
         <p class="eyebrow">Hidden-Object Hunt</p>
         <h1 class="game-title">Where's Epstein?</h1>
       </div>
-      <button id="topMenuButton" class="ghost-button" type="button" aria-label="Open main menu">Menu</button>
+      <button id="topMenuButton" class="ghost-button topbar-button" type="button" aria-label="Open main menu">Menu</button>
     </header>
 
     <main class="app-main">
       <section id="homeScreen" class="screen screen-active">
         <div class="hero-card">
+          <div class="hero-media">
+            <img
+              id="startScreenImage"
+              class="hero-image"
+              src="Assets/startscreen.png"
+              alt="Start screen artwork"
+              draggable="false"
+            >
+            <div class="hero-image-overlay"></div>
+            <div class="hero-badge">10 Levels</div>
+            <div id="startScreenFallback" class="hero-fallback hidden">
+              <p class="eyebrow">Missing Start Screen Art</p>
+              <h2>Add <span>Assets/startscreen.png</span></h2>
+              <p id="startScreenErrorText">The game will use this image as the main menu artwork.</p>
+            </div>
+          </div>
+
           <div class="hero-copy">
             <p class="eyebrow">Single Player</p>
-            <h2>Find the exact person before the timer runs out.</h2>
-            <p>
-              Each level shows the real cropped target you need to find inside the larger scene.
-              No hover hints. No fake outlines. Just the image, your eyes, and the clock.
+            <h2>Hunt the exact target before the clock hits zero.</h2>
+            <p class="hero-description">
+              Each round gives you the real cropped face to find. Zoom in, pan around, stay sharp,
+              and clear all 10 scenes before the timer runs out.
             </p>
-            <div class="button-row">
+
+            <div class="button-row hero-actions">
               <button id="startGameButton" class="primary-button" type="button">Start Game</button>
               <button id="openSettingsButton" class="secondary-button" type="button">Settings</button>
               <button id="moreGamesButton" class="ghost-button" type="button">More Games</button>
             </div>
-          </div>
-          <div class="hero-panel">
-            <div class="hero-stat">
-              <span>Levels</span>
-              <strong id="homeLevelCount">10</strong>
-            </div>
-            <div class="hero-stat">
-              <span>Best Legit Score</span>
-              <strong id="homeBestScore">0</strong>
-            </div>
-            <div class="hero-stat">
-              <span>Best Cheated Score</span>
-              <strong id="homeBestCheatScore">0</strong>
+
+            <div class="home-grid">
+              <div class="home-panel">
+                <p class="eyebrow">Run Summary</p>
+                <div class="stat-stack">
+                  <div class="hero-stat">
+                    <span>Levels</span>
+                    <strong id="homeLevelCount">10</strong>
+                  </div>
+                  <div class="hero-stat">
+                    <span>Best Legit Score</span>
+                    <strong id="homeBestScore">0</strong>
+                  </div>
+                  <div class="hero-stat">
+                    <span>Best Cheated Score</span>
+                    <strong id="homeBestCheatScore">0</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="home-panel">
+                <p class="eyebrow">Controls</p>
+                <ul class="control-list">
+                  <li>Wheel or buttons to zoom</li>
+                  <li>Drag to pan while zoomed</li>
+                  <li>`WASD` or arrow keys to move the camera</li>
+                  <li>`Reset` and `Fit` snap the view back into place</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -55,29 +89,58 @@
           <div class="panel-header">
             <div>
               <p class="eyebrow">Settings</p>
-              <h2>Game Options</h2>
+              <h2>Look, Feel, and Accessibility</h2>
             </div>
             <button id="closeSettingsButton" class="ghost-button" type="button">Back</button>
           </div>
 
-          <div class="settings-grid">
-            <label class="setting-item">
-              <span>Wrong click time penalty</span>
-              <select id="timePenaltySelect">
-                <option value="3">3 seconds</option>
-                <option value="5" selected>5 seconds</option>
-                <option value="8">8 seconds</option>
-              </select>
-            </label>
+          <div class="settings-layout">
+            <section class="settings-panel">
+              <p class="eyebrow">Appearance</p>
+              <div class="settings-grid">
+                <label class="setting-item">
+                  <span>Theme</span>
+                  <select id="themeSelect">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                  </select>
+                </label>
 
-            <label class="setting-item">
-              <span>Wrong click score penalty</span>
-              <select id="scorePenaltySelect">
-                <option value="50">50 points</option>
-                <option value="75" selected>75 points</option>
-                <option value="100">100 points</option>
-              </select>
-            </label>
+                <label class="setting-item">
+                  <span>HUD Size</span>
+                  <select id="densitySelect">
+                    <option value="comfortable">Comfortable</option>
+                    <option value="compact">Compact</option>
+                  </select>
+                </label>
+
+                <label class="setting-item">
+                  <span>Motion</span>
+                  <select id="motionSelect">
+                    <option value="full">Full</option>
+                    <option value="reduced">Reduced</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+
+            <section class="settings-panel">
+              <p class="eyebrow">How It Plays</p>
+              <div class="settings-note-list">
+                <div class="info-card">
+                  <strong>Scoring is locked</strong>
+                  <p>Players cannot change the scoring or penalties from the menu.</p>
+                </div>
+                <div class="info-card">
+                  <strong>Keyboard camera controls</strong>
+                  <p>Use `WASD` or the arrow keys to push the camera while zoomed in.</p>
+                </div>
+                <div class="info-card">
+                  <strong>Testing mode</strong>
+                  <p>Still hidden. Tap the build label four times and enter `5278` to unlock it for this session.</p>
+                </div>
+              </div>
+            </section>
           </div>
 
           <div class="diagnostic-panel">
@@ -126,6 +189,7 @@
             </div>
             <h3 id="targetLevelName">Level Name</h3>
             <p id="targetHelpText">Tap or click the real person hidden in the scene.</p>
+            <p id="previewErrorText" class="asset-error hidden"></p>
           </aside>
         </div>
 
@@ -137,6 +201,9 @@
               <button id="resetZoomButton" class="ghost-button" type="button">Reset</button>
               <button id="fitZoomButton" class="ghost-button" type="button">Fit</button>
             </div>
+            <div class="toolbar-meta">
+              <span class="toolbar-hint">Pan: drag or use `WASD` / arrows</span>
+            </div>
             <div class="toolbar-actions">
               <button id="pauseButton" class="secondary-button" type="button">Pause</button>
               <button id="returnHomeButton" class="ghost-button" type="button">Quit</button>
@@ -147,6 +214,11 @@
             <div id="sceneContent" class="scene-content">
               <img id="levelImage" class="level-image" alt="Hidden object level scene" draggable="false">
               <div id="hitboxOverlay" class="hitbox-overlay hidden" aria-hidden="true"></div>
+            </div>
+            <div id="sceneFallback" class="scene-fallback hidden">
+              <p class="eyebrow">Missing Level Art</p>
+              <h3 id="sceneFallbackTitle">Unable to load level background</h3>
+              <p id="sceneFallbackText">Check the image path and filename.</p>
             </div>
             <div id="sceneFeedback" class="scene-feedback" aria-live="polite"></div>
             <div id="debugReadout" class="debug-readout hidden" aria-live="polite"></div>
@@ -164,6 +236,7 @@
       <div class="intro-preview-frame">
         <img id="introPreviewImage" alt="Target preview for upcoming level">
       </div>
+      <p id="introPreviewErrorText" class="asset-error hidden"></p>
       <p>Find this exact person inside the crowd scene before time runs out.</p>
       <button id="startLevelButton" class="primary-button" type="button">Begin Level</button>
     </div>
@@ -172,7 +245,8 @@
   <div id="pauseOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Paused</p>
-      <h2>Take a breath, then jump back in.</h2>
+      <h2>Scan the scene, then dive back in.</h2>
+      <p>The timer stays frozen while this menu is open.</p>
       <div class="button-row">
         <button id="resumeButton" class="primary-button" type="button">Resume</button>
         <button id="pauseQuitButton" class="ghost-button" type="button">Quit Run</button>

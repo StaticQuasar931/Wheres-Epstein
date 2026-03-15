@@ -1,15 +1,13 @@
-// Where's Epstein?
-// Where's Epstein?
-
 import { LEVELS, DEFAULT_SETTINGS } from "./levels.js";
 import { loadSave, recordRun, saveSettings } from "./storage.js";
 
-const MORE_GAMES_URL = "#";
+const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 5;
 const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
+const KEYBOARD_PAN_STEP = 18;
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -17,6 +15,10 @@ function clamp(value, min, max) {
 
 function formatScore(value) {
   return Math.max(0, Math.round(value)).toLocaleString();
+}
+
+function filenameFromPath(path) {
+  return path.split("/").pop() ?? path;
 }
 
 function isHit(hitbox, point) {
@@ -39,6 +41,8 @@ export class HiddenObjectGame {
     this.save = loadSave();
     this.sessionTestingUnlocked = false;
     this.diagnosticTapCount = 0;
+    this.keyState = new Set();
+    this.keyboardPanFrame = null;
     this.state = {
       levelIndex: 0,
       score: 0,
@@ -70,7 +74,7 @@ export class HiddenObjectGame {
     this.elements = this.getElements();
     this.bindEvents();
     this.populateStaticUi();
-    this.applySettingsUi();
+    this.applySavedSettings();
     this.updateHomeStats();
     this.updateDiagnosticStatus();
   }
@@ -82,6 +86,7 @@ export class HiddenObjectGame {
         settings: document.getElementById("settingsScreen"),
         game: document.getElementById("gameScreen"),
       },
+      body: document.body,
       homeLevelCount: document.getElementById("homeLevelCount"),
       homeBestScore: document.getElementById("homeBestScore"),
       homeBestCheatScore: document.getElementById("homeBestCheatScore"),
@@ -90,8 +95,12 @@ export class HiddenObjectGame {
       openSettingsButton: document.getElementById("openSettingsButton"),
       moreGamesButton: document.getElementById("moreGamesButton"),
       closeSettingsButton: document.getElementById("closeSettingsButton"),
-      timePenaltySelect: document.getElementById("timePenaltySelect"),
-      scorePenaltySelect: document.getElementById("scorePenaltySelect"),
+      startScreenImage: document.getElementById("startScreenImage"),
+      startScreenFallback: document.getElementById("startScreenFallback"),
+      startScreenErrorText: document.getElementById("startScreenErrorText"),
+      themeSelect: document.getElementById("themeSelect"),
+      densitySelect: document.getElementById("densitySelect"),
+      motionSelect: document.getElementById("motionSelect"),
       diagnosticHintButton: document.getElementById("diagnosticHintButton"),
       diagnosticUnlock: document.getElementById("diagnosticUnlock"),
       diagnosticCodeInput: document.getElementById("diagnosticCodeInput"),
@@ -105,10 +114,14 @@ export class HiddenObjectGame {
       targetPreviewImage: document.getElementById("targetPreviewImage"),
       targetLevelName: document.getElementById("targetLevelName"),
       targetHelpText: document.getElementById("targetHelpText"),
+      previewErrorText: document.getElementById("previewErrorText"),
       levelImage: document.getElementById("levelImage"),
       sceneViewport: document.getElementById("sceneViewport"),
       sceneContent: document.getElementById("sceneContent"),
       hitboxOverlay: document.getElementById("hitboxOverlay"),
+      sceneFallback: document.getElementById("sceneFallback"),
+      sceneFallbackTitle: document.getElementById("sceneFallbackTitle"),
+      sceneFallbackText: document.getElementById("sceneFallbackText"),
       sceneFeedback: document.getElementById("sceneFeedback"),
       debugReadout: document.getElementById("debugReadout"),
       zoomOutButton: document.getElementById("zoomOutButton"),
@@ -121,6 +134,7 @@ export class HiddenObjectGame {
       introLevelLabel: document.getElementById("introLevelLabel"),
       introLevelName: document.getElementById("introLevelName"),
       introPreviewImage: document.getElementById("introPreviewImage"),
+      introPreviewErrorText: document.getElementById("introPreviewErrorText"),
       startLevelButton: document.getElementById("startLevelButton"),
       pauseOverlay: document.getElementById("pauseOverlay"),
       resumeButton: document.getElementById("resumeButton"),
@@ -151,12 +165,12 @@ export class HiddenObjectGame {
         this.quitRun();
         return;
       }
-
       this.showScreen("home");
     });
-    this.elements.moreGamesButton.addEventListener("click", () => this.handleMoreGames());
-    this.elements.timePenaltySelect.addEventListener("change", () => this.persistSettings());
-    this.elements.scorePenaltySelect.addEventListener("change", () => this.persistSettings());
+    this.elements.moreGamesButton.addEventListener("click", () => window.open(MORE_GAMES_URL, "_blank", "noopener"));
+    this.elements.themeSelect.addEventListener("change", () => this.persistSettings());
+    this.elements.densitySelect.addEventListener("change", () => this.persistSettings());
+    this.elements.motionSelect.addEventListener("change", () => this.persistSettings());
     this.elements.diagnosticHintButton.addEventListener("click", () => this.revealDiagnosticEntry());
     this.elements.unlockDiagnosticButton.addEventListener("click", () => this.unlockTestingMode());
     this.elements.startLevelButton.addEventListener("click", () => this.beginActiveLevel());
@@ -173,7 +187,13 @@ export class HiddenObjectGame {
     this.elements.playAgainButton.addEventListener("click", () => this.startCampaign());
     this.elements.completionHomeButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.levelImage.addEventListener("load", () => this.onLevelImageLoaded());
-    this.elements.levelImage.addEventListener("error", () => this.showFeedback("Level image could not be loaded.", true));
+    this.elements.levelImage.addEventListener("error", () => this.onLevelImageError());
+    this.elements.targetPreviewImage.addEventListener("load", () => this.clearPreviewError());
+    this.elements.targetPreviewImage.addEventListener("error", () => this.showPreviewError());
+    this.elements.introPreviewImage.addEventListener("load", () => this.clearIntroPreviewError());
+    this.elements.introPreviewImage.addEventListener("error", () => this.showIntroPreviewError());
+    this.elements.startScreenImage.addEventListener("load", () => this.clearStartScreenError());
+    this.elements.startScreenImage.addEventListener("error", () => this.showStartScreenError());
 
     this.elements.sceneViewport.addEventListener("wheel", (event) => {
       event.preventDefault();
@@ -186,6 +206,9 @@ export class HiddenObjectGame {
     this.elements.sceneViewport.addEventListener("pointerup", (event) => this.onPointerUp(event));
     this.elements.sceneViewport.addEventListener("pointercancel", (event) => this.onPointerCancel(event));
 
+    window.addEventListener("keydown", (event) => this.onKeyDown(event));
+    window.addEventListener("keyup", (event) => this.onKeyUp(event));
+    window.addEventListener("blur", () => this.clearKeys());
     window.addEventListener("resize", () => {
       if (this.elements.screens.game.classList.contains("screen-active")) {
         this.fitLevelToViewport(false);
@@ -197,9 +220,26 @@ export class HiddenObjectGame {
     this.elements.homeLevelCount.textContent = String(LEVELS.length);
   }
 
-  applySettingsUi() {
-    this.elements.timePenaltySelect.value = String(this.save.settings.wrongClickTimePenalty);
-    this.elements.scorePenaltySelect.value = String(this.save.settings.wrongClickScorePenalty);
+  applySavedSettings() {
+    this.elements.themeSelect.value = this.save.settings.theme;
+    this.elements.densitySelect.value = this.save.settings.density;
+    this.elements.motionSelect.value = this.save.settings.motion;
+    this.applyThemeSettings();
+  }
+
+  applyThemeSettings() {
+    this.elements.body.dataset.theme = this.save.settings.theme;
+    this.elements.body.dataset.density = this.save.settings.density;
+    this.elements.body.dataset.motion = this.save.settings.motion;
+  }
+
+  persistSettings() {
+    this.save = saveSettings({
+      theme: this.elements.themeSelect.value,
+      density: this.elements.densitySelect.value,
+      motion: this.elements.motionSelect.value,
+    });
+    this.applyThemeSettings();
   }
 
   updateHomeStats() {
@@ -209,7 +249,6 @@ export class HiddenObjectGame {
   }
 
   updateDiagnosticStatus() {
-    // Testing mode is session-only. Once unlocked, only future runs are marked cheated.
     this.elements.diagnosticStatus.textContent = this.sessionTestingUnlocked
       ? "Testing mode is unlocked for this browser session. New runs will be marked CHEATED."
       : "Testing mode is locked for this session.";
@@ -230,6 +269,7 @@ export class HiddenObjectGame {
       this.stopTimer();
       this.state.runActive = false;
       this.state.paused = false;
+      this.clearKeys();
     }
 
     if (name === "home") {
@@ -274,6 +314,9 @@ export class HiddenObjectGame {
     this.state.timer = level.timeLimit ?? 45;
     this.state.pointerImage = null;
     this.state.lastClickImage = null;
+    this.state.runActive = false;
+    this.stopTimer();
+    this.elements.sceneFallback.classList.add("hidden");
     this.elements.targetPreviewImage.src = level.targetPreview;
     this.elements.targetLevelName.textContent = level.name;
     this.elements.targetHelpText.textContent = this.state.runCheated
@@ -292,13 +335,56 @@ export class HiddenObjectGame {
     this.elements.sceneContent.style.height = `${this.state.naturalHeight}px`;
     this.elements.hitboxOverlay.style.width = `${this.state.naturalWidth}px`;
     this.elements.hitboxOverlay.style.height = `${this.state.naturalHeight}px`;
+    this.elements.sceneFallback.classList.add("hidden");
     this.resetLevelCamera();
     this.state.runActive = true;
     this.startTimer();
   }
 
+  onLevelImageError() {
+    const level = this.getCurrentLevel();
+    const file = filenameFromPath(level.background);
+    this.stopTimer();
+    this.state.runActive = false;
+    this.elements.sceneFallbackTitle.textContent = "Unable to load level background";
+    this.elements.sceneFallbackText.textContent = `Tried to load: ${file}`;
+    this.elements.sceneFallback.classList.remove("hidden");
+    this.showFeedback(`Missing background image: ${file}`, true);
+  }
+
+  showPreviewError() {
+    const file = filenameFromPath(this.getCurrentLevel().targetPreview);
+    this.elements.previewErrorText.textContent = `Missing preview image: ${file}`;
+    this.elements.previewErrorText.classList.remove("hidden");
+  }
+
+  clearPreviewError() {
+    this.elements.previewErrorText.classList.add("hidden");
+    this.elements.previewErrorText.textContent = "";
+  }
+
+  showIntroPreviewError() {
+    const file = filenameFromPath(this.getCurrentLevel().targetPreview);
+    this.elements.introPreviewErrorText.textContent = `Missing preview image: ${file}`;
+    this.elements.introPreviewErrorText.classList.remove("hidden");
+  }
+
+  clearIntroPreviewError() {
+    this.elements.introPreviewErrorText.classList.add("hidden");
+    this.elements.introPreviewErrorText.textContent = "";
+  }
+
+  showStartScreenError() {
+    const file = filenameFromPath(this.elements.startScreenImage.getAttribute("src") ?? "Assets/startscreen.png");
+    this.elements.startScreenFallback.classList.remove("hidden");
+    this.elements.startScreenErrorText.textContent = `Tried to load: ${file}`;
+  }
+
+  clearStartScreenError() {
+    this.elements.startScreenFallback.classList.add("hidden");
+  }
+
   renderHitbox(hitbox) {
-    // The testing overlay is drawn from the exact same hitbox data used by real clicks.
     this.elements.hitboxOverlay.innerHTML = "";
     const node = document.createElement("div");
     node.className = "hitbox-shape";
@@ -356,6 +442,7 @@ export class HiddenObjectGame {
     }
 
     this.state.paused = true;
+    this.clearKeys();
     this.elements.pauseOverlay.classList.remove("hidden");
     this.elements.pauseOverlay.setAttribute("aria-hidden", "false");
   }
@@ -370,6 +457,7 @@ export class HiddenObjectGame {
     this.saveCurrentRun(false);
     this.closeAllOverlays();
     this.stopTimer();
+    this.clearKeys();
     this.showScreen("home");
   }
 
@@ -386,11 +474,6 @@ export class HiddenObjectGame {
   }
 
   handleMoreGames() {
-    if (MORE_GAMES_URL === "#") {
-      window.alert("Set MORE_GAMES_URL in scripts/game.js to wire the More Games button to your site.");
-      return;
-    }
-
     window.open(MORE_GAMES_URL, "_blank", "noopener");
   }
 
@@ -419,9 +502,11 @@ export class HiddenObjectGame {
 
   persistSettings() {
     this.save = saveSettings({
-      wrongClickTimePenalty: Number(this.elements.timePenaltySelect.value),
-      wrongClickScorePenalty: Number(this.elements.scorePenaltySelect.value),
+      theme: this.elements.themeSelect.value,
+      density: this.elements.densitySelect.value,
+      motion: this.elements.motionSelect.value,
     });
+    this.applySavedSettings();
   }
 
   getCurrentLevel() {
@@ -490,6 +575,83 @@ export class HiddenObjectGame {
     }
   }
 
+  onKeyDown(event) {
+    const key = event.key.toLowerCase();
+    const panKeys = new Set(["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"]);
+
+    if (!panKeys.has(key) || !this.elements.screens.game.classList.contains("screen-active")) {
+      return;
+    }
+
+    event.preventDefault();
+    this.keyState.add(key);
+    this.ensureKeyboardPanLoop();
+  }
+
+  onKeyUp(event) {
+    this.keyState.delete(event.key.toLowerCase());
+  }
+
+  ensureKeyboardPanLoop() {
+    if (this.keyboardPanFrame !== null) {
+      return;
+    }
+
+    const tick = () => {
+      this.keyboardPanFrame = null;
+
+      if (this.keyState.size > 0) {
+        this.panFromKeys();
+        this.keyboardPanFrame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    this.keyboardPanFrame = window.requestAnimationFrame(tick);
+  }
+
+  panFromKeys() {
+    if (!this.elements.screens.game.classList.contains("screen-active") || this.state.paused) {
+      return;
+    }
+
+    if (this.state.transform.scale <= this.state.fitScale) {
+      return;
+    }
+
+    let deltaX = 0;
+    let deltaY = 0;
+
+    if (this.keyState.has("a") || this.keyState.has("arrowleft")) {
+      deltaX += KEYBOARD_PAN_STEP;
+    }
+    if (this.keyState.has("d") || this.keyState.has("arrowright")) {
+      deltaX -= KEYBOARD_PAN_STEP;
+    }
+    if (this.keyState.has("w") || this.keyState.has("arrowup")) {
+      deltaY += KEYBOARD_PAN_STEP;
+    }
+    if (this.keyState.has("s") || this.keyState.has("arrowdown")) {
+      deltaY -= KEYBOARD_PAN_STEP;
+    }
+
+    if (!deltaX && !deltaY) {
+      return;
+    }
+
+    this.state.transform.x += deltaX;
+    this.state.transform.y += deltaY;
+    this.clampTransform();
+    this.applyTransform();
+  }
+
+  clearKeys() {
+    this.keyState.clear();
+    if (this.keyboardPanFrame !== null) {
+      window.cancelAnimationFrame(this.keyboardPanFrame);
+      this.keyboardPanFrame = null;
+    }
+  }
+
   handleSceneSelection(imagePoint) {
     if (!this.state.runActive || this.state.paused) {
       return;
@@ -504,14 +666,8 @@ export class HiddenObjectGame {
       return;
     }
 
-    this.state.score = Math.max(
-      0,
-      this.state.score - Number(this.save.settings.wrongClickScorePenalty ?? DEFAULT_SETTINGS.wrongClickScorePenalty),
-    );
-    this.state.timer = Math.max(
-      0,
-      this.state.timer - Number(this.save.settings.wrongClickTimePenalty ?? DEFAULT_SETTINGS.wrongClickTimePenalty),
-    );
+    this.state.score = Math.max(0, this.state.score - DEFAULT_SETTINGS.wrongClickScorePenalty);
+    this.state.timer = Math.max(0, this.state.timer - DEFAULT_SETTINGS.wrongClickTimePenalty);
     this.updateHud();
     this.showFeedback("Wrong spot. Keep searching.", true);
 
@@ -523,6 +679,7 @@ export class HiddenObjectGame {
   completeLevel() {
     this.stopTimer();
     this.state.runActive = false;
+    this.clearKeys();
     this.state.highestLevelCleared = Math.max(this.state.highestLevelCleared, this.state.levelIndex + 1);
 
     const basePoints = DEFAULT_SETTINGS.correctClickPoints;
@@ -530,8 +687,7 @@ export class HiddenObjectGame {
     this.state.score += basePoints + timeBonus;
     this.updateHud();
 
-    const isFinalLevel = this.state.levelIndex === LEVELS.length - 1;
-    if (isFinalLevel) {
+    if (this.state.levelIndex === LEVELS.length - 1) {
       this.finishCampaign();
       return;
     }
@@ -550,6 +706,7 @@ export class HiddenObjectGame {
   failLevel() {
     this.stopTimer();
     this.state.runActive = false;
+    this.clearKeys();
     this.saveCurrentRun(false);
     this.showResult({
       eyebrow: this.state.runCheated ? "Level Failed | CHEATED" : "Level Failed",
@@ -639,7 +796,6 @@ export class HiddenObjectGame {
   }
 
   fitLevelToViewport(useLevelCamera = true) {
-    // Fit scale shows the whole image. Per-level camera values zoom in from that baseline.
     const viewportRect = this.elements.sceneViewport.getBoundingClientRect();
     const fitScale = Math.min(
       viewportRect.width / this.state.naturalWidth,
@@ -719,11 +875,9 @@ export class HiddenObjectGame {
   }
 
   clientToImage(clientX, clientY) {
-    // Convert visible pointer coordinates back into original image pixels so hitboxes stay accurate.
     const rect = this.elements.sceneViewport.getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
-
     const imageX = (localX - this.state.transform.x) / this.state.transform.scale;
     const imageY = (localY - this.state.transform.y) / this.state.transform.scale;
 
