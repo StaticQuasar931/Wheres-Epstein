@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where's Epstein?</title>
+  <meta name="description" content="A browser-based hidden-object game with zoom, touch support, and a hidden testing mode.">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Hidden-Object Hunt</p>
+        <h1 class="game-title">Where's Epstein?</h1>
+      </div>
+      <button id="topMenuButton" class="ghost-button" type="button" aria-label="Open main menu">Menu</button>
+    </header>
+
+    <main class="app-main">
+      <section id="homeScreen" class="screen screen-active">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <p class="eyebrow">Single Player</p>
+            <h2>Find the exact person before the timer runs out.</h2>
+            <p>
+              Each level shows the real cropped target you need to find inside the larger scene.
+              No hover hints. No fake outlines. Just the image, your eyes, and the clock.
+            </p>
+            <div class="button-row">
+              <button id="startGameButton" class="primary-button" type="button">Start Game</button>
+              <button id="openSettingsButton" class="secondary-button" type="button">Settings</button>
+              <button id="moreGamesButton" class="ghost-button" type="button">More Games</button>
+            </div>
+          </div>
+          <div class="hero-panel">
+            <div class="hero-stat">
+              <span>Levels</span>
+              <strong id="homeLevelCount">10</strong>
+            </div>
+            <div class="hero-stat">
+              <span>Best Legit Score</span>
+              <strong id="homeBestScore">0</strong>
+            </div>
+            <div class="hero-stat">
+              <span>Best Cheated Score</span>
+              <strong id="homeBestCheatScore">0</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settingsScreen" class="screen" aria-hidden="true">
+        <div class="panel-card settings-card">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Settings</p>
+              <h2>Game Options</h2>
+            </div>
+            <button id="closeSettingsButton" class="ghost-button" type="button">Back</button>
+          </div>
+
+          <div class="settings-grid">
+            <label class="setting-item">
+              <span>Wrong click time penalty</span>
+              <select id="timePenaltySelect">
+                <option value="3">3 seconds</option>
+                <option value="5" selected>5 seconds</option>
+                <option value="8">8 seconds</option>
+              </select>
+            </label>
+
+            <label class="setting-item">
+              <span>Wrong click score penalty</span>
+              <select id="scorePenaltySelect">
+                <option value="50">50 points</option>
+                <option value="75" selected>75 points</option>
+                <option value="100">100 points</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="diagnostic-panel">
+            <p class="diagnostic-copy">
+              Diagnostics are hidden during normal play. Tap the build label four times if you need testing access.
+            </p>
+            <button id="diagnosticHintButton" class="tiny-link" type="button">build 1.0.0</button>
+            <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
+              <label for="diagnosticCodeInput">Enter diagnostics code</label>
+              <div class="diagnostic-row">
+                <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
+                <button id="unlockDiagnosticButton" class="secondary-button" type="button">Unlock</button>
+              </div>
+              <p id="diagnosticMessage" class="diagnostic-message"></p>
+            </div>
+            <p id="diagnosticStatus" class="diagnostic-status">Testing mode is locked for this session.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen" aria-hidden="true">
+        <div class="hud">
+          <div class="hud-primary">
+            <div class="hud-chip">
+              <span>Level</span>
+              <strong id="hudLevelText">1 / 10</strong>
+            </div>
+            <div class="hud-chip">
+              <span>Score</span>
+              <strong id="hudScoreText">0</strong>
+            </div>
+            <div class="hud-chip">
+              <span>Time</span>
+              <strong id="hudTimerText">45</strong>
+            </div>
+            <div id="cheatBadge" class="hud-chip cheat-badge hidden">
+              <span>Status</span>
+              <strong>CHEATED</strong>
+            </div>
+          </div>
+
+          <aside class="target-panel">
+            <p class="eyebrow">Find This Person</p>
+            <div class="target-preview-frame">
+              <img id="targetPreviewImage" alt="Target preview">
+            </div>
+            <h3 id="targetLevelName">Level Name</h3>
+            <p id="targetHelpText">Tap or click the real person hidden in the scene.</p>
+          </aside>
+        </div>
+
+        <div class="scene-card">
+          <div class="scene-toolbar">
+            <div class="zoom-controls">
+              <button id="zoomOutButton" class="ghost-button" type="button" aria-label="Zoom out">-</button>
+              <button id="zoomInButton" class="ghost-button" type="button" aria-label="Zoom in">+</button>
+              <button id="resetZoomButton" class="ghost-button" type="button">Reset</button>
+              <button id="fitZoomButton" class="ghost-button" type="button">Fit</button>
+            </div>
+            <div class="toolbar-actions">
+              <button id="pauseButton" class="secondary-button" type="button">Pause</button>
+              <button id="returnHomeButton" class="ghost-button" type="button">Quit</button>
+            </div>
+          </div>
+
+          <div id="sceneViewport" class="scene-viewport">
+            <div id="sceneContent" class="scene-content">
+              <img id="levelImage" class="level-image" alt="Hidden object level scene" draggable="false">
+              <div id="hitboxOverlay" class="hitbox-overlay hidden" aria-hidden="true"></div>
+            </div>
+            <div id="sceneFeedback" class="scene-feedback" aria-live="polite"></div>
+            <div id="debugReadout" class="debug-readout hidden" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="levelIntroOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card intro-card">
+      <p class="eyebrow">Incoming Level</p>
+      <h2 id="introLevelLabel">Level 1</h2>
+      <h3 id="introLevelName">Placeholder Name</h3>
+      <div class="intro-preview-frame">
+        <img id="introPreviewImage" alt="Target preview for upcoming level">
+      </div>
+      <p>Find this exact person inside the crowd scene before time runs out.</p>
+      <button id="startLevelButton" class="primary-button" type="button">Begin Level</button>
+    </div>
+  </div>
+
+  <div id="pauseOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Paused</p>
+      <h2>Take a breath, then jump back in.</h2>
+      <div class="button-row">
+        <button id="resumeButton" class="primary-button" type="button">Resume</button>
+        <button id="pauseQuitButton" class="ghost-button" type="button">Quit Run</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p id="resultEyebrow" class="eyebrow">Level Result</p>
+      <h2 id="resultTitle">You Found Them</h2>
+      <p id="resultBody">Points awarded.</p>
+      <div class="result-stats">
+        <div>
+          <span>Run Score</span>
+          <strong id="resultScore">0</strong>
+        </div>
+        <div>
+          <span>Time Left</span>
+          <strong id="resultTimeLeft">0</strong>
+        </div>
+      </div>
+      <div class="button-row">
+        <button id="resultPrimaryButton" class="primary-button" type="button">Next Level</button>
+        <button id="resultSecondaryButton" class="ghost-button" type="button">Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="completionOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Campaign Complete</p>
+      <h2>You cleared all 10 levels.</h2>
+      <p id="completionBody">Your score has been saved locally.</p>
+      <div class="result-stats">
+        <div>
+          <span>Final Score</span>
+          <strong id="completionScore">0</strong>
+        </div>
+        <div>
+          <span>Run Type</span>
+          <strong id="completionRunType">Legit</strong>
+        </div>
+      </div>
+      <div class="button-row">
+        <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
+        <button id="completionHomeButton" class="ghost-button" type="button">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="scripts/app.js"></script>
+</body>
+</html>
