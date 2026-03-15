@@ -15,9 +15,8 @@ Plain HTML, CSS, and JavaScript hidden-object game built for normal websites.
 
 - Start screen: `Assets/startscreen.png`
 - Main backgrounds: `Assets/Bakgrounds/level1.png` through `Assets/Bakgrounds/level10.png`
-- Main previews: `Assets/waldopreviews/level1.jpg` through `Assets/waldopreviews/level10.jpg`
-- Bonus backgrounds: `Assets/Bakgrounds/bonus1.png` and `Assets/Bakgrounds/level11.png`
-- Bonus previews: `Assets/waldopreviews/bonus1.jpg` and `Assets/waldopreviews/level11.jpg`
+- Target previews: `Assets/Waldos/*.png`
+- Bonus background: `Assets/Bakgrounds/bonus1.png`
 
 ## Editing hitboxes
 

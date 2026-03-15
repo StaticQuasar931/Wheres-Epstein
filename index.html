@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Where's Epstein?</title>
   <meta name="description" content="A browser-based hidden-object game with zoom, touch support, keyboard pan, level select, and hidden testing tools.">
+  <link rel="icon" href="Assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="styles/main.css">
 </head>
 <body data-theme="dark" data-density="comfortable" data-motion="full" data-preview="normal">
@@ -213,7 +214,10 @@
         </div>
 
         <aside class="target-card">
-          <p class="eyebrow">Find This Person</p>
+          <div class="target-card-header">
+            <p class="eyebrow">Find This Person</p>
+            <button id="togglePreviewButton" class="overlay-button preview-toggle" type="button">Hide</button>
+          </div>
           <div class="target-preview-frame">
             <img id="targetPreviewImage" alt="Target preview">
           </div>

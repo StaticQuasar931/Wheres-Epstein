@@ -8,6 +8,7 @@ const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
 const KEYBOARD_PAN_STEP = 18;
+const PAN_MARGIN = 120;
 const DIAGNOSTIC_CODE = "5278";
 
 const MAIN_LEVELS = LEVELS.filter((level) => !level.isBonus);
@@ -50,7 +51,7 @@ function getStars(elapsedMs) {
 }
 
 function starText(stars) {
-  return `${"★".repeat(stars)}${"☆".repeat(3 - stars)}`;
+  return `${"*".repeat(stars)}${".".repeat(3 - stars)}`;
 }
 
 export class HiddenObjectGame {
@@ -144,6 +145,7 @@ export class HiddenObjectGame {
       resetZoomButton: document.getElementById("resetZoomButton"),
       pauseButton: document.getElementById("pauseButton"),
       returnHomeButton: document.getElementById("returnHomeButton"),
+      togglePreviewButton: document.getElementById("togglePreviewButton"),
       hudLevelText: document.getElementById("hudLevelText"),
       hudLevelName: document.getElementById("hudLevelName"),
       hudStarsText: document.getElementById("hudStarsText"),
@@ -208,6 +210,7 @@ export class HiddenObjectGame {
     this.elements.resetZoomButton.addEventListener("click", () => this.fitLevelToViewport());
     this.elements.pauseButton.addEventListener("click", () => this.pauseGame());
     this.elements.returnHomeButton.addEventListener("click", () => this.quitRun());
+    this.elements.togglePreviewButton.addEventListener("click", () => this.togglePreviewCard());
     this.elements.resumeButton.addEventListener("click", () => this.resumeGame());
     this.elements.pauseQuitButton.addEventListener("click", () => this.quitRun());
     this.elements.startLevelButton.addEventListener("click", () => this.beginLevel());
@@ -215,6 +218,7 @@ export class HiddenObjectGame {
     this.elements.resultSecondaryButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.playAgainButton.addEventListener("click", () => this.startCampaignFromLevel(0));
     this.elements.completionLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
+    this.elements.hudLevelText.addEventListener("dblclick", () => this.showScreen("levelSelect"));
 
     this.elements.sceneViewport.addEventListener("wheel", (event) => {
       event.preventDefault();
@@ -475,6 +479,11 @@ export class HiddenObjectGame {
     this.elements.hudScoreText.textContent = formatScore(this.getCurrentLevelScore());
   }
 
+  togglePreviewCard() {
+    const hidden = this.elements.targetPreviewImage.closest(".target-card").classList.toggle("hidden-preview");
+    this.elements.togglePreviewButton.textContent = hidden ? "Show" : "Hide";
+  }
+
   pauseGame() {
     if (!this.state.runActive || this.state.paused) {
       return;
@@ -587,6 +596,15 @@ export class HiddenObjectGame {
 
   onKeyDown(event) {
     const key = event.key.toLowerCase();
+    if (event.code === "Space" && this.elements.screens.game.classList.contains("screen-active")) {
+      event.preventDefault();
+      if (this.state.paused) {
+        this.resumeGame();
+      } else {
+        this.pauseGame();
+      }
+      return;
+    }
     if (!["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
       return;
     }
@@ -770,12 +788,12 @@ export class HiddenObjectGame {
     if (scaledWidth <= rect.width) {
       this.state.transform.x = (rect.width - scaledWidth) / 2;
     } else {
-      this.state.transform.x = clamp(this.state.transform.x, rect.width - scaledWidth, 0);
+      this.state.transform.x = clamp(this.state.transform.x, rect.width - scaledWidth - PAN_MARGIN, PAN_MARGIN);
     }
     if (scaledHeight <= rect.height) {
       this.state.transform.y = (rect.height - scaledHeight) / 2;
     } else {
-      this.state.transform.y = clamp(this.state.transform.y, rect.height - scaledHeight, 0);
+      this.state.transform.y = clamp(this.state.transform.y, rect.height - scaledHeight - PAN_MARGIN, PAN_MARGIN);
     }
   }
 
