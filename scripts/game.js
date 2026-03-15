@@ -26,6 +26,10 @@ function formatTime(ms) {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
+function getTotalStars(bucket) {
+  return Object.values(bucket.levelResults ?? {}).reduce((sum, item) => sum + (item.bestStars ?? 0), 0);
+}
+
 function getHit(point, hitbox) {
   if (hitbox.type === "circle") {
     const dx = point.x - hitbox.x;
@@ -131,6 +135,7 @@ export class HiddenObjectGame {
       homeStarCount: document.getElementById("homeStarCount"),
       mainProgressText: document.getElementById("mainProgressText"),
       bonusUnlockText: document.getElementById("bonusUnlockText"),
+      bonusRuleText: document.getElementById("bonusRuleText"),
       mainLevelGrid: document.getElementById("mainLevelGrid"),
       bonusLevelGrid: document.getElementById("bonusLevelGrid"),
       themeSelect: document.getElementById("themeSelect"),
@@ -138,6 +143,9 @@ export class HiddenObjectGame {
       motionSelect: document.getElementById("motionSelect"),
       previewSizeSelect: document.getElementById("previewSizeSelect"),
       levelIntroSelect: document.getElementById("levelIntroSelect"),
+      panTipSelect: document.getElementById("panTipSelect"),
+      confirmQuitSelect: document.getElementById("confirmQuitSelect"),
+      previewDefaultSelect: document.getElementById("previewDefaultSelect"),
       versionTapTarget: document.getElementById("versionTapTarget"),
       diagnosticUnlock: document.getElementById("diagnosticUnlock"),
       diagnosticCodeInput: document.getElementById("diagnosticCodeInput"),
@@ -157,6 +165,7 @@ export class HiddenObjectGame {
       pauseButton: document.getElementById("pauseButton"),
       returnHomeButton: document.getElementById("returnHomeButton"),
       togglePreviewButton: document.getElementById("togglePreviewButton"),
+      panTipText: document.getElementById("panTipText"),
       hudLevelText: document.getElementById("hudLevelText"),
       hudLevelName: document.getElementById("hudLevelName"),
       hudStarsText: document.getElementById("hudStarsText"),
@@ -205,6 +214,9 @@ export class HiddenObjectGame {
     this.elements.motionSelect.addEventListener("change", () => this.persistSettings());
     this.elements.previewSizeSelect.addEventListener("change", () => this.persistSettings());
     this.elements.levelIntroSelect.addEventListener("change", () => this.persistSettings());
+    this.elements.panTipSelect.addEventListener("change", () => this.persistSettings());
+    this.elements.confirmQuitSelect.addEventListener("change", () => this.persistSettings());
+    this.elements.previewDefaultSelect.addEventListener("change", () => this.persistSettings());
     this.elements.versionTapTarget.addEventListener("click", () => this.handleVersionTap());
     this.elements.unlockDiagnosticButton.addEventListener("click", () => this.unlockDiagnostics());
     this.elements.levelImage.addEventListener("load", () => this.onLevelImageLoaded());
@@ -263,10 +275,14 @@ export class HiddenObjectGame {
     this.elements.motionSelect.value = this.save.settings.motion;
     this.elements.previewSizeSelect.value = this.save.settings.previewSize;
     this.elements.levelIntroSelect.value = this.save.settings.showLevelIntro;
+    this.elements.panTipSelect.value = this.save.settings.showPanTip;
+    this.elements.confirmQuitSelect.value = this.save.settings.confirmQuit;
+    this.elements.previewDefaultSelect.value = this.save.settings.previewDefault;
     this.elements.body.dataset.theme = this.save.settings.theme;
     this.elements.body.dataset.density = this.save.settings.density;
     this.elements.body.dataset.motion = this.save.settings.motion;
     this.elements.body.dataset.preview = this.save.settings.previewSize;
+    this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
   }
 
   persistSettings() {
@@ -276,6 +292,9 @@ export class HiddenObjectGame {
       motion: this.elements.motionSelect.value,
       previewSize: this.elements.previewSizeSelect.value,
       showLevelIntro: this.elements.levelIntroSelect.value,
+      showPanTip: this.elements.panTipSelect.value,
+      confirmQuit: this.elements.confirmQuitSelect.value,
+      previewDefault: this.elements.previewDefaultSelect.value,
     });
     this.applySettings();
   }
@@ -316,7 +335,7 @@ export class HiddenObjectGame {
 
   renderHomeStats() {
     const unlockedMain = Math.min(this.save.legit.highestLevelCleared, MAIN_LEVELS.length);
-    const starCount = Object.values(this.save.legit.levelResults).reduce((sum, item) => sum + (item.bestStars ?? 0), 0);
+    const starCount = getTotalStars(this.save.legit);
     const mainCleared = MAIN_LEVELS.filter((level) => this.save.legit.levelResults[level.id]?.completed).length;
     this.elements.homeLevelCount.textContent = String(MAIN_LEVELS.length);
     this.elements.homeUnlockedText.textContent = `${unlockedMain} / ${MAIN_LEVELS.length}`;
@@ -324,6 +343,7 @@ export class HiddenObjectGame {
     this.elements.homeStarCount.textContent = String(starCount);
     this.elements.mainProgressText.textContent = `${mainCleared} / ${MAIN_LEVELS.length} cleared`;
     this.elements.bonusUnlockText.textContent = this.isBonusUnlocked() ? "Unlocked" : "Locked";
+    this.elements.bonusRuleText.textContent = `Bonuses unlock after normal level 5 or 10 total stars. Current stars: ${starCount}.`;
   }
 
   renderLevelSelect() {
@@ -353,7 +373,7 @@ export class HiddenObjectGame {
   }
 
   isBonusUnlocked() {
-    return this.save.legit.highestLevelCleared > MAIN_LEVELS.length;
+    return this.save.legit.highestLevelCleared >= 6 || getTotalStars(this.save.legit) >= 10;
   }
 
   startNextLevel() {
@@ -394,7 +414,7 @@ export class HiddenObjectGame {
     this.elements.introLevelLabel.textContent = label;
     this.elements.introLevelName.textContent = level.name;
     this.clearIntroPreviewError();
-    this.elements.introPreviewImage.src = level.targetPreview;
+    this.loadPreviewImage(this.elements.introPreviewImage, this.elements.introPreviewErrorText, level.targetPreview);
     this.elements.levelIntroOverlay.classList.remove("hidden");
   }
 
@@ -411,11 +431,23 @@ export class HiddenObjectGame {
       ? "Bonus"
       : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     this.elements.hudLevelName.textContent = level.name;
-    this.clearPreviewError();
-    this.elements.targetPreviewImage.src = level.targetPreview;
+    this.loadPreviewImage(this.elements.targetPreviewImage, this.elements.previewErrorText, level.targetPreview);
     this.elements.levelImage.src = level.background;
     this.renderHitbox(level.hitbox);
+    this.setPreviewVisibility(this.save.settings.previewDefault !== "hidden");
     this.updateHud();
+  }
+
+  loadPreviewImage(imageElement, errorElement, path) {
+    errorElement.classList.add("hidden");
+    errorElement.textContent = "";
+    if (!path) {
+      imageElement.removeAttribute("src");
+      errorElement.textContent = "Tried to load: [empty preview path]";
+      errorElement.classList.remove("hidden");
+      return;
+    }
+    imageElement.src = path;
   }
 
   onLevelImageLoaded() {
@@ -512,6 +544,8 @@ export class HiddenObjectGame {
     const scaleX = drawWidth / naturalWidth;
     const scaleY = drawHeight / naturalHeight;
     element.style.position = "absolute";
+    element.style.display = "block";
+    element.style.cursor = "pointer";
     element.style.left = `${zone.x1 * scaleX}px`;
     element.style.top = `${zone.y1 * scaleY}px`;
     element.style.width = `${(zone.x2 - zone.x1) * scaleX}px`;
@@ -624,8 +658,14 @@ export class HiddenObjectGame {
   }
 
   togglePreviewCard() {
-    const hidden = this.elements.targetPreviewImage.closest(".target-card").classList.toggle("hidden-preview");
-    this.elements.togglePreviewButton.textContent = hidden ? "Show" : "Hide";
+    const card = this.elements.targetPreviewImage.closest(".target-card");
+    this.setPreviewVisibility(card.classList.contains("hidden-preview"));
+  }
+
+  setPreviewVisibility(visible) {
+    const card = this.elements.targetPreviewImage.closest(".target-card");
+    card.classList.toggle("hidden-preview", !visible);
+    this.elements.togglePreviewButton.textContent = visible ? "Hide" : "Show";
   }
 
   pauseGame() {
@@ -646,6 +686,12 @@ export class HiddenObjectGame {
   }
 
   quitRun() {
+    if (this.save.settings.confirmQuit === "on" && this.elements.screens.game.classList.contains("screen-active")) {
+      const leave = window.confirm("Leave this run and return to the menu?");
+      if (!leave) {
+        return;
+      }
+    }
     this.stopElapsedTimer();
     this.clearKeys();
     this.closeAllOverlays();
@@ -854,9 +900,9 @@ export class HiddenObjectGame {
     this.renderLevelSelect();
 
     if (!level.isBonus && mainIndex === MAIN_LEVELS.length - 1 && !this.sessionTestingUnlocked) {
-      this.elements.completionBody.textContent = "Bonus levels are now unlocked.";
+      this.elements.completionBody.textContent = "You cleared the main route. Bonus levels stay open once you beat level 5 or collect 10 stars.";
       this.elements.completionScore.textContent = formatScore(this.save.legit.bestScore);
-      this.elements.completionStars.textContent = String(Object.values(this.save.legit.levelResults).reduce((sum, item) => sum + (item.bestStars ?? 0), 0));
+      this.elements.completionStars.textContent = String(getTotalStars(this.save.legit));
       this.elements.completionOverlay.classList.remove("hidden");
       return;
     }

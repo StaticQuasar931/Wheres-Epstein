@@ -209,6 +209,9 @@ p {
   pointer-events: auto;
   border-radius: 18px;
   outline: none;
+  appearance: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .image-button:focus-visible {
@@ -495,6 +498,13 @@ p {
 .version-label,
 .subtle-text {
   color: var(--muted);
+}
+
+code {
+  padding: 0.08rem 0.36rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--text);
 }
 
 .diagnostic-row {

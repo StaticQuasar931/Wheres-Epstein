@@ -1,4 +1,4 @@
-const STORAGE_KEY = "wheres-epstein-save-v3";
+const STORAGE_KEY = "wheres-epstein-save-v5";
 
 const DEFAULT_SAVE = {
   settings: {
@@ -7,6 +7,9 @@ const DEFAULT_SAVE = {
     motion: "full",
     previewSize: "normal",
     showLevelIntro: "on",
+    showPanTip: "on",
+    confirmQuit: "on",
+    previewDefault: "shown",
   },
   legit: {
     bestScore: 0,

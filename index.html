@@ -49,7 +49,7 @@
                 <p class="eyebrow">Main Route</p>
                 <h3>Story Levels</h3>
               </div>
-              <span id="mainProgressText" class="chip-label">0 / 14 cleared</span>
+              <span id="mainProgressText" class="chip-label">0 / 17 cleared</span>
             </div>
             <div id="mainLevelGrid" class="level-grid"></div>
           </section>
@@ -73,11 +73,12 @@
               </div>
             </div>
             <div class="stat-grid">
-              <div class="stat-card"><span>Levels</span><strong id="homeLevelCount">14</strong></div>
+              <div class="stat-card"><span>Levels</span><strong id="homeLevelCount">17</strong></div>
               <div class="stat-card"><span>Unlocked</span><strong id="homeUnlockedText">1</strong></div>
               <div class="stat-card"><span>Best Score</span><strong id="homeBestScore">0</strong></div>
               <div class="stat-card"><span>Total Stars</span><strong id="homeStarCount">0</strong></div>
             </div>
+            <p id="bonusRuleText" class="subtle-text">Bonuses unlock after clearing normal level 5 or collecting 10 total stars.</p>
           </section>
         </div>
       </div>
@@ -133,6 +134,30 @@
               <option value="off">Off</option>
             </select>
           </label>
+
+          <label class="setting-card">
+            <span>Pan Tip</span>
+            <select id="panTipSelect">
+              <option value="on">Show</option>
+              <option value="off">Hide</option>
+            </select>
+          </label>
+
+          <label class="setting-card">
+            <span>Quit Confirmation</span>
+            <select id="confirmQuitSelect">
+              <option value="on">Ask First</option>
+              <option value="off">Instant</option>
+            </select>
+          </label>
+
+          <label class="setting-card">
+            <span>Preview Default</span>
+            <select id="previewDefaultSelect">
+              <option value="shown">Shown</option>
+              <option value="hidden">Hidden</option>
+            </select>
+          </label>
         </div>
 
         <div class="level-select-groups">
@@ -152,8 +177,24 @@
             </ul>
           </section>
 
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">How Scoring Works</p>
+                <h3>Fast is better</h3>
+              </div>
+            </div>
+            <ul class="control-list">
+              <li>There is no fail timer. You can search as long as you need.</li>
+              <li>Faster clears earn more score and more stars.</li>
+              <li>Wrong clicks only reduce score. They do not reveal the target.</li>
+              <li>Bonuses open once you beat normal level 5 or reach 10 stars total.</li>
+            </ul>
+          </section>
+
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.03</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.05</p>
+            <p class="subtle-text">Level hitbox editing lives in <code>scripts/levels.js</code>. Rectangles use <code>x1, y1</code> to <code>x2, y2</code>.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -187,7 +228,7 @@
             <button id="resetZoomButton" class="overlay-button" type="button">Reset</button>
           </div>
           <div class="play-top-middle-left">
-            <span class="overlay-pill">Pan with drag, `WASD`, or arrows</span>
+            <span id="panTipText" class="overlay-pill">Pan with drag, `WASD`, or arrows</span>
           </div>
           <div class="play-top-middle-right">
             <span id="hudLevelText" class="overlay-pill">Level 1</span>

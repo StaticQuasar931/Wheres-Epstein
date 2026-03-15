@@ -20,9 +20,9 @@ function makeLevel(number, previewFile, overrides = {}) {
 
 export const START_SCREEN_BUTTONS = {
   // Edit these to match your start-screen artwork.
-  start: { x1: 140, y1: 420, x2: 460, y2: 500, color: "green" },
-  settings: { x1: 140, y1: 520, x2: 460, y2: 600, color: "blue" },
-  moreGames: { x1: 140, y1: 620, x2: 460, y2: 700, color: "orange" },
+  start: { x1: 143, y1: 815, x2: 530, y2: 922, color: "green" },
+  settings: { x1: 557, y1: 814, x2: 935, y2: 922, color: "blue" },
+  moreGames: { x1: 961, y1: 814, x2: 1365, y2: 918, color: "orange" },
 };
 
 export const LEVELS = [
@@ -74,12 +74,24 @@ export const LEVELS = [
     name: "Packed Promenade",
     hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
   }),
-  makeLevel(13, "eps7", {
+  makeLevel(13, "trum2", {
     name: "Festival Drift",
     hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
   }),
-  makeLevel(14, "eps7", {
+  makeLevel(14, "eps6", {
     name: "Grand Finale Crowd",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+  }),
+  makeLevel(15, "trum5", {
+    name: "Level 15",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+  }),
+  makeLevel(16, "eps6", {
+    name: "Level 16",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+  }),
+  makeLevel(17, "trum4", {
+    name: "Level 17",
     hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
   }),
   {
@@ -94,7 +106,31 @@ export const LEVELS = [
     id: "bonus-02",
     name: "Bonus 2",
     background: "Assets/Bakgrounds/bonus2.png",
-    targetPreview: "Assets/Waldos/eps7.png",
+    targetPreview: "Assets/Waldos/steph1.png",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+    isBonus: true,
+  },
+  {
+    id: "bonus-03",
+    name: "Bonus 3",
+    background: "Assets/Bakgrounds/bonus3.png",
+    targetPreview: "Assets/Waldos/eps4.png",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+    isBonus: true,
+  },
+  {
+    id: "bonus-04",
+    name: "Bonus 4",
+    background: "Assets/Bakgrounds/bonus4.png",
+    targetPreview: "",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+    isBonus: true,
+  },
+  {
+    id: "bonus-05",
+    name: "Bonus 5",
+    background: "Assets/Bakgrounds/bonus5.png",
+    targetPreview: "Assets/Waldos/trum3.png",
     hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
     isBonus: true,
   },
