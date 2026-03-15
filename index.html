@@ -4,240 +4,253 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Where's Epstein?</title>
-  <meta name="description" content="A browser-based hidden-object game with zoom, touch support, keyboard pan, and a hidden testing mode.">
+  <meta name="description" content="A browser-based hidden-object game with zoom, touch support, keyboard pan, level select, and hidden testing tools.">
   <link rel="stylesheet" href="styles/main.css">
 </head>
-<body data-theme="dark" data-density="comfortable" data-motion="full">
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-lockup">
-        <p class="eyebrow">Hidden-Object Hunt</p>
-        <h1 class="game-title">Where's Epstein?</h1>
+<body data-theme="dark" data-density="comfortable" data-motion="full" data-preview="normal">
+  <header class="site-topbar">
+    <div class="site-brand">
+      <p class="eyebrow">Hidden-Object Hunt</p>
+      <h1 class="site-title">Where's Epstein?</h1>
+    </div>
+    <button id="topMenuButton" class="ghost-button" type="button">Menu</button>
+  </header>
+
+  <main class="screen-shell">
+    <section id="homeScreen" class="screen screen-active hero-screen">
+      <img id="startScreenImage" class="hero-background" src="Assets/startscreen.png" alt="Start screen artwork" draggable="false">
+      <div class="hero-shade"></div>
+      <div id="startScreenFallback" class="hero-fallback hidden">
+        <p class="eyebrow">Missing Start Screen Art</p>
+        <h2>Add `Assets/startscreen.png`</h2>
+        <p id="startScreenErrorText">The home screen will use that exact file path.</p>
       </div>
-      <button id="topMenuButton" class="ghost-button topbar-button" type="button" aria-label="Open main menu">Menu</button>
-    </header>
 
-    <main class="app-main">
-      <section id="homeScreen" class="screen screen-active">
-        <div class="hero-card">
-          <div class="hero-media">
-            <img
-              id="startScreenImage"
-              class="hero-image"
-              src="Assets/startscreen.png"
-              alt="Start screen artwork"
-              draggable="false"
-            >
-            <div class="hero-image-overlay"></div>
-            <div class="hero-badge">10 Levels</div>
-            <div id="startScreenFallback" class="hero-fallback hidden">
-              <p class="eyebrow">Missing Start Screen Art</p>
-              <h2>Add <span>Assets/startscreen.png</span></h2>
-              <p id="startScreenErrorText">The game will use this image as the main menu artwork.</p>
-            </div>
-          </div>
-
-          <div class="hero-copy">
-            <p class="eyebrow">Single Player</p>
-            <h2>Hunt the exact target before the clock hits zero.</h2>
-            <p class="hero-description">
-              Each round gives you the real cropped face to find. Zoom in, pan around, stay sharp,
-              and clear all 10 scenes before the timer runs out.
-            </p>
-
-            <div class="button-row hero-actions">
-              <button id="startGameButton" class="primary-button" type="button">Start Game</button>
-              <button id="openSettingsButton" class="secondary-button" type="button">Settings</button>
-              <button id="moreGamesButton" class="ghost-button" type="button">More Games</button>
-            </div>
-
-            <div class="home-grid">
-              <div class="home-panel">
-                <p class="eyebrow">Run Summary</p>
-                <div class="stat-stack">
-                  <div class="hero-stat">
-                    <span>Levels</span>
-                    <strong id="homeLevelCount">10</strong>
-                  </div>
-                  <div class="hero-stat">
-                    <span>Best Legit Score</span>
-                    <strong id="homeBestScore">0</strong>
-                  </div>
-                  <div class="hero-stat">
-                    <span>Best Cheated Score</span>
-                    <strong id="homeBestCheatScore">0</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div class="home-panel">
-                <p class="eyebrow">Controls</p>
-                <ul class="control-list">
-                  <li>Wheel or buttons to zoom</li>
-                  <li>Drag to pan while zoomed</li>
-                  <li>`WASD` or arrow keys to move the camera</li>
-                  <li>`Reset` and `Fit` snap the view back into place</li>
-                </ul>
-              </div>
-            </div>
+      <div class="hero-content">
+        <div class="hero-left">
+          <p class="eyebrow">Version 0.0.0.03</p>
+          <h2 class="hero-title">Find the target fast, earn more stars, unlock the next scene.</h2>
+          <p class="hero-copy">
+            This is a hidden-object game for entertainment purposes only. It is not made to mock victims
+            or the actions associated with the people shown, and it uses no graphic imagery.
+          </p>
+          <div class="hero-actions">
+            <button id="startGameButton" class="primary-button" type="button">Start Next Level</button>
+            <button id="openLevelSelectButton" class="secondary-button" type="button">Level Select</button>
+            <button id="openSettingsButton" class="ghost-button" type="button">Settings</button>
+            <button id="moreGamesButton" class="ghost-button" type="button">More Games</button>
           </div>
         </div>
-      </section>
 
-      <section id="settingsScreen" class="screen" aria-hidden="true">
-        <div class="panel-card settings-card">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Settings</p>
-              <h2>Look, Feel, and Accessibility</h2>
+        <div class="hero-right">
+          <div class="home-card">
+            <p class="eyebrow">Progress</p>
+            <div class="stat-grid">
+              <div class="stat-card">
+                <span>Levels</span>
+                <strong id="homeLevelCount">10</strong>
+              </div>
+              <div class="stat-card">
+                <span>Unlocked</span>
+                <strong id="homeUnlockedText">1</strong>
+              </div>
+              <div class="stat-card">
+                <span>Best Score</span>
+                <strong id="homeBestScore">0</strong>
+              </div>
+              <div class="stat-card">
+                <span>Total Stars</span>
+                <strong id="homeStarCount">0</strong>
+              </div>
             </div>
-            <button id="closeSettingsButton" class="ghost-button" type="button">Back</button>
           </div>
 
-          <div class="settings-layout">
-            <section class="settings-panel">
-              <p class="eyebrow">Appearance</p>
-              <div class="settings-grid">
-                <label class="setting-item">
-                  <span>Theme</span>
-                  <select id="themeSelect">
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                  </select>
-                </label>
-
-                <label class="setting-item">
-                  <span>HUD Size</span>
-                  <select id="densitySelect">
-                    <option value="comfortable">Comfortable</option>
-                    <option value="compact">Compact</option>
-                  </select>
-                </label>
-
-                <label class="setting-item">
-                  <span>Motion</span>
-                  <select id="motionSelect">
-                    <option value="full">Full</option>
-                    <option value="reduced">Reduced</option>
-                  </select>
-                </label>
-              </div>
-            </section>
-
-            <section class="settings-panel">
-              <p class="eyebrow">How It Plays</p>
-              <div class="settings-note-list">
-                <div class="info-card">
-                  <strong>Scoring is locked</strong>
-                  <p>Players cannot change the scoring or penalties from the menu.</p>
-                </div>
-                <div class="info-card">
-                  <strong>Keyboard camera controls</strong>
-                  <p>Use `WASD` or the arrow keys to push the camera while zoomed in.</p>
-                </div>
-                <div class="info-card">
-                  <strong>Testing mode</strong>
-                  <p>Still hidden. Tap the build label four times and enter `5278` to unlock it for this session.</p>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <div class="diagnostic-panel">
-            <p class="diagnostic-copy">
-              Diagnostics are hidden during normal play. Tap the build label four times if you need testing access.
-            </p>
-            <button id="diagnosticHintButton" class="tiny-link" type="button">build 1.0.0</button>
-            <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
-              <label for="diagnosticCodeInput">Enter diagnostics code</label>
-              <div class="diagnostic-row">
-                <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
-                <button id="unlockDiagnosticButton" class="secondary-button" type="button">Unlock</button>
-              </div>
-              <p id="diagnosticMessage" class="diagnostic-message"></p>
-            </div>
-            <p id="diagnosticStatus" class="diagnostic-status">Testing mode is locked for this session.</p>
+          <div class="home-card">
+            <p class="eyebrow">Controls</p>
+            <ul class="control-list">
+              <li>Mouse wheel or buttons to zoom</li>
+              <li>Drag, `WASD`, or arrows to pan</li>
+              <li>Faster clears earn more stars and a better score</li>
+              <li>Bonus levels unlock after the main run is cleared</li>
+            </ul>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section id="gameScreen" class="screen" aria-hidden="true">
-        <div class="hud">
-          <div class="hud-primary">
-            <div class="hud-chip">
-              <span>Level</span>
-              <strong id="hudLevelText">1 / 10</strong>
-            </div>
-            <div class="hud-chip">
-              <span>Score</span>
-              <strong id="hudScoreText">0</strong>
-            </div>
-            <div class="hud-chip">
-              <span>Time</span>
-              <strong id="hudTimerText">45</strong>
-            </div>
-            <div id="cheatBadge" class="hud-chip cheat-badge hidden">
-              <span>Status</span>
-              <strong>CHEATED</strong>
-            </div>
+    <section id="levelSelectScreen" class="screen" aria-hidden="true">
+      <div class="menu-shell">
+        <div class="menu-header">
+          <div>
+            <p class="eyebrow">Level Select</p>
+            <h2>Choose a scene</h2>
           </div>
-
-          <aside class="target-panel">
-            <p class="eyebrow">Find This Person</p>
-            <div class="target-preview-frame">
-              <img id="targetPreviewImage" alt="Target preview">
-            </div>
-            <h3 id="targetLevelName">Level Name</h3>
-            <p id="targetHelpText">Tap or click the real person hidden in the scene.</p>
-            <p id="previewErrorText" class="asset-error hidden"></p>
-          </aside>
+          <button id="closeLevelSelectButton" class="ghost-button" type="button">Back</button>
         </div>
 
-        <div class="scene-card">
-          <div class="scene-toolbar">
-            <div class="zoom-controls">
-              <button id="zoomOutButton" class="ghost-button" type="button" aria-label="Zoom out">-</button>
-              <button id="zoomInButton" class="ghost-button" type="button" aria-label="Zoom in">+</button>
-              <button id="resetZoomButton" class="ghost-button" type="button">Reset</button>
-              <button id="fitZoomButton" class="ghost-button" type="button">Fit</button>
+        <div class="level-select-groups">
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Main Route</p>
+                <h3>Story Levels</h3>
+              </div>
+              <span id="mainProgressText" class="chip-label">0 / 10 cleared</span>
             </div>
-            <div class="toolbar-meta">
-              <span class="toolbar-hint">Pan: drag or use `WASD` / arrows</span>
-            </div>
-            <div class="toolbar-actions">
-              <button id="pauseButton" class="secondary-button" type="button">Pause</button>
-              <button id="returnHomeButton" class="ghost-button" type="button">Quit</button>
-            </div>
-          </div>
+            <div id="mainLevelGrid" class="level-grid"></div>
+          </section>
 
-          <div id="sceneViewport" class="scene-viewport">
-            <div id="sceneContent" class="scene-content">
-              <img id="levelImage" class="level-image" alt="Hidden object level scene" draggable="false">
-              <div id="hitboxOverlay" class="hitbox-overlay hidden" aria-hidden="true"></div>
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Bonus Route</p>
+                <h3>Extra Levels</h3>
+              </div>
+              <span id="bonusUnlockText" class="chip-label">Locked</span>
             </div>
-            <div id="sceneFallback" class="scene-fallback hidden">
-              <p class="eyebrow">Missing Level Art</p>
-              <h3 id="sceneFallbackTitle">Unable to load level background</h3>
-              <p id="sceneFallbackText">Check the image path and filename.</p>
+            <div id="bonusLevelGrid" class="level-grid"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="settingsScreen" class="screen" aria-hidden="true">
+      <div class="menu-shell">
+        <div class="menu-header">
+          <div>
+            <p class="eyebrow">Settings</p>
+            <h2>Look, feel, and quality of life</h2>
+          </div>
+          <button id="closeSettingsButton" class="ghost-button" type="button">Back</button>
+        </div>
+
+        <div class="settings-grid">
+          <label class="setting-card">
+            <span>Theme</span>
+            <select id="themeSelect">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </label>
+
+          <label class="setting-card">
+            <span>UI Size</span>
+            <select id="densitySelect">
+              <option value="comfortable">Comfortable</option>
+              <option value="compact">Compact</option>
+            </select>
+          </label>
+
+          <label class="setting-card">
+            <span>Motion</span>
+            <select id="motionSelect">
+              <option value="full">Full</option>
+              <option value="reduced">Reduced</option>
+            </select>
+          </label>
+
+          <label class="setting-card">
+            <span>Target Card Size</span>
+            <select id="previewSizeSelect">
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+
+          <label class="setting-card">
+            <span>Show Level Intro</span>
+            <select id="levelIntroSelect">
+              <option value="on">On</option>
+              <option value="off">Off</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="menu-card version-card">
+          <p id="versionTapTarget" class="version-label">Version 0.0.0.03</p>
+          <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
+            <div class="diagnostic-row">
+              <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
+              <button id="unlockDiagnosticButton" class="secondary-button" type="button">Open</button>
             </div>
-            <div id="sceneFeedback" class="scene-feedback" aria-live="polite"></div>
-            <div id="debugReadout" class="debug-readout hidden" aria-live="polite"></div>
+            <p id="diagnosticMessage" class="subtle-text"></p>
           </div>
         </div>
-      </section>
-    </main>
-  </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen" aria-hidden="true">
+      <div id="sceneViewport" class="scene-viewport">
+        <div id="sceneContent" class="scene-content">
+          <img id="levelImage" class="level-image" alt="Hidden object level scene" draggable="false">
+          <div id="hitboxOverlay" class="hitbox-overlay hidden" aria-hidden="true"></div>
+        </div>
+
+        <div id="sceneFallback" class="scene-fallback hidden">
+          <p class="eyebrow">Missing Level Art</p>
+          <h3 id="sceneFallbackTitle">Unable to load level background</h3>
+          <p id="sceneFallbackText">Check the image path and filename.</p>
+        </div>
+
+        <div class="play-topbar">
+          <div class="play-top-left">
+            <button id="zoomOutButton" class="overlay-button" type="button">-</button>
+            <button id="zoomInButton" class="overlay-button" type="button">+</button>
+            <button id="fitZoomButton" class="overlay-button" type="button">Fit</button>
+            <button id="resetZoomButton" class="overlay-button" type="button">Reset</button>
+          </div>
+          <div class="play-top-middle-left">
+            <span class="overlay-pill">Pan with drag, `WASD`, or arrows</span>
+          </div>
+          <div class="play-top-middle-right">
+            <span id="hudLevelText" class="overlay-pill">Level 1</span>
+            <span id="hudLevelName" class="overlay-pill">Boardwalk Search</span>
+          </div>
+          <div class="play-top-right">
+            <button id="pauseButton" class="overlay-button" type="button">Pause</button>
+            <button id="returnHomeButton" class="overlay-button danger-button" type="button">Quit</button>
+          </div>
+        </div>
+
+        <aside class="target-card">
+          <p class="eyebrow">Find This Person</p>
+          <div class="target-preview-frame">
+            <img id="targetPreviewImage" alt="Target preview">
+          </div>
+          <p id="previewErrorText" class="asset-error hidden"></p>
+        </aside>
+
+        <div class="play-stats">
+          <div class="overlay-pill stat-pill">
+            <span>Stars</span>
+            <strong id="hudStarsText">0</strong>
+          </div>
+          <div class="overlay-pill stat-pill">
+            <span>Score</span>
+            <strong id="hudScoreText">0</strong>
+          </div>
+          <div class="overlay-pill stat-pill">
+            <span>Time</span>
+            <strong id="hudTimeText">0.0s</strong>
+          </div>
+        </div>
+
+        <div id="sceneFeedback" class="scene-feedback" aria-live="polite"></div>
+        <div id="debugReadout" class="debug-readout hidden" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
 
   <div id="levelIntroOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card intro-card">
-      <p class="eyebrow">Incoming Level</p>
+      <p class="eyebrow">Level Start</p>
       <h2 id="introLevelLabel">Level 1</h2>
       <h3 id="introLevelName">Placeholder Name</h3>
       <div class="intro-preview-frame">
         <img id="introPreviewImage" alt="Target preview for upcoming level">
       </div>
       <p id="introPreviewErrorText" class="asset-error hidden"></p>
-      <p>Find this exact person inside the crowd scene before time runs out.</p>
+      <p>Find the exact preview target in the full crowd scene as quickly as you can.</p>
       <button id="startLevelButton" class="primary-button" type="button">Begin Level</button>
     </div>
   </div>
@@ -245,8 +258,7 @@
   <div id="pauseOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Paused</p>
-      <h2>Scan the scene, then dive back in.</h2>
-      <p>The timer stays frozen while this menu is open.</p>
+      <h2>Take your time. The score clock is frozen.</h2>
       <div class="button-row">
         <button id="resumeButton" class="primary-button" type="button">Resume</button>
         <button id="pauseQuitButton" class="ghost-button" type="button">Quit Run</button>
@@ -256,22 +268,23 @@
 
   <div id="resultOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
-      <p id="resultEyebrow" class="eyebrow">Level Result</p>
-      <h2 id="resultTitle">You Found Them</h2>
-      <p id="resultBody">Points awarded.</p>
+      <p id="resultEyebrow" class="eyebrow">Level Cleared</p>
+      <h2 id="resultTitle">Target Found</h2>
+      <div class="result-stars" id="resultStarsText">☆☆☆</div>
+      <p id="resultBody">Fast clears earn more stars and more score.</p>
       <div class="result-stats">
         <div>
-          <span>Run Score</span>
+          <span>Level Score</span>
           <strong id="resultScore">0</strong>
         </div>
         <div>
-          <span>Time Left</span>
-          <strong id="resultTimeLeft">0</strong>
+          <span>Clear Time</span>
+          <strong id="resultTimeText">0.0s</strong>
         </div>
       </div>
       <div class="button-row">
         <button id="resultPrimaryButton" class="primary-button" type="button">Next Level</button>
-        <button id="resultSecondaryButton" class="ghost-button" type="button">Retry</button>
+        <button id="resultSecondaryButton" class="ghost-button" type="button">Level Select</button>
       </div>
     </div>
   </div>
@@ -279,21 +292,21 @@
   <div id="completionOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Campaign Complete</p>
-      <h2>You cleared all 10 levels.</h2>
-      <p id="completionBody">Your score has been saved locally.</p>
+      <h2>You cleared the main route.</h2>
+      <p id="completionBody">Bonus levels are now unlocked.</p>
       <div class="result-stats">
         <div>
-          <span>Final Score</span>
+          <span>Total Score</span>
           <strong id="completionScore">0</strong>
         </div>
         <div>
-          <span>Run Type</span>
-          <strong id="completionRunType">Legit</strong>
+          <span>Total Stars</span>
+          <strong id="completionStars">0</strong>
         </div>
       </div>
       <div class="button-row">
         <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
-        <button id="completionHomeButton" class="ghost-button" type="button">Main Menu</button>
+        <button id="completionLevelSelectButton" class="ghost-button" type="button">Level Select</button>
       </div>
     </div>
   </div>

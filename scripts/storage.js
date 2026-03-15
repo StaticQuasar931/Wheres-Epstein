@@ -1,22 +1,23 @@
-// Where's Epstein?
-// Where's Epstein?
-
-const STORAGE_KEY = "wheres-epstein-save-v2";
+const STORAGE_KEY = "wheres-epstein-save-v3";
 
 const DEFAULT_SAVE = {
   settings: {
     theme: "dark",
     density: "comfortable",
     motion: "full",
+    previewSize: "normal",
+    showLevelIntro: "on",
   },
   legit: {
     bestScore: 0,
-    highestLevelCleared: 0,
+    highestLevelCleared: 1,
     totalWins: 0,
+    levelResults: {},
   },
   cheated: {
     bestScore: 0,
     totalWins: 0,
+    levelResults: {},
   },
 };
 
@@ -29,10 +30,18 @@ function mergeSave(parsed) {
     legit: {
       ...DEFAULT_SAVE.legit,
       ...(parsed?.legit ?? {}),
+      levelResults: {
+        ...DEFAULT_SAVE.legit.levelResults,
+        ...(parsed?.legit?.levelResults ?? {}),
+      },
     },
     cheated: {
       ...DEFAULT_SAVE.cheated,
       ...(parsed?.cheated ?? {}),
+      levelResults: {
+        ...DEFAULT_SAVE.cheated.levelResults,
+        ...(parsed?.cheated?.levelResults ?? {}),
+      },
     },
   };
 }
@@ -64,21 +73,28 @@ export function saveSettings(partialSettings) {
   return next;
 }
 
-export function recordRun({ cheated, score, highestLevelCleared, campaignWon }) {
+export function recordLevelResult({ cheated, levelId, score, stars, clearMs, highestLevelCleared, campaignWon }) {
   const current = loadSave();
   const next = structuredClone(current);
+  const bucket = cheated ? next.cheated : next.legit;
+  const previous = bucket.levelResults[levelId] ?? {};
 
-  if (cheated) {
-    next.cheated.bestScore = Math.max(next.cheated.bestScore, score);
-    if (campaignWon) {
-      next.cheated.totalWins += 1;
-    }
-  } else {
-    next.legit.bestScore = Math.max(next.legit.bestScore, score);
+  bucket.levelResults[levelId] = {
+    completed: true,
+    bestScore: Math.max(previous.bestScore ?? 0, score),
+    bestStars: Math.max(previous.bestStars ?? 0, stars),
+    bestTimeMs: previous.bestTimeMs ? Math.min(previous.bestTimeMs, clearMs) : clearMs,
+  };
+
+  bucket.bestScore = Math.max(bucket.bestScore, score);
+
+  if (!cheated) {
     next.legit.highestLevelCleared = Math.max(next.legit.highestLevelCleared, highestLevelCleared);
     if (campaignWon) {
       next.legit.totalWins += 1;
     }
+  } else if (campaignWon) {
+    next.cheated.totalWins += 1;
   }
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
