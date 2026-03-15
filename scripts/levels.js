@@ -47,12 +47,12 @@ export const LEVELS = [
     hitbox: { type: "rect", x1: 593, y1: 278, x2: 614, y2: 306 },
   }),
   makeLevel(6, "trum2", {
-    name: "Waldo's Beachddsss",
+    name: "Waldo's Beach",
     hitbox: { type: "rect", x1: 751, y1: 660, x2: 802, y2: 711 },
   }),
   makeLevel(7, "trum5", {
-    name: "Beachside Maze",
-    hitbox: { type: "rect", x1: 1322, y1: 622, x2: 1478, y2: 778 },
+    name: "Waldo's Briefcase",
+    hitbox: { type: "rect", x1: 531, y1: 204, x2: 554, y2: 225 },
   }),
   makeLevel(8, "eps4", {
     name: "Waldo's Briefcase",

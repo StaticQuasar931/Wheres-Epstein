@@ -37,7 +37,7 @@
         <div class="menu-header">
           <div>
             <p class="eyebrow">Level Select</p>
-            <h2>Choose a scene</h2>
+            <h2>Choose your next scene</h2>
           </div>
           <button id="closeLevelSelectButton" class="ghost-button" type="button">Back</button>
         </div>
@@ -128,10 +128,10 @@
           </label>
 
           <label class="setting-card">
-            <span>Show Level Intro</span>
+            <span>Pre-Level Preview</span>
             <select id="levelIntroSelect">
-              <option value="on">On</option>
-              <option value="off">Off</option>
+              <option value="on">Show</option>
+              <option value="off">Skip</option>
             </select>
           </label>
 
@@ -172,6 +172,9 @@
               <li>Mouse wheel or buttons to zoom</li>
               <li>Drag, `WASD`, or arrows to pan</li>
               <li>`Space` pauses and resumes</li>
+              <li>`Enter` confirms the main action on popups</li>
+              <li>`R` retries when retry is available</li>
+              <li>`L` opens level select</li>
               <li>Double click the level badge to open level select</li>
               <li>Use the preview toggle to hide the target card</li>
             </ul>
@@ -192,8 +195,23 @@
             </ul>
           </section>
 
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Content Note</p>
+                <h3>About the assets</h3>
+              </div>
+            </div>
+            <ul class="control-list">
+              <li>Most visual assets in this project were made with AI assistance.</li>
+              <li>This is not meant to discredit human artists or replace real art.</li>
+              <li>This game is for entertainment only and is not meant to make light of victims or real harm.</li>
+              <li>No graphic imagery is intended for normal gameplay presentation.</li>
+            </ul>
+          </section>
+
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.05</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.06</p>
             <p class="subtle-text">Level hitbox editing lives in <code>scripts/levels.js</code>. Rectangles use <code>x1, y1</code> to <code>x2, y2</code>.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
@@ -315,6 +333,7 @@
       </div>
       <div class="button-row">
         <button id="resultPrimaryButton" class="primary-button" type="button">Next Level</button>
+        <button id="resultRetryButton" class="secondary-button" type="button">Retry</button>
         <button id="resultSecondaryButton" class="ghost-button" type="button">Level Select</button>
       </div>
     </div>

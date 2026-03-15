@@ -32,6 +32,14 @@ body[data-theme="light"] {
   --shadow: 0 24px 60px rgba(31, 62, 96, 0.18);
 }
 
+body[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body[data-theme="light"] {
+  color-scheme: light;
+}
+
 body[data-density="compact"] {
   --shell-padding: 0.65rem;
 }
@@ -224,18 +232,28 @@ p {
 
 .home-debug-box {
   position: absolute;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 0.35rem 0.45rem;
   border: 3px solid currentColor;
   border-radius: 18px;
   background: rgba(0, 0, 0, 0.12);
   color: #fff;
+  overflow: visible;
+}
+
+.home-debug-label {
+  position: absolute;
+  left: 0;
+  top: -2rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(7, 12, 18, 0.88);
+  color: inherit;
   font-size: 0.72rem;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-  overflow: hidden;
 }
 
 .color-green {
@@ -409,6 +427,13 @@ p {
   margin: 0 auto;
 }
 
+#levelSelectScreen .menu-shell,
+#settingsScreen .menu-shell {
+  background:
+    radial-gradient(circle at top left, rgba(255, 216, 78, 0.08), transparent 22%),
+    radial-gradient(circle at bottom right, rgba(111, 227, 168, 0.08), transparent 20%);
+}
+
 .menu-header,
 .menu-card-header {
   display: flex;
@@ -428,6 +453,8 @@ p {
   border-radius: 999px;
   padding: 0.45rem 0.8rem;
   background: var(--panel-soft);
+  color: var(--text);
+  font-weight: 700;
 }
 
 .level-grid {
@@ -438,11 +465,14 @@ p {
 .level-card {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: var(--panel-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    var(--panel-soft);
   padding: 1rem;
   text-align: left;
   min-height: 132px;
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .level-card:hover:not(:disabled) {
@@ -453,11 +483,17 @@ p {
 
 .level-card.locked {
   opacity: 0.58;
+  filter: saturate(0.65);
 }
 
 .level-card h4,
 .level-card p {
   margin: 0;
+}
+
+.level-card h4 {
+  font-size: 1.03rem;
+  line-height: 1.2;
 }
 
 .level-meta {
@@ -486,9 +522,42 @@ p {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--text);
   padding: 0.85rem 0.95rem;
+}
+
+.setting-card span,
+.menu-card h3,
+.menu-card h2,
+.menu-card h4,
+.menu-header h2 {
+  color: var(--text);
+}
+
+body[data-theme="dark"] .setting-card,
+body[data-theme="dark"] .stat-card,
+body[data-theme="dark"] .level-card {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+body[data-theme="dark"] .setting-card select,
+body[data-theme="dark"] .diagnostic-row input,
+body[data-theme="dark"] .ghost-button,
+body[data-theme="dark"] .overlay-button,
+body[data-theme="dark"] .secondary-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f7fbff;
+}
+
+body[data-theme="dark"] .setting-card select option {
+  background: #112339;
+  color: #f7fbff;
+}
+
+body[data-theme="light"] .setting-card select option {
+  background: #ffffff;
+  color: #102038;
 }
 
 .version-card {

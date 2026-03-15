@@ -3,7 +3,7 @@ import { loadSave, recordLevelResult, saveSettings } from "./storage.js";
 
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
 const MIN_SCALE = 0.6;
-const MAX_SCALE = 5;
+const MAX_SCALE = 8;
 const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
@@ -192,6 +192,7 @@ export class HiddenObjectGame {
       resultScore: document.getElementById("resultScore"),
       resultTimeText: document.getElementById("resultTimeText"),
       resultPrimaryButton: document.getElementById("resultPrimaryButton"),
+      resultRetryButton: document.getElementById("resultRetryButton"),
       resultSecondaryButton: document.getElementById("resultSecondaryButton"),
       completionOverlay: document.getElementById("completionOverlay"),
       completionBody: document.getElementById("completionBody"),
@@ -203,7 +204,7 @@ export class HiddenObjectGame {
   }
 
   bindEvents() {
-    this.elements.startGameButton.addEventListener("click", () => this.startNextLevel());
+    this.elements.startGameButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.closeLevelSelectButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.openSettingsButton.addEventListener("click", () => this.showScreen("settings"));
     this.elements.closeSettingsButton.addEventListener("click", () => this.showScreen("home"));
@@ -241,6 +242,7 @@ export class HiddenObjectGame {
     this.elements.pauseQuitButton.addEventListener("click", () => this.quitRun());
     this.elements.startLevelButton.addEventListener("click", () => this.beginLevel());
     this.elements.resultPrimaryButton.addEventListener("click", () => this.handleResultPrimary());
+    this.elements.resultRetryButton.addEventListener("click", () => this.retryCurrentLevel());
     this.elements.resultSecondaryButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.playAgainButton.addEventListener("click", () => this.startCampaignFromLevel(0));
     this.elements.completionLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
@@ -333,6 +335,14 @@ export class HiddenObjectGame {
     this.showScreen("home");
   }
 
+  isTypingTarget(target) {
+    if (!target) {
+      return false;
+    }
+    const tagName = target.tagName?.toLowerCase?.() ?? "";
+    return tagName === "input" || tagName === "textarea" || tagName === "select" || target.isContentEditable;
+  }
+
   renderHomeStats() {
     const unlockedMain = Math.min(this.save.legit.highestLevelCleared, MAIN_LEVELS.length);
     const starCount = getTotalStars(this.save.legit);
@@ -386,6 +396,15 @@ export class HiddenObjectGame {
     if (index >= 0) {
       this.startCampaignFromLevel(index);
     }
+  }
+
+  retryCurrentLevel() {
+    this.elements.resultOverlay.classList.add("hidden");
+    if (this.save.settings.showLevelIntro === "on") {
+      this.openLevelIntro();
+      return;
+    }
+    this.beginLevel();
   }
 
   startCampaignFromLevel(index) {
@@ -569,13 +588,16 @@ export class HiddenObjectGame {
     ].forEach(([label, zone]) => {
       const node = document.createElement("div");
       node.className = `home-debug-box color-${zone.color}`;
+      const tag = document.createElement("span");
+      tag.className = "home-debug-label";
       const scaleX = drawWidth / naturalWidth;
       const scaleY = drawHeight / naturalHeight;
       node.style.left = `${zone.x1 * scaleX}px`;
       node.style.top = `${zone.y1 * scaleY}px`;
       node.style.width = `${(zone.x2 - zone.x1) * scaleX}px`;
       node.style.height = `${(zone.y2 - zone.y1) * scaleY}px`;
-      node.textContent = `${label}: ${zone.x1},${zone.y1} -> ${zone.x2},${zone.y2}`;
+      tag.textContent = `${label}: ${zone.x1},${zone.y1} -> ${zone.x2},${zone.y2}`;
+      node.appendChild(tag);
       debug.appendChild(node);
     });
   }
@@ -786,7 +808,54 @@ export class HiddenObjectGame {
   }
 
   onKeyDown(event) {
+    if (this.isTypingTarget(event.target)) {
+      return;
+    }
     const key = event.key.toLowerCase();
+    if (key === "l") {
+      event.preventDefault();
+      this.showScreen("levelSelect");
+      return;
+    }
+    if (event.code === "Space") {
+      if (!this.elements.levelIntroOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.beginLevel();
+        return;
+      }
+      if (!this.elements.resultOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.handleResultPrimary();
+        return;
+      }
+      if (!this.elements.pauseOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.resumeGame();
+        return;
+      }
+    }
+    if (key === "enter") {
+      if (!this.elements.levelIntroOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.beginLevel();
+        return;
+      }
+      if (!this.elements.resultOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.handleResultPrimary();
+        return;
+      }
+      if (!this.elements.pauseOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.resumeGame();
+        return;
+      }
+    }
+    if (key === "r" && !this.elements.resultOverlay.classList.contains("hidden")) {
+      event.preventDefault();
+      this.retryCurrentLevel();
+      return;
+    }
     if (event.code === "Space" && this.elements.screens.game.classList.contains("screen-active")) {
       event.preventDefault();
       if (this.state.paused) {
