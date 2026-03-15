@@ -31,7 +31,7 @@ function makeLevel(number, overrides = {}) {
 export const LEVELS = [
   makeLevel(1, {
     name: "Boardwalk Search",
-    hitbox: { type: "rect", x: 1170, y: 450, width: 110, height: 165 },
+    hitbox: { type: "rect", x: 991, y: 583, width: 1069, height: 688 },
     camera: { x: 1225, y: 520, zoom: 1.35 },
     timeLimit: 45,
   }),
