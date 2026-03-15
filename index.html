@@ -10,72 +10,25 @@
 </head>
 <body data-theme="dark" data-density="comfortable" data-motion="full" data-preview="normal">
   <header class="site-topbar">
-    <div class="site-brand">
-      <p class="eyebrow">Hidden-Object Hunt</p>
-      <h1 class="site-title">Where's Epstein?</h1>
-    </div>
-    <button id="topMenuButton" class="ghost-button" type="button">Menu</button>
+    <button id="topMenuButton" class="ghost-button" type="button">Levels</button>
   </header>
 
   <main class="screen-shell">
     <section id="homeScreen" class="screen screen-active hero-screen">
-      <img id="startScreenImage" class="hero-background" src="Assets/startscreen.png" alt="Start screen artwork" draggable="false">
-      <div class="hero-shade"></div>
-      <div id="startScreenFallback" class="hero-fallback hidden">
-        <p class="eyebrow">Missing Start Screen Art</p>
-        <h2>Add `Assets/startscreen.png`</h2>
-        <p id="startScreenErrorText">The home screen will use that exact file path.</p>
-      </div>
-
-      <div class="hero-content">
-        <div class="hero-left">
-          <p class="eyebrow">Version 0.0.0.03</p>
-          <h2 class="hero-title">Find the target fast, earn more stars, unlock the next scene.</h2>
-          <p class="hero-copy">
-            This is a hidden-object game for entertainment purposes only. It is not made to mock victims
-            or the actions associated with the people shown, and it uses no graphic imagery.
-          </p>
-          <div class="hero-actions">
-            <button id="startGameButton" class="primary-button" type="button">Start Next Level</button>
-            <button id="openLevelSelectButton" class="secondary-button" type="button">Level Select</button>
-            <button id="openSettingsButton" class="ghost-button" type="button">Settings</button>
-            <button id="moreGamesButton" class="ghost-button" type="button">More Games</button>
-          </div>
+      <div id="homeViewport" class="home-viewport">
+        <img id="startScreenImage" class="hero-background" src="Assets/startscreen.png" alt="Start screen artwork" draggable="false">
+        <div id="homeButtonOverlay" class="home-button-overlay">
+          <button id="startGameButton" class="image-button image-button-start" type="button" aria-label="Start game"></button>
+          <button id="openSettingsButton" class="image-button image-button-settings" type="button" aria-label="Open settings"></button>
+          <button id="moreGamesButton" class="image-button image-button-more" type="button" aria-label="Open more games"></button>
         </div>
-
-        <div class="hero-right">
-          <div class="home-card">
-            <p class="eyebrow">Progress</p>
-            <div class="stat-grid">
-              <div class="stat-card">
-                <span>Levels</span>
-                <strong id="homeLevelCount">10</strong>
-              </div>
-              <div class="stat-card">
-                <span>Unlocked</span>
-                <strong id="homeUnlockedText">1</strong>
-              </div>
-              <div class="stat-card">
-                <span>Best Score</span>
-                <strong id="homeBestScore">0</strong>
-              </div>
-              <div class="stat-card">
-                <span>Total Stars</span>
-                <strong id="homeStarCount">0</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="home-card">
-            <p class="eyebrow">Controls</p>
-            <ul class="control-list">
-              <li>Mouse wheel or buttons to zoom</li>
-              <li>Drag, `WASD`, or arrows to pan</li>
-              <li>Faster clears earn more stars and a better score</li>
-              <li>Bonus levels unlock after the main run is cleared</li>
-            </ul>
-          </div>
+        <div id="homeDebugOverlay" class="home-debug-overlay hidden" aria-hidden="true"></div>
+        <div id="startScreenFallback" class="hero-fallback hidden">
+          <p class="eyebrow">Missing Start Screen Art</p>
+          <h2>Add `Assets/startscreen.png`</h2>
+          <p id="startScreenErrorText">The home screen will use that exact file path.</p>
         </div>
+        <div id="homeDebugReadout" class="home-debug-readout hidden" aria-live="polite"></div>
       </div>
     </section>
 
@@ -96,7 +49,7 @@
                 <p class="eyebrow">Main Route</p>
                 <h3>Story Levels</h3>
               </div>
-              <span id="mainProgressText" class="chip-label">0 / 10 cleared</span>
+              <span id="mainProgressText" class="chip-label">0 / 14 cleared</span>
             </div>
             <div id="mainLevelGrid" class="level-grid"></div>
           </section>
@@ -110,6 +63,21 @@
               <span id="bonusUnlockText" class="chip-label">Locked</span>
             </div>
             <div id="bonusLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Progress</p>
+                <h3>Run Summary</h3>
+              </div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat-card"><span>Levels</span><strong id="homeLevelCount">14</strong></div>
+              <div class="stat-card"><span>Unlocked</span><strong id="homeUnlockedText">1</strong></div>
+              <div class="stat-card"><span>Best Score</span><strong id="homeBestScore">0</strong></div>
+              <div class="stat-card"><span>Total Stars</span><strong id="homeStarCount">0</strong></div>
+            </div>
           </section>
         </div>
       </div>
@@ -167,14 +135,32 @@
           </label>
         </div>
 
-        <div class="menu-card version-card">
-          <p id="versionTapTarget" class="version-label">Version 0.0.0.03</p>
-          <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
-            <div class="diagnostic-row">
-              <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
-              <button id="unlockDiagnosticButton" class="secondary-button" type="button">Open</button>
+        <div class="level-select-groups">
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Controls</p>
+                <h3>Play Shortcuts</h3>
+              </div>
             </div>
-            <p id="diagnosticMessage" class="subtle-text"></p>
+            <ul class="control-list">
+              <li>Mouse wheel or buttons to zoom</li>
+              <li>Drag, `WASD`, or arrows to pan</li>
+              <li>`Space` pauses and resumes</li>
+              <li>Double click the level badge to open level select</li>
+              <li>Use the preview toggle to hide the target card</li>
+            </ul>
+          </section>
+
+          <div class="menu-card version-card">
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.03</p>
+            <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
+              <div class="diagnostic-row">
+                <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
+                <button id="unlockDiagnosticButton" class="secondary-button" type="button">Open</button>
+              </div>
+              <p id="diagnosticMessage" class="subtle-text"></p>
+            </div>
           </div>
         </div>
       </div>
@@ -205,7 +191,7 @@
           </div>
           <div class="play-top-middle-right">
             <span id="hudLevelText" class="overlay-pill">Level 1</span>
-            <span id="hudLevelName" class="overlay-pill">Boardwalk Search</span>
+            <span id="hudLevelName" class="overlay-pill">Welcome Party</span>
           </div>
           <div class="play-top-right">
             <button id="pauseButton" class="overlay-button" type="button">Pause</button>
@@ -227,7 +213,7 @@
         <div class="play-stats">
           <div class="overlay-pill stat-pill">
             <span>Stars</span>
-            <strong id="hudStarsText">0</strong>
+            <strong id="hudStarsText">&#9734;&#9734;&#9734;</strong>
           </div>
           <div class="overlay-pill stat-pill">
             <span>Score</span>
@@ -249,7 +235,7 @@
     <div class="modal-card intro-card">
       <p class="eyebrow">Level Start</p>
       <h2 id="introLevelLabel">Level 1</h2>
-      <h3 id="introLevelName">Placeholder Name</h3>
+      <h3 id="introLevelName">Welcome Party</h3>
       <div class="intro-preview-frame">
         <img id="introPreviewImage" alt="Target preview for upcoming level">
       </div>
@@ -274,7 +260,7 @@
     <div class="modal-card">
       <p id="resultEyebrow" class="eyebrow">Level Cleared</p>
       <h2 id="resultTitle">Target Found</h2>
-      <div class="result-stars" id="resultStarsText">☆☆☆</div>
+      <div class="result-stars" id="resultStarsText">&#9734;&#9734;&#9734;</div>
       <p id="resultBody">Fast clears earn more stars and more score.</p>
       <div class="result-stats">
         <div>

@@ -1,4 +1,4 @@
-import { LEVELS, DEFAULT_SETTINGS } from "./levels.js";
+import { LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
 import { loadSave, recordLevelResult, saveSettings } from "./storage.js";
 
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
@@ -51,7 +51,7 @@ function getStars(elapsedMs) {
 }
 
 function starText(stars) {
-  return `${"*".repeat(stars)}${".".repeat(3 - stars)}`;
+  return `${"\u2605".repeat(stars)}${"\u2606".repeat(3 - stars)}`;
 }
 
 export class HiddenObjectGame {
@@ -93,6 +93,14 @@ export class HiddenObjectGame {
     this.applySettings();
     this.renderHomeStats();
     this.renderLevelSelect();
+    window.requestAnimationFrame(() => this.layoutHomeButtons());
+    if (this.elements.startScreenImage.complete) {
+      if (this.elements.startScreenImage.naturalWidth > 0) {
+        this.layoutHomeButtons();
+      } else {
+        this.showStartImageError();
+      }
+    }
   }
 
   getElements() {
@@ -106,11 +114,14 @@ export class HiddenObjectGame {
       },
       topMenuButton: document.getElementById("topMenuButton"),
       startGameButton: document.getElementById("startGameButton"),
-      openLevelSelectButton: document.getElementById("openLevelSelectButton"),
       closeLevelSelectButton: document.getElementById("closeLevelSelectButton"),
       openSettingsButton: document.getElementById("openSettingsButton"),
       closeSettingsButton: document.getElementById("closeSettingsButton"),
       moreGamesButton: document.getElementById("moreGamesButton"),
+      homeViewport: document.getElementById("homeViewport"),
+      homeButtonOverlay: document.getElementById("homeButtonOverlay"),
+      homeDebugOverlay: document.getElementById("homeDebugOverlay"),
+      homeDebugReadout: document.getElementById("homeDebugReadout"),
       startScreenImage: document.getElementById("startScreenImage"),
       startScreenFallback: document.getElementById("startScreenFallback"),
       startScreenErrorText: document.getElementById("startScreenErrorText"),
@@ -184,12 +195,11 @@ export class HiddenObjectGame {
 
   bindEvents() {
     this.elements.startGameButton.addEventListener("click", () => this.startNextLevel());
-    this.elements.openLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.closeLevelSelectButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.openSettingsButton.addEventListener("click", () => this.showScreen("settings"));
     this.elements.closeSettingsButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.moreGamesButton.addEventListener("click", () => window.open(MORE_GAMES_URL, "_blank", "noopener"));
-    this.elements.topMenuButton.addEventListener("click", () => this.showScreen("home"));
+    this.elements.topMenuButton.addEventListener("click", () => this.handleTopMenu());
     this.elements.themeSelect.addEventListener("change", () => this.persistSettings());
     this.elements.densitySelect.addEventListener("change", () => this.persistSettings());
     this.elements.motionSelect.addEventListener("change", () => this.persistSettings());
@@ -204,6 +214,10 @@ export class HiddenObjectGame {
     this.elements.introPreviewImage.addEventListener("load", () => this.clearIntroPreviewError());
     this.elements.introPreviewImage.addEventListener("error", () => this.showIntroPreviewError(this.getCurrentLevel()?.targetPreview));
     this.elements.startScreenImage.addEventListener("error", () => this.showStartImageError());
+    this.elements.startScreenImage.addEventListener("load", () => {
+      this.hideStartImageError();
+      this.layoutHomeButtons();
+    });
     this.elements.zoomOutButton.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
     this.elements.zoomInButton.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
     this.elements.fitZoomButton.addEventListener("click", () => this.fitLevelToViewport());
@@ -230,6 +244,7 @@ export class HiddenObjectGame {
     this.elements.sceneViewport.addEventListener("pointermove", (event) => this.onPointerMove(event));
     this.elements.sceneViewport.addEventListener("pointerup", (event) => this.onPointerUp(event));
     this.elements.sceneViewport.addEventListener("pointercancel", (event) => this.onPointerCancel(event));
+    this.elements.homeViewport.addEventListener("pointermove", (event) => this.updateHomeDebug(event));
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("keyup", (event) => this.onKeyUp(event));
@@ -238,6 +253,7 @@ export class HiddenObjectGame {
       if (this.elements.screens.game.classList.contains("screen-active")) {
         this.fitLevelToViewport();
       }
+      this.layoutHomeButtons();
     });
   }
 
@@ -271,12 +287,31 @@ export class HiddenObjectGame {
       element.setAttribute("aria-hidden", String(!active));
     });
     this.elements.body.classList.toggle("mode-game", name === "game");
+    this.elements.topMenuButton.textContent = name === "home" ? "Levels" : "Menu";
     if (name !== "game") {
       this.stopElapsedTimer();
       this.clearKeys();
       this.state.runActive = false;
       this.closeAllOverlays();
     }
+    if (name === "home" || name === "levelSelect") {
+      this.renderLevelSelect();
+    }
+    this.layoutHomeButtons();
+  }
+
+  handleTopMenu() {
+    if (this.elements.screens.game.classList.contains("screen-active")) {
+      this.quitRun();
+      return;
+    }
+
+    if (this.elements.screens.home.classList.contains("screen-active")) {
+      this.showScreen("levelSelect");
+      return;
+    }
+
+    this.showScreen("home");
   }
 
   renderHomeStats() {
@@ -306,7 +341,7 @@ export class HiddenObjectGame {
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
-      button.innerHTML = `<h4>${level.name}</h4><p class="level-meta">${unlocked ? "Ready" : "Locked"}</p><p class="level-meta">${result ? starText(result.bestStars ?? 0) : "☆☆☆"}</p>`;
+      button.innerHTML = `<h4>${level.name}</h4><p class="level-meta">${unlocked ? "Ready" : "Locked"}</p><p class="level-meta level-stars">${result ? starText(result.bestStars ?? 0) : starText(0)}</p>`;
       button.addEventListener("click", () => this.startSelectedLevel(level.id));
       container.appendChild(button);
     });
@@ -338,6 +373,7 @@ export class HiddenObjectGame {
     this.state.levelIndex = index;
     this.state.totalScore = 0;
     this.state.runCheated = this.sessionTestingUnlocked;
+    this.state.paused = false;
     this.showScreen("game");
     if (this.save.settings.showLevelIntro === "on") {
       this.openLevelIntro();
@@ -357,6 +393,7 @@ export class HiddenObjectGame {
       : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     this.elements.introLevelLabel.textContent = label;
     this.elements.introLevelName.textContent = level.name;
+    this.clearIntroPreviewError();
     this.elements.introPreviewImage.src = level.targetPreview;
     this.elements.levelIntroOverlay.classList.remove("hidden");
   }
@@ -374,6 +411,7 @@ export class HiddenObjectGame {
       ? "Bonus"
       : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     this.elements.hudLevelName.textContent = level.name;
+    this.clearPreviewError();
     this.elements.targetPreviewImage.src = level.targetPreview;
     this.elements.levelImage.src = level.background;
     this.renderHitbox(level.hitbox);
@@ -426,6 +464,112 @@ export class HiddenObjectGame {
   showStartImageError() {
     this.elements.startScreenFallback.classList.remove("hidden");
     this.elements.startScreenErrorText.textContent = "Tried to load: Assets/startscreen.png";
+  }
+
+  hideStartImageError() {
+    this.elements.startScreenFallback.classList.add("hidden");
+  }
+
+  layoutHomeButtons() {
+    const image = this.elements.startScreenImage;
+    const overlay = this.elements.homeButtonOverlay;
+    if (!image.naturalWidth || !overlay || !this.elements.homeViewport) {
+      return;
+    }
+
+    const rect = this.elements.homeViewport.getBoundingClientRect();
+    const imageRatio = image.naturalWidth / image.naturalHeight;
+    const viewportRatio = rect.width / rect.height;
+    let drawWidth;
+    let drawHeight;
+    let offsetX;
+    let offsetY;
+
+    if (viewportRatio > imageRatio) {
+      drawHeight = rect.height;
+      drawWidth = drawHeight * imageRatio;
+      offsetX = (rect.width - drawWidth) / 2;
+      offsetY = 0;
+    } else {
+      drawWidth = rect.width;
+      drawHeight = drawWidth / imageRatio;
+      offsetX = 0;
+      offsetY = (rect.height - drawHeight) / 2;
+    }
+
+    overlay.style.left = `${offsetX}px`;
+    overlay.style.top = `${offsetY}px`;
+    overlay.style.width = `${drawWidth}px`;
+    overlay.style.height = `${drawHeight}px`;
+
+    this.placeHomeButton(this.elements.startGameButton, START_SCREEN_BUTTONS.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
+    this.placeHomeButton(this.elements.openSettingsButton, START_SCREEN_BUTTONS.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
+    this.placeHomeButton(this.elements.moreGamesButton, START_SCREEN_BUTTONS.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
+    this.renderHomeDebugOverlay(drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
+  }
+
+  placeHomeButton(element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight) {
+    const scaleX = drawWidth / naturalWidth;
+    const scaleY = drawHeight / naturalHeight;
+    element.style.position = "absolute";
+    element.style.left = `${zone.x1 * scaleX}px`;
+    element.style.top = `${zone.y1 * scaleY}px`;
+    element.style.width = `${(zone.x2 - zone.x1) * scaleX}px`;
+    element.style.height = `${(zone.y2 - zone.y1) * scaleY}px`;
+  }
+
+  renderHomeDebugOverlay(drawWidth, drawHeight, naturalWidth, naturalHeight) {
+    const debug = this.elements.homeDebugOverlay;
+    debug.innerHTML = "";
+    const active = this.sessionTestingUnlocked;
+    debug.classList.toggle("hidden", !active);
+    this.elements.homeDebugReadout.classList.toggle("hidden", !active);
+    if (!active) {
+      return;
+    }
+
+    [
+      ["start", START_SCREEN_BUTTONS.start],
+      ["settings", START_SCREEN_BUTTONS.settings],
+      ["more", START_SCREEN_BUTTONS.moreGames],
+    ].forEach(([label, zone]) => {
+      const node = document.createElement("div");
+      node.className = `home-debug-box color-${zone.color}`;
+      const scaleX = drawWidth / naturalWidth;
+      const scaleY = drawHeight / naturalHeight;
+      node.style.left = `${zone.x1 * scaleX}px`;
+      node.style.top = `${zone.y1 * scaleY}px`;
+      node.style.width = `${(zone.x2 - zone.x1) * scaleX}px`;
+      node.style.height = `${(zone.y2 - zone.y1) * scaleY}px`;
+      node.textContent = `${label}: ${zone.x1},${zone.y1} -> ${zone.x2},${zone.y2}`;
+      debug.appendChild(node);
+    });
+  }
+
+  updateHomeDebug(event) {
+    if (!this.sessionTestingUnlocked) {
+      return;
+    }
+    const imagePoint = this.clientToHomeImage(event.clientX, event.clientY);
+    const pointer = imagePoint ? `Pointer: ${imagePoint.x}, ${imagePoint.y}` : "Pointer: outside image";
+    this.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${START_SCREEN_BUTTONS.start.x1},${START_SCREEN_BUTTONS.start.y1} -> ${START_SCREEN_BUTTONS.start.x2},${START_SCREEN_BUTTONS.start.y2}\nsettings: ${START_SCREEN_BUTTONS.settings.x1},${START_SCREEN_BUTTONS.settings.y1} -> ${START_SCREEN_BUTTONS.settings.x2},${START_SCREEN_BUTTONS.settings.y2}\nmore: ${START_SCREEN_BUTTONS.moreGames.x1},${START_SCREEN_BUTTONS.moreGames.y1} -> ${START_SCREEN_BUTTONS.moreGames.x2},${START_SCREEN_BUTTONS.moreGames.y2}`;
+  }
+
+  clientToHomeImage(clientX, clientY) {
+    const rect = this.elements.homeButtonOverlay.getBoundingClientRect();
+    const image = this.elements.startScreenImage;
+    if (!image.naturalWidth || !rect.width || !rect.height) {
+      return null;
+    }
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    if (localX < 0 || localY < 0 || localX > rect.width || localY > rect.height) {
+      return null;
+    }
+    return {
+      x: Math.round((localX / rect.width) * image.naturalWidth),
+      y: Math.round((localY / rect.height) * image.naturalHeight),
+    };
   }
 
   renderHitbox(hitbox) {
@@ -533,6 +677,7 @@ export class HiddenObjectGame {
       this.elements.diagnosticMessage.textContent = "Opened.";
       this.elements.hitboxOverlay.classList.remove("hidden");
       this.elements.debugReadout.classList.remove("hidden");
+      this.layoutHomeButtons();
       return;
     }
     this.elements.diagnosticMessage.textContent = "Denied.";
@@ -757,6 +902,7 @@ export class HiddenObjectGame {
     this.state.transform.scale = fitScale;
     this.state.transform.x = (rect.width - (this.state.naturalWidth * fitScale)) / 2;
     this.state.transform.y = (rect.height - (this.state.naturalHeight * fitScale)) / 2;
+    this.clampTransform();
     this.applyTransform();
   }
 

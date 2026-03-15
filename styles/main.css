@@ -17,6 +17,7 @@
   --radius-md: 16px;
   --radius-sm: 12px;
   --shell-padding: 1rem;
+  --topbar-height: 3.5rem;
 }
 
 body[data-theme="light"] {
@@ -172,6 +173,97 @@ p {
   overflow: hidden;
 }
 
+.home-viewport {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(255, 216, 78, 0.12), transparent 26%),
+    linear-gradient(160deg, #08111b, #152a41 70%, #08111b);
+}
+
+.home-viewport .hero-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.home-button-overlay,
+.home-debug-overlay {
+  position: absolute;
+  z-index: 5;
+}
+
+.home-button-overlay {
+  pointer-events: none;
+}
+
+.image-button {
+  position: absolute;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  pointer-events: auto;
+  border-radius: 18px;
+  outline: none;
+}
+
+.image-button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 216, 78, 0.95);
+}
+
+.home-debug-overlay {
+  pointer-events: none;
+}
+
+.home-debug-box {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.35rem 0.45rem;
+  border: 3px solid currentColor;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.12);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+
+.color-green {
+  color: #4df7a6;
+}
+
+.color-blue {
+  color: #56b7ff;
+}
+
+.color-orange {
+  color: #ffac57;
+}
+
+.home-debug-readout {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 6;
+  min-width: 250px;
+  max-width: min(92vw, 420px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 0.85rem 0.95rem;
+  background: var(--panel-strong);
+  box-shadow: var(--shadow);
+  white-space: pre-line;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
 .hero-background,
 .hero-shade {
   position: absolute;
@@ -309,7 +401,9 @@ p {
 
 .menu-shell {
   min-height: 100vh;
-  padding: 5.8rem 1.25rem 1.25rem;
+  padding: 5.35rem 1rem 1rem;
+  max-width: 1320px;
+  margin: 0 auto;
 }
 
 .menu-header,
@@ -344,6 +438,14 @@ p {
   background: var(--panel-soft);
   padding: 1rem;
   text-align: left;
+  min-height: 132px;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.level-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(255, 216, 78, 0.45);
+  background: rgba(255, 255, 255, 0.11);
 }
 
 .level-card.locked {
@@ -359,6 +461,11 @@ p {
   margin-top: 0.55rem;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.level-stars {
+  color: var(--accent);
+  letter-spacing: 0.14rem;
 }
 
 .settings-grid {
@@ -476,8 +583,9 @@ p {
 
 .overlay-pill {
   border-radius: 999px;
-  padding: 0.7rem 0.95rem;
+  padding: 0.58rem 0.82rem;
   color: var(--text);
+  font-size: 0.92rem;
 }
 
 .target-card {
@@ -485,8 +593,8 @@ p {
   left: var(--shell-padding);
   bottom: calc(var(--shell-padding) + 2.7rem);
   z-index: 5;
-  width: min(180px, 24vw);
-  padding: 0.7rem;
+  width: min(160px, 22vw);
+  padding: 0.65rem;
 }
 
 body[data-preview="large"] .target-card {
@@ -501,7 +609,7 @@ body[data-preview="large"] .target-card {
 }
 
 .preview-toggle {
-  padding: 0.45rem 0.75rem;
+  padding: 0.38rem 0.68rem;
 }
 
 .target-preview-frame,
@@ -548,6 +656,13 @@ body[data-preview="large"] .target-card {
 
 .stat-pill strong {
   font-size: 1.05rem;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1rem;
 }
 
 .scene-feedback,
@@ -635,7 +750,6 @@ body[data-preview="large"] .target-card {
 }
 
 @media (max-width: 720px) {
-  .hero-content,
   .menu-shell {
     padding-inline: 0.85rem;
   }
@@ -650,7 +764,7 @@ body[data-preview="large"] .target-card {
   .play-top-right,
   .play-top-middle-right,
   .diagnostic-row,
-  .hero-actions {
+  .button-row {
     flex-direction: column;
     align-items: stretch;
   }
@@ -658,5 +772,12 @@ body[data-preview="large"] .target-card {
   .target-card {
     width: calc(100% - 1.7rem);
     bottom: 5.2rem;
+  }
+
+  .home-debug-readout {
+    left: 0.75rem;
+    right: 0.75rem;
+    min-width: 0;
+    max-width: none;
   }
 }
