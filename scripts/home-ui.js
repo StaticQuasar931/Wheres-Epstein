@@ -34,23 +34,43 @@ export function layoutHomeButtons(game, config) {
   placeHomeButton(game.elements.openSettingsButton, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
   placeHomeButton(game.elements.moreGamesButton, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
   placeHomeArt(game, game.elements.startButtonArt, config.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeSheen(game, game.elements.startButtonSheen, game.elements.startButtonArt);
   placeHomeArt(game, game.elements.settingsButtonArt, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeSheen(game, game.elements.settingsButtonSheen, game.elements.settingsButtonArt);
   placeHomeArt(game, game.elements.moreGamesButtonArt, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeSheen(game, game.elements.moreGamesButtonSheen, game.elements.moreGamesButtonArt);
   renderHomeDebugOverlay(game, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
 }
 
 export function bindHomeButtonHoverEffects(game) {
   const mappings = [
-    [game.elements.startGameButton, game.elements.startButtonArt],
-    [game.elements.openSettingsButton, game.elements.settingsButtonArt],
-    [game.elements.moreGamesButton, game.elements.moreGamesButtonArt],
+    [game.elements.startGameButton, game.elements.startButtonArt, game.elements.startButtonSheen],
+    [game.elements.openSettingsButton, game.elements.settingsButtonArt, game.elements.settingsButtonSheen],
+    [game.elements.moreGamesButton, game.elements.moreGamesButtonArt, game.elements.moreGamesButtonSheen],
   ];
 
-  mappings.forEach(([button, art]) => {
-    const activate = () => art.classList.add("is-hovered");
-    const deactivate = () => art.classList.remove("is-hovered");
+  mappings.forEach(([button, art, sheen]) => {
+    const activate = () => {
+      art.classList.add("is-hovered");
+      sheen.classList.add("is-hovered");
+    };
+    const deactivate = () => {
+      art.classList.remove("is-hovered", "is-pressed");
+      sheen.classList.remove("is-hovered", "is-pressed");
+    };
+    const press = () => {
+      art.classList.add("is-pressed");
+      sheen.classList.add("is-pressed");
+    };
+    const release = () => {
+      art.classList.remove("is-pressed");
+      sheen.classList.remove("is-pressed");
+    };
     button.addEventListener("pointerenter", activate);
     button.addEventListener("pointerleave", deactivate);
+    button.addEventListener("pointerdown", press);
+    button.addEventListener("pointerup", release);
+    button.addEventListener("pointercancel", release);
     button.addEventListener("focus", activate);
     button.addEventListener("blur", deactivate);
   });
@@ -63,6 +83,11 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
     game.elements.settingsButtonArt,
     game.elements.moreGamesButtonArt,
   ];
+  const sheenLayers = [
+    game.elements.startButtonSheen,
+    game.elements.settingsButtonSheen,
+    game.elements.moreGamesButtonSheen,
+  ];
 
   if (artLayers.some((layer) => !layer.complete || !layer.naturalWidth)) {
     return;
@@ -73,6 +98,7 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
       layer.classList.remove("is-prepping", "is-entering");
       layer.classList.add("is-settled");
     });
+    sheenLayers.forEach((layer) => layer.classList.add("is-settled"));
     return;
   }
 
@@ -80,11 +106,15 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
     layer.classList.remove("is-entering", "is-settled");
     layer.classList.add("is-prepping");
   });
+  sheenLayers.forEach((layer) => {
+    layer.classList.remove("is-settled");
+  });
 
   artLayers.forEach((layer, index) => {
     const timerId = window.setTimeout(() => {
       layer.classList.remove("is-prepping");
       layer.classList.add("is-entering");
+      sheenLayers[index].classList.add("is-settled");
       const settleTimerId = window.setTimeout(() => {
         layer.classList.remove("is-entering");
         layer.classList.add("is-settled");
@@ -211,6 +241,17 @@ function placeHomeArt(game, imageElement, zone, drawWidth, drawHeight, naturalWi
   imageElement.style.width = `${imageElement.naturalWidth * scale}px`;
   imageElement.style.height = `${imageElement.naturalHeight * scale}px`;
   imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
+}
+
+function placeHomeSheen(game, sheenElement, imageElement) {
+  if (!sheenElement || !imageElement.style.width) {
+    return;
+  }
+  sheenElement.style.left = imageElement.style.left;
+  sheenElement.style.top = imageElement.style.top;
+  sheenElement.style.width = imageElement.style.width;
+  sheenElement.style.height = imageElement.style.height;
+  sheenElement.style.setProperty("--home-enter-offset", imageElement.style.getPropertyValue("--home-enter-offset"));
 }
 
 function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {

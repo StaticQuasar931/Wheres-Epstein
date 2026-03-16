@@ -17,11 +17,22 @@
   <main class="screen-shell">
     <section id="homeScreen" class="screen screen-active hero-screen">
       <div id="homeViewport" class="home-viewport">
+        <div id="homeBootOverlay" class="home-boot-overlay">
+          <div class="home-boot-card">
+            <div class="home-boot-spinner" aria-hidden="true"></div>
+            <p class="eyebrow">Loading</p>
+            <h2>Preparing the start screen</h2>
+            <p id="homeBootStatus" class="subtle-text">Loading menu art and button assets.</p>
+          </div>
+        </div>
         <img id="startScreenImage" class="hero-background" src="Assets/ui/nobuttonloadingscreen.jpg" alt="Start screen artwork" draggable="false">
         <div id="homeButtonOverlay" class="home-button-overlay">
           <img id="startButtonArt" class="home-button-art" src="Assets/ui/startbutton.png" alt="" aria-hidden="true">
+          <div id="startButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
           <img id="settingsButtonArt" class="home-button-art" src="Assets/ui/settingsbutton.png" alt="" aria-hidden="true">
+          <div id="settingsButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
           <img id="moreGamesButtonArt" class="home-button-art" src="Assets/ui/moregbutton.png" alt="" aria-hidden="true">
+          <div id="moreGamesButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
           <button id="startGameButton" class="image-button image-button-start" type="button" aria-label="Start game"></button>
           <button id="openSettingsButton" class="image-button image-button-settings" type="button" aria-label="Open settings"></button>
           <button id="moreGamesButton" class="image-button image-button-more" type="button" aria-label="Open more games"></button>
@@ -78,9 +89,15 @@
                 <h3>Harder Scenes</h3>
               </div>
               <button id="levelSelectPrevPageButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to main levels">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <path d="M14.75 5.75L8.5 12l6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <span class="page-arrow-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M14.75 5.75L8.5 12l6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="page-arrow-text">
+                  <strong>Previous</strong>
+                  <span>Page One</span>
+                </span>
               </button>
             </div>
             <div id="advancedLevelGrid" class="level-grid"></div>
@@ -96,7 +113,7 @@
             <div id="advancedBonusLevelGrid" class="level-grid"></div>
           </section>
 
-          <section class="menu-card">
+          <section id="progressRouteSection" class="menu-card">
             <div class="menu-card-header">
               <div>
                 <p class="eyebrow">Progress</p>
@@ -114,9 +131,15 @@
           </section>
         </div>
         <button id="levelSelectNextPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open advanced levels">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M9.25 5.75L15.5 12l-6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="page-arrow-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M9.25 5.75L15.5 12l-6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="page-arrow-text">
+            <strong>Page Two</strong>
+            <span>Advanced</span>
+          </span>
         </button>
       </div>
     </section>
@@ -279,7 +302,7 @@
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.0.3</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.0.5</p>
             <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">

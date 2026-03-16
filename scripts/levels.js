@@ -46,6 +46,22 @@ function makeAdvancedLevel(number, targets, overrides = {}) {
   };
 }
 
+function makeAdvancedBonusLevel(number, targets, overrides = {}) {
+  return {
+    id: `advanced-bonus-${String(number).padStart(2, "0")}`,
+    name: `Advanced Bonus ${number}`,
+    background: `Assets/Bakgrounds/advanced/ab${number}.png`,
+    targets,
+    isAdvanced: true,
+    isAdvancedBonus: true,
+    ...overrides,
+  };
+}
+
+function makePlaceholderTarget(id) {
+  return makeTarget(id, "", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced");
+}
+
 function normalizeLevel(level) {
   const targets = level.targets?.length
     ? level.targets
@@ -156,13 +172,13 @@ const ADVANCED_LEVELS_RAW = [
   // Advanced Level 2: Double Elephant
   makeAdvancedLevel(2, [
     makeTarget("advanced-02-a", "ep1", { type: "rect", x1: 1103, y1: 400, x2: 1070, y2: 369 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-02-b", "tru6", { type: "rect", x1: 470, y1: 300, x2: 378, y2: 371 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-02-b", "tru6", { type: "rect", x1: 473, y1: 378, x2: 498, y2: 405 }, "Assets/Waldos/advanced"),
   ], {
     name: "Double Elephant",    
   }),
   // Advanced Level 3: Crowd Split
   makeAdvancedLevel(3, [
-    makeTarget("advanced-03-a", "ep3", { type: "rect", x1: 1103, y1: 400, x2: 1070, y2: 369 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-03-a", "ep3", { type: "rect", x1: 1172, y1: 336, x2: 1136, y2: 294 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-03-b", "tru2", { type: "rect", x1: 311, y1: 413, x2: 288, y2: 381 }, "Assets/Waldos/advanced"),
   ], {
     name: "Crowd Split",
@@ -188,18 +204,55 @@ const ADVANCED_LEVELS_RAW = [
   ], {
     name: "Final Pairing",
   }),
-  {
-    id: "advanced-bonus-01",
+  // Advanced Level 7: Masked Pair
+  makeAdvancedLevel(7, [
+    makeTarget("advanced-07-a", "tru3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-07-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Masked Pair",
+  }),
+  // Advanced Level 8: Final Double Take
+  makeAdvancedLevel(8, [
+    makeTarget("advanced-08-a", "tru10", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-08-b", "ep7", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Final Double Take",
+  }),
+  makeAdvancedBonusLevel(1, [
+    makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-01-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
     name: "Hidden VIPs",
-    background: "Assets/Bakgrounds/advanced/ab1.png",
-    targets: [
-      makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-      makeTarget("advanced-bonus-01-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
-    ],
-    isAdvanced: true,
-    isAdvancedBonus: true,
-  },
+  }),
+  makeAdvancedBonusLevel(2, [
+    makeTarget("advanced-bonus-02-a", "tru1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-02-b", "sh1", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Secret Guests",
+  }),
 ];
+
+for (let number = 9; number <= 20; number += 1) {
+  ADVANCED_LEVELS_RAW.push(
+    makeAdvancedLevel(number, [
+      makePlaceholderTarget(`advanced-${String(number).padStart(2, "0")}-a`),
+      makePlaceholderTarget(`advanced-${String(number).padStart(2, "0")}-b`),
+    ], {
+      name: `Advanced Level ${number}`,
+    }),
+  );
+}
+
+for (let number = 3; number <= 20; number += 1) {
+  ADVANCED_LEVELS_RAW.push(
+    makeAdvancedBonusLevel(number, [
+      makePlaceholderTarget(`advanced-bonus-${String(number).padStart(2, "0")}-a`),
+      makePlaceholderTarget(`advanced-bonus-${String(number).padStart(2, "0")}-b`),
+    ], {
+      name: `Advanced Bonus ${number}`,
+    }),
+  );
+}
 
 export const MAIN_LEVELS = MAIN_LEVELS_RAW.map(normalizeLevel);
 export const BONUS_LEVELS = BONUS_LEVELS_RAW.map(normalizeLevel);

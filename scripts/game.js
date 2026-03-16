@@ -14,7 +14,7 @@ const KEYBOARD_PAN_STEP = 18;
 const PAN_MARGIN = 120;
 const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
-const HOME_BUTTON_ANIMATION_MS = 980;
+const HOME_BUTTON_ANIMATION_MS = 1320;
 const HOME_BUTTON_X_OFFSET = -90;
 const HOME_BUTTON_Y_OFFSET = -180;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
@@ -85,6 +85,8 @@ export class HiddenObjectGame {
     this.homeArtBounds = new Map();
     this.preloadedAssets = new Set();
     this.homeIntroPlayed = false;
+    this.homeAssetsReady = false;
+    this.homeBootStarted = false;
     this.state = {
       levelIndex: 0,
       levelSelectPage: 1,
@@ -121,18 +123,7 @@ export class HiddenObjectGame {
     this.applySettings();
     this.renderHomeStats();
     this.renderLevelSelect();
-    window.requestAnimationFrame(() => {
-      this.layoutHomeButtons();
-      this.playHomeButtonIntro();
-    });
-    if (this.elements.startScreenImage.complete) {
-      if (this.elements.startScreenImage.naturalWidth > 0) {
-        this.layoutHomeButtons();
-        this.playHomeButtonIntro();
-      } else {
-        this.showStartImageError();
-      }
-    }
+    this.startHomeBoot();
   }
 
   getElements() {
@@ -151,12 +142,17 @@ export class HiddenObjectGame {
       closeSettingsButton: document.getElementById("closeSettingsButton"),
       moreGamesButton: document.getElementById("moreGamesButton"),
       homeViewport: document.getElementById("homeViewport"),
+      homeBootOverlay: document.getElementById("homeBootOverlay"),
+      homeBootStatus: document.getElementById("homeBootStatus"),
       homeButtonOverlay: document.getElementById("homeButtonOverlay"),
       homeDebugOverlay: document.getElementById("homeDebugOverlay"),
       homeDebugReadout: document.getElementById("homeDebugReadout"),
       startButtonArt: document.getElementById("startButtonArt"),
+      startButtonSheen: document.getElementById("startButtonSheen"),
       settingsButtonArt: document.getElementById("settingsButtonArt"),
+      settingsButtonSheen: document.getElementById("settingsButtonSheen"),
       moreGamesButtonArt: document.getElementById("moreGamesButtonArt"),
+      moreGamesButtonSheen: document.getElementById("moreGamesButtonSheen"),
       startScreenImage: document.getElementById("startScreenImage"),
       startScreenFallback: document.getElementById("startScreenFallback"),
       startScreenErrorText: document.getElementById("startScreenErrorText"),
@@ -287,12 +283,13 @@ export class HiddenObjectGame {
     this.elements.startScreenImage.addEventListener("load", () => {
       this.hideStartImageError();
       this.layoutHomeButtons();
-      this.playHomeButtonIntro();
     });
     [this.elements.startButtonArt, this.elements.settingsButtonArt, this.elements.moreGamesButtonArt].forEach((image) => {
       image.addEventListener("load", () => {
         this.layoutHomeButtons();
-        this.playHomeButtonIntro();
+        if (this.homeAssetsReady) {
+          this.playHomeButtonIntro();
+        }
       });
     });
     this.elements.zoomOutButton.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
@@ -393,9 +390,72 @@ export class HiddenObjectGame {
       this.renderLevelSelect();
     }
     this.layoutHomeButtons();
-    if (name === "home" && this.elements.startScreenImage.naturalWidth > 0) {
+    if (name === "home" && this.homeAssetsReady && this.elements.startScreenImage.naturalWidth > 0) {
       this.playHomeButtonIntro();
     }
+  }
+
+  startHomeBoot() {
+    if (this.homeBootStarted) {
+      return;
+    }
+    this.homeBootStarted = true;
+    const assets = [
+      ["background", this.elements.startScreenImage, "Assets/ui/nobuttonloadingscreen.jpg"],
+      ["start", this.elements.startButtonArt, "Assets/ui/startbutton.png"],
+      ["settings", this.elements.settingsButtonArt, "Assets/ui/settingsbutton.png"],
+      ["moreGames", this.elements.moreGamesButtonArt, "Assets/ui/moregbutton.png"],
+    ];
+    this.elements.homeViewport.classList.remove("home-ready");
+    this.elements.homeBootOverlay.classList.remove("hidden", "is-exiting");
+    this.elements.homeBootStatus.textContent = "Loading menu art and button assets.";
+    Promise.allSettled(assets.map(([key, element, src]) => this.preloadImageAsset(element, src, key))).then((results) => {
+      const failures = results
+        .filter((result) => result.status === "fulfilled" && !result.value.ok)
+        .map((result) => result.value.src);
+      this.homeAssetsReady = true;
+      this.layoutHomeButtons();
+      if (failures.includes("Assets/ui/nobuttonloadingscreen.jpg")) {
+        this.showStartImageError();
+      }
+      this.elements.homeBootStatus.textContent = failures.length
+        ? `Some menu art is missing: ${failures.join(" | ")}`
+        : "Ready.";
+      this.elements.homeViewport.classList.add("home-ready");
+      this.elements.homeBootOverlay.classList.add("is-exiting");
+      window.setTimeout(() => {
+        this.elements.homeBootOverlay.classList.add("hidden");
+        this.elements.homeBootOverlay.classList.remove("is-exiting");
+      }, 520);
+      this.playHomeButtonIntro();
+    });
+  }
+
+  preloadImageAsset(element, src, key) {
+    return new Promise((resolve) => {
+      const finish = (ok) => resolve({ key, src, ok });
+      if (element.complete) {
+        finish(element.naturalWidth > 0);
+        return;
+      }
+      const onLoad = () => {
+        cleanup();
+        finish(true);
+      };
+      const onError = () => {
+        cleanup();
+        finish(false);
+      };
+      const cleanup = () => {
+        element.removeEventListener("load", onLoad);
+        element.removeEventListener("error", onError);
+      };
+      element.addEventListener("load", onLoad, { once: true });
+      element.addEventListener("error", onError, { once: true });
+      if (!element.getAttribute("src")) {
+        element.setAttribute("src", src);
+      }
+    });
   }
 
   openExternalLink(url, emptyMessage) {
@@ -465,7 +525,7 @@ export class HiddenObjectGame {
       const bestScore = result ? formatScore(result.bestScore ?? 0) : "0";
       const cardLabel = this.getLevelCardLabel(level, options.kind);
       const button = document.createElement("button");
-      const scoreMarkup = `<p class="level-meta level-best-score"><span>First ${firstScore}</span><span>Best ${bestScore}</span></p>`;
+      const scoreMarkup = `<div class="level-meta level-best-score"><span>Best ${bestScore}</span><span>First ${firstScore}</span></div>`;
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
@@ -792,6 +852,9 @@ export class HiddenObjectGame {
   }
 
   playHomeButtonIntro() {
+    if (!this.homeAssetsReady) {
+      return;
+    }
     playHomeButtonIntroUi(this, HOME_BUTTON_ANIMATION_MS, HOME_BUTTON_STAGGER_MS);
   }
 

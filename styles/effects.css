@@ -1,13 +1,21 @@
+.image-button {
+  transition: box-shadow 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
 .image-button:hover {
   background: rgba(255, 255, 255, 0.02);
   box-shadow: 0 0 24px rgba(255, 216, 78, 0.2);
 }
 
+.image-button:active {
+  transform: scale(0.97);
+}
+
 .home-button-art.is-hovered,
 .image-button:focus-visible + .home-button-art {
-  filter: drop-shadow(0 28px 44px rgba(0, 0, 0, 0.38)) drop-shadow(0 0 32px rgba(255, 216, 78, 0.28)) brightness(1.06) saturate(1.08);
-  transform: translateY(-4px) scale(1.08);
-  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 200ms ease;
+  filter: drop-shadow(0 30px 44px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 34px rgba(255, 216, 78, 0.32)) brightness(1.07) saturate(1.1);
+  transform: translateY(-5px) scale(1.1);
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 220ms ease;
 }
 
 .home-button-art {
@@ -22,22 +30,68 @@
   transform: translateY(var(--home-enter-offset, 140%));
   will-change: transform;
   transform-origin: center center;
+  animation: home-idle-glow 2.8s ease-in-out infinite;
+  animation-play-state: paused;
 }
 
 .home-button-art.is-prepping {
   opacity: 1;
   transform: translateY(var(--home-enter-offset, 140%));
+  animation-play-state: paused;
 }
 
 .home-button-art.is-entering {
   opacity: 1;
   transform: translateY(0);
-  transition: transform 1120ms cubic-bezier(0.16, 0.84, 0.2, 1);
+  transition: transform 1320ms cubic-bezier(0.12, 0.88, 0.18, 1.03);
+  animation-play-state: paused;
 }
 
 .home-button-art.is-settled {
   opacity: 1;
   transform: translateY(0);
+  animation-play-state: running;
+}
+
+.home-button-art.is-pressed {
+  transform: translateY(2px) scale(0.965);
+  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.3));
+}
+
+.home-button-sheen {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 24px;
+  opacity: 0;
+  transform: translateY(var(--home-enter-offset, 140%));
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.home-button-sheen::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -38%;
+  width: 34%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+  transform: skewX(-24deg);
+}
+
+.home-button-sheen.is-settled {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.home-button-sheen.is-hovered::before,
+.home-button-art.is-settled + .home-button-sheen::before {
+  animation: home-shimmer 2.8s ease-in-out infinite;
+}
+
+.home-button-sheen.is-pressed {
+  transform: translateY(2px) scale(0.965);
 }
 
 .page-arrow {
@@ -45,35 +99,67 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 8;
-  width: 5rem;
-  height: 5rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--panel-strong);
+  width: 7.2rem;
+  min-height: 6.1rem;
+  padding: 0.7rem 0.6rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 216, 78, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+    rgba(8, 17, 27, 0.9);
   color: var(--text);
   box-shadow: var(--shadow);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  gap: 0.2rem;
+  justify-items: center;
+  align-content: center;
+  text-align: center;
 }
 
 .page-arrow-left {
-  left: 0.1rem;
+  left: -0.25rem;
 }
 
 .page-arrow-right {
-  right: -1rem;
+  right: -0.25rem;
+}
+
+.page-arrow-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 999px;
+  background: rgba(255, 216, 78, 0.14);
+  color: var(--accent);
 }
 
 .page-arrow svg {
-  width: 1.8rem;
-  height: 1.8rem;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.page-arrow-text {
+  display: grid;
+  gap: 0.04rem;
+}
+
+.page-arrow-text strong {
+  font-size: 0.96rem;
+}
+
+.page-arrow-text span {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .page-arrow:hover {
-  transform: translateY(-50%) scale(1.06);
-  border-color: rgba(255, 216, 78, 0.5);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28), 0 0 30px rgba(255, 216, 78, 0.14);
+  transform: translateY(-50%) scale(1.04);
+  border-color: rgba(255, 216, 78, 0.42);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28), 0 0 30px rgba(255, 216, 78, 0.18);
 }
 
 .target-preview-list {
@@ -105,10 +191,11 @@
   left: 8%;
   right: 8%;
   top: 34%;
-  height: 3px;
+  height: 4px;
   border-radius: 999px;
-  background: rgba(255, 122, 114, 0.95);
-  box-shadow: 0 0 14px rgba(255, 122, 114, 0.35);
+  background: rgba(255, 122, 114, 0.98);
+  box-shadow: 0 0 18px rgba(255, 122, 114, 0.6);
+  animation: found-cross-pulse 1.4s ease-in-out infinite;
 }
 
 .preview-item.is-found::before {
@@ -151,6 +238,7 @@
   border-color: rgba(111, 227, 168, 0.95);
   background: rgba(111, 227, 168, 0.18);
   box-shadow: 0 0 0 3px rgba(111, 227, 168, 0.28), 0 0 20px rgba(111, 227, 168, 0.65);
+  animation: found-hitbox-pulse 1.3s ease-in-out infinite;
 }
 
 body.easter-arcade {
@@ -189,4 +277,50 @@ body.easter-party .home-viewport::after {
     radial-gradient(circle at 18% 22%, rgba(255, 122, 114, 0.16), transparent 18%),
     radial-gradient(circle at 78% 28%, rgba(255, 216, 78, 0.16), transparent 18%),
     radial-gradient(circle at 48% 72%, rgba(111, 227, 168, 0.16), transparent 18%);
+}
+
+@keyframes home-idle-glow {
+  0%, 100% {
+    filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.28));
+  }
+  50% {
+    filter: drop-shadow(0 22px 38px rgba(0, 0, 0, 0.32)) drop-shadow(0 0 18px rgba(255, 216, 78, 0.16));
+  }
+}
+
+@keyframes home-shimmer {
+  0%, 18% {
+    transform: translateX(-165%) skewX(-24deg);
+  }
+  38%, 100% {
+    transform: translateX(360%) skewX(-24deg);
+  }
+}
+
+@keyframes found-cross-pulse {
+  0%, 100% {
+    opacity: 0.9;
+    box-shadow: 0 0 18px rgba(255, 122, 114, 0.45);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 28px rgba(255, 122, 114, 0.76);
+  }
+}
+
+@keyframes found-hitbox-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 3px rgba(111, 227, 168, 0.28), 0 0 20px rgba(111, 227, 168, 0.5);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px rgba(111, 227, 168, 0.34), 0 0 28px rgba(111, 227, 168, 0.76);
+  }
+}
+
+@keyframes home-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

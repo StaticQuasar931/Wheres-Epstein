@@ -195,6 +195,45 @@ p {
     linear-gradient(160deg, #08111b, #152a41 70%, #08111b);
 }
 
+.home-boot-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 216, 78, 0.12), transparent 18%),
+    linear-gradient(160deg, rgba(8, 17, 27, 0.96), rgba(14, 28, 45, 0.98));
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.home-boot-overlay.is-exiting {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.home-boot-card {
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+  width: min(440px, calc(100vw - 2rem));
+  padding: 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius-xl) + 2px);
+  background: rgba(8, 17, 27, 0.78);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.home-boot-spinner {
+  width: 3.15rem;
+  height: 3.15rem;
+  border-radius: 999px;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--accent);
+  animation: home-spin 1s linear infinite;
+}
+
 .home-viewport .hero-background {
   position: absolute;
   inset: 0;
@@ -213,6 +252,12 @@ p {
 .home-button-overlay {
   pointer-events: none;
   overflow: visible;
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+
+.home-viewport.home-ready .home-button-overlay {
+  opacity: 1;
 }
 
 .image-button {
@@ -454,7 +499,7 @@ p {
 .menu-shell {
   min-height: 100vh;
   padding: 4.75rem 1rem 1rem;
-  max-width: 1480px;
+  max-width: 1680px;
   margin: 0 auto;
   position: relative;
 }
@@ -484,6 +529,22 @@ p {
   margin-top: 1rem;
 }
 
+#levelSelectScreen .level-select-groups {
+  grid-template-columns: minmax(0, 2.5fr) minmax(280px, 1fr);
+  align-items: start;
+}
+
+#mainRouteSection,
+#advancedRouteSection {
+  grid-column: 1;
+}
+
+#bonusRouteSection,
+#advancedBonusSection,
+#progressRouteSection {
+  grid-column: 2;
+}
+
 #settingsScreen .level-select-groups {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
@@ -509,7 +570,7 @@ p {
 
 
 .level-grid {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   margin-top: 1rem;
 }
 
@@ -523,9 +584,9 @@ p {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
     var(--panel-soft);
-  padding: 1rem;
+  padding: 0.82rem;
   text-align: center;
-  min-height: 148px;
+  min-height: 118px;
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   display: grid;
@@ -550,7 +611,7 @@ p {
 }
 
 .level-card h4 {
-  font-size: 1.08rem;
+  font-size: 0.95rem;
   line-height: 1.18;
 }
 
@@ -564,13 +625,13 @@ p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 84px;
-  padding: 0.34rem 0.62rem;
+  min-width: 76px;
+  padding: 0.28rem 0.56rem;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   color: var(--muted);
-  font-size: 0.76rem;
+  font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -578,22 +639,21 @@ p {
 
 .level-meta {
   color: var(--muted);
-  font-size: 0.98rem;
+  font-size: 0.86rem;
 }
 
 .level-best-score {
-  display: flex;
-  justify-content: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  font-size: 0.84rem;
+  display: grid;
+  gap: 0.18rem;
+  justify-items: center;
+  font-size: 0.8rem;
   font-weight: 800;
 }
 
 .level-stars {
   color: var(--accent);
   letter-spacing: 0.18rem;
-  font-size: 1.45rem;
+  font-size: 1.32rem;
   font-weight: 900;
   justify-self: center;
   text-shadow: 0 0 18px rgba(255, 216, 78, 0.18);
@@ -966,6 +1026,16 @@ body[data-preview="large"] .target-card {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  #levelSelectScreen .level-select-groups {
+    grid-template-columns: 1fr;
+  }
+
+  #bonusRouteSection,
+  #advancedBonusSection,
+  #progressRouteSection {
+    grid-column: 1;
+  }
+
   #settingsScreen .level-select-groups {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -1010,6 +1080,7 @@ body[data-preview="large"] .target-card {
   }
 
   .settings-grid,
+  #levelSelectScreen .level-select-groups,
   #settingsScreen .level-select-groups {
     grid-template-columns: 1fr;
   }
