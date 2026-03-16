@@ -13,6 +13,7 @@ const PAN_MARGIN = 120;
 const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
 const HOME_BUTTON_ANIMATION_MS = 980;
+const HOME_BUTTON_X_OFFSET = -10;
 const HOME_BUTTON_Y_OFFSET = -300;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
@@ -705,10 +706,10 @@ export class HiddenObjectGame {
 
   getAdjustedHomeZone(zone) {
     return {
-      x1: zone.x1,
-      x2: zone.x2,
-      y1: zone.y1 + HOME_BUTTON_Y_OFFSET,
-      y2: zone.y2 + HOME_BUTTON_Y_OFFSET,
+      x1: zone.x1 + HOME_BUTTON_X_OFFSET,
+      x2: zone.x2 + HOME_BUTTON_X_OFFSET,
+      y1: zone.y1 + HOME_BUTTON_Y_OFFSET + 30,
+      y2: zone.y2 + HOME_BUTTON_Y_OFFSET + 30,
       color: zone.color,
     };
   }
