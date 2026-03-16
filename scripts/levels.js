@@ -225,17 +225,17 @@ const ADVANCED_LEVELS_RAW = [
   ], {
     name: "Crowd Pressure",
   }),
-  // Advanced Level 10: Twin Watch
+  // Advanced Level 10: Twin Watch         
   makeAdvancedLevel(10, [
-    makeTarget("advanced-10-a", "ep12", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 680, y1: 302, x2: 656, y2: 273 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-10-a", "ep12", { type: "rect", x1: 680, y1: 302, x2: 656, y2: 273 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 1021, y1: 286, x2: 991, y2: 251 }, "Assets/Waldos/advanced"),
   ], {
     name: "Twin Watch",
   }),
-  // Advanced Level 11: Narrow Pursuit
+  // Advanced Level 11: Narrow Pursuit              
   makeAdvancedLevel(11, [
-    makeTarget("advanced-11-a", "di2", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-11-b", "tru7", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-11-a", "di2", { type: "rect", x1: 497, y1: 307, x2: 480, y2: 282 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-11-b", "tru7", { type: "rect", x1: 1065, y1: 317, x2: 1043, y2: 285 }, "Assets/Waldos/advanced"),
   ], {
     name: "Narrow Pursuit",
   }),

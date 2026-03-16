@@ -1,36 +1,26 @@
-.image-button {
-  transition: box-shadow 180ms ease, background-color 180ms ease, transform 180ms ease;
-}
+/* ============================================================
+   WHERE'S EPSTEIN? — effects.css
+   Animation-heavy styles, hover effects, home button entrance,
+   page arrows, preview items, found-target effects.
+   Frontend-only polish pass. Game logic untouched.
+   ============================================================ */
 
-.image-button:hover {
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow: 0 0 24px rgba(255, 216, 78, 0.2);
-}
-
-.image-button:active {
-  transform: scale(0.985);
-}
-
-.home-button-art.is-hovered,
-.image-button:focus-visible + .home-button-art {
-  filter: drop-shadow(0 30px 44px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 34px rgba(255, 216, 78, 0.32)) brightness(1.07) saturate(1.1);
-  transform: translateY(-5px) scale(1.055);
-  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 220ms ease;
-}
-
+/* ============================================================
+   HOME BUTTON — IMAGE ART
+   ============================================================ */
 .home-button-art {
   position: absolute;
   width: auto;
   height: auto;
   display: block;
   pointer-events: none;
-  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.28));
+  filter: drop-shadow(0 18px 36px rgba(0,0,0,0.3));
   z-index: 1;
   opacity: 1;
   transform: translateY(var(--home-enter-offset, 140%));
-  will-change: transform;
-  transform-origin: center center;
-  animation: home-idle-glow 2.8s ease-in-out infinite;
+  will-change: transform, filter;
+  transform-origin: center bottom;
+  animation: home-idle-glow 3s ease-in-out infinite;
   animation-play-state: paused;
 }
 
@@ -43,7 +33,7 @@
 .home-button-art.is-entering {
   opacity: 1;
   transform: translateY(0);
-  transition: transform 1320ms cubic-bezier(0.12, 0.88, 0.18, 1.03);
+  transition: transform 1280ms cubic-bezier(0.08, 0.92, 0.16, 1.04);
   animation-play-state: paused;
 }
 
@@ -53,20 +43,62 @@
   animation-play-state: running;
 }
 
-.home-button-art.is-pressed {
-  transform: translateY(2px) scale(0.985);
-  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.3));
+/* Hover lift + glow */
+.home-button-art.is-hovered {
+  filter:
+    drop-shadow(0 28px 42px rgba(0,0,0,0.44))
+    drop-shadow(0 0 32px rgba(255,216,78,0.36))
+    brightness(1.08)
+    saturate(1.12);
+  transform: translateY(-6px) scale(1.058);
+  transition:
+    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 200ms ease;
 }
 
+/* Press squash */
+.home-button-art.is-pressed {
+  transform: translateY(3px) scale(0.982);
+  filter: drop-shadow(0 14px 22px rgba(0,0,0,0.32));
+  transition: transform 80ms ease, filter 80ms ease;
+}
+
+/* focus-visible fallback */
+.image-button:focus-visible + .home-button-art {
+  filter:
+    drop-shadow(0 28px 42px rgba(0,0,0,0.44))
+    drop-shadow(0 0 32px rgba(255,216,78,0.4))
+    brightness(1.08);
+  transform: translateY(-5px) scale(1.055);
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 200ms ease;
+}
+
+/* ============================================================
+   HOME BUTTON — IMAGE BUTTON HITBOX
+   ============================================================ */
+.image-button {
+  transition: box-shadow 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+.image-button:hover {
+  background: rgba(255,255,255,0.025);
+  box-shadow: 0 0 28px rgba(255,216,78,0.18);
+}
+.image-button:active {
+  transform: scale(0.983);
+}
+
+/* ============================================================
+   HOME BUTTON — SHEEN
+   ============================================================ */
 .home-button-sheen {
   position: absolute;
   pointer-events: none;
   z-index: 2;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 22px;
   opacity: 0;
   transform: translateY(var(--home-enter-offset, 140%));
-  transition: opacity 220ms ease, transform 220ms ease;
+  transition: opacity 240ms ease, transform 240ms ease;
 }
 
 .home-button-sheen::before {
@@ -74,10 +106,10 @@
   position: absolute;
   top: -20%;
   bottom: -20%;
-  left: -38%;
-  width: 34%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
-  transform: skewX(-24deg);
+  left: -42%;
+  width: 32%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent);
+  transform: skewX(-22deg);
   opacity: 0;
 }
 
@@ -85,91 +117,99 @@
   opacity: 1;
   transform: translateY(0);
 }
-
-.home-button-sheen.is-hovered::before,
-.home-button-art.is-settled + .home-button-sheen::before {
-  animation: home-shimmer 7s ease-in-out infinite;
-}
-
 .home-button-sheen.is-pressed {
-  transform: translateY(2px) scale(0.985);
+  transform: translateY(3px) scale(0.982);
+  transition: transform 80ms ease;
 }
 
+/* Run shimmer after button settles */
+.home-button-art.is-settled + .home-button-sheen::before,
+.home-button-sheen.is-hovered::before {
+  animation: home-shimmer 7.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   PAGE ARROWS (level select navigation)
+   ============================================================ */
 .page-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 8;
-  width: 7.8rem;
-  min-height: 6.5rem;
-  padding: 0.8rem 0.7rem;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(255, 216, 78, 0.18);
+  width: 7.6rem;
+  min-height: 6.2rem;
+  padding: 0.75rem 0.65rem;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(255,216,78,0.2);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
-    rgba(8, 17, 27, 0.9);
+    linear-gradient(170deg, rgba(255,255,255,0.11), rgba(255,255,255,0.04)),
+    rgba(7,16,27,0.92);
   color: var(--text);
-  box-shadow: var(--shadow);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.36);
   display: grid;
-  gap: 0.2rem;
+  gap: 0.22rem;
   justify-items: center;
   align-content: center;
   text-align: center;
+  transition: transform 200ms var(--ease-bounce), border-color 180ms ease, box-shadow 180ms ease;
+  backdrop-filter: blur(12px);
 }
 
-.page-arrow-left {
-  left: -1.15rem;
-}
-
-.page-arrow-right {
-  right: -2.2rem;
-}
+.page-arrow-left  { left: -1.1rem; }
+.page-arrow-right { right: -2.1rem; }
 
 .page-arrow-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.55rem;
-  height: 2.55rem;
-  border-radius: 999px;
-  background: rgba(255, 216, 78, 0.14);
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: rgba(255,216,78,0.14);
   color: var(--accent);
+  transition: background 180ms ease;
 }
-
 .page-arrow svg {
-  width: 1.62rem;
-  height: 1.62rem;
+  width: 1.55rem;
+  height: 1.55rem;
 }
 
 .page-arrow-text {
   display: grid;
   gap: 0.04rem;
 }
-
-.page-arrow-text strong {
-  font-size: 1.02rem;
-}
-
+.page-arrow-text strong { font-size: 0.98rem; font-weight: 800; }
 .page-arrow-text span {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--muted);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .page-arrow:hover {
-  transform: translateY(-50%) scale(1.04);
-  border-color: rgba(255, 216, 78, 0.42);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28), 0 0 30px rgba(255, 216, 78, 0.18);
+  transform: translateY(-50%) scale(1.05);
+  border-color: rgba(255,216,78,0.48);
+  box-shadow:
+    0 18px 44px rgba(0,0,0,0.3),
+    0 0 28px rgba(255,216,78,0.16);
+}
+.page-arrow:hover .page-arrow-icon {
+  background: rgba(255,216,78,0.22);
+}
+.page-arrow:active {
+  transform: translateY(-50%) scale(0.97);
+  transition-duration: 60ms;
 }
 
+/* ============================================================
+   TARGET PREVIEW LIST
+   ============================================================ */
 .target-preview-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
-  gap: 0.65rem;
-  margin: 0.75rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.6rem;
+  margin: 0.65rem 0;
 }
-
 .intro-preview-list {
   max-width: 320px;
   margin-inline: auto;
@@ -178,13 +218,13 @@
 .preview-item {
   position: relative;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
+/* Found state — cross-out */
 .preview-item.is-found {
-  opacity: 0.64;
+  opacity: 0.62;
 }
-
 .preview-item.is-found::before,
 .preview-item.is-found::after {
   content: "";
@@ -194,18 +234,12 @@
   top: 34%;
   height: 4px;
   border-radius: 999px;
-  background: rgba(255, 122, 114, 0.98);
-  box-shadow: 0 0 18px rgba(255, 122, 114, 0.6);
-  animation: found-cross-pulse 1.4s ease-in-out infinite;
+  background: rgba(255,122,114,0.96);
+  box-shadow: 0 0 16px rgba(255,122,114,0.56);
+  animation: found-cross-pulse 1.5s ease-in-out infinite;
 }
-
-.preview-item.is-found::before {
-  transform: rotate(26deg);
-}
-
-.preview-item.is-found::after {
-  transform: rotate(-26deg);
-}
+.preview-item.is-found::before { transform: rotate(26deg); }
+.preview-item.is-found::after  { transform: rotate(-26deg); }
 
 .preview-image {
   width: 100%;
@@ -214,123 +248,120 @@
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
+  transition: opacity 200ms ease;
 }
 
 .preview-badge {
   display: inline-flex;
   justify-content: center;
   border-radius: 999px;
-  padding: 0.25rem 0.48rem;
+  padding: 0.22rem 0.46rem;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.07);
   color: var(--muted);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
-
 .preview-item.is-found .preview-badge {
-  color: #ffe5e3;
-  background: rgba(255, 122, 114, 0.22);
-  border-color: rgba(255, 122, 114, 0.42);
+  color: #ffe3e0;
+  background: rgba(255,122,114,0.2);
+  border-color: rgba(255,122,114,0.4);
 }
 
+/* ============================================================
+   HITBOX FOUND STATE
+   ============================================================ */
 .hitbox-shape-found {
-  border-color: rgba(111, 227, 168, 0.95);
-  background: rgba(111, 227, 168, 0.18);
-  box-shadow: 0 0 0 3px rgba(111, 227, 168, 0.28), 0 0 20px rgba(111, 227, 168, 0.65);
-  animation: found-hitbox-pulse 1.3s ease-in-out infinite;
+  border-color: rgba(111,227,168,0.95);
+  background: rgba(111,227,168,0.16);
+  box-shadow:
+    0 0 0 3px rgba(111,227,168,0.25),
+    0 0 22px rgba(111,227,168,0.6);
+  animation: found-hitbox-pulse 1.4s ease-in-out infinite;
 }
 
+/* ============================================================
+   EASTER EGGS
+   ============================================================ */
 body.easter-arcade {
-  --accent: #7affd7;
+  --accent:   #7affd7;
   --accent-2: #4ea3ff;
-  --good: #9eff83;
+  --good:     #9eff83;
 }
-
 body.easter-arcade .menu-shell,
 body.easter-arcade .home-viewport {
   background:
-    radial-gradient(circle at 10% 10%, rgba(122, 255, 215, 0.16), transparent 22%),
-    radial-gradient(circle at 90% 18%, rgba(78, 163, 255, 0.16), transparent 20%),
-    linear-gradient(160deg, #08111b, #112744 70%, #09111d);
+    radial-gradient(circle at 10% 10%, rgba(122,255,215,0.14), transparent 22%),
+    radial-gradient(circle at 90% 18%, rgba(78,163,255,0.14), transparent 20%),
+    linear-gradient(160deg, #07111b, #102540 70%, #08111d);
 }
-
 body.easter-arcade .level-stars,
 body.easter-arcade .result-stars {
-  text-shadow: 0 0 18px rgba(122, 255, 215, 0.45);
+  text-shadow: 0 0 18px rgba(122,255,215,0.45);
 }
 
-body.easter-stripes .home-viewport::after,
-body.easter-party .home-viewport::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+/* NOTE: easter-stripes / easter-party viewport overlays live in main.css
+   to avoid duplication. */
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+/* Boot spinner */
+@keyframes home-spin {
+  to { transform: rotate(360deg); }
 }
 
-body.easter-stripes .home-viewport::after {
-  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 18px, transparent 18px 36px);
-}
-
-body.easter-party .home-viewport::after {
-  background:
-    radial-gradient(circle at 18% 22%, rgba(255, 122, 114, 0.16), transparent 18%),
-    radial-gradient(circle at 78% 28%, rgba(255, 216, 78, 0.16), transparent 18%),
-    radial-gradient(circle at 48% 72%, rgba(111, 227, 168, 0.16), transparent 18%);
-}
-
+/* Idle glow breathe */
 @keyframes home-idle-glow {
   0%, 100% {
-    filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.28));
+    filter: drop-shadow(0 18px 34px rgba(0,0,0,0.3));
   }
   50% {
-    filter: drop-shadow(0 22px 38px rgba(0, 0, 0, 0.32)) drop-shadow(0 0 18px rgba(255, 216, 78, 0.16));
+    filter:
+      drop-shadow(0 22px 40px rgba(0,0,0,0.34))
+      drop-shadow(0 0 20px rgba(255,216,78,0.18));
   }
 }
 
+/* Button sheen sweep */
 @keyframes home-shimmer {
-  0%, 70% {
-    transform: translateX(-180%) skewX(-24deg);
+  0%, 68% {
+    transform: translateX(-200%) skewX(-22deg);
     opacity: 0;
   }
-  74% {
-    opacity: 0.9;
-  }
+  72% { opacity: 0.85; }
   84% {
-    transform: translateX(340%) skewX(-24deg);
-    opacity: 0.9;
+    transform: translateX(360%) skewX(-22deg);
+    opacity: 0.85;
   }
   100% {
-    transform: translateX(360%) skewX(-24deg);
+    transform: translateX(380%) skewX(-22deg);
     opacity: 0;
   }
 }
 
+/* Found cross pulse */
 @keyframes found-cross-pulse {
   0%, 100% {
-    opacity: 0.9;
-    box-shadow: 0 0 18px rgba(255, 122, 114, 0.45);
+    opacity: 0.88;
+    box-shadow: 0 0 16px rgba(255,122,114,0.42);
   }
   50% {
     opacity: 1;
-    box-shadow: 0 0 28px rgba(255, 122, 114, 0.76);
+    box-shadow: 0 0 26px rgba(255,122,114,0.72);
   }
 }
 
+/* Found hitbox pulse */
 @keyframes found-hitbox-pulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 3px rgba(111, 227, 168, 0.28), 0 0 20px rgba(111, 227, 168, 0.5);
+    box-shadow: 0 0 0 3px rgba(111,227,168,0.25), 0 0 20px rgba(111,227,168,0.5);
   }
   50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 4px rgba(111, 227, 168, 0.34), 0 0 28px rgba(111, 227, 168, 0.76);
-  }
-}
-
-@keyframes home-spin {
-  to {
-    transform: rotate(360deg);
+    transform: scale(1.018);
+    box-shadow: 0 0 0 4px rgba(111,227,168,0.32), 0 0 30px rgba(111,227,168,0.72);
   }
 }
