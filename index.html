@@ -228,9 +228,24 @@
             <p id="settingsLinkHint" class="subtle-text">Community links open in a new tab when configured.</p>
           </section>
 
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Editing</p>
+                <h3>Useful file info</h3>
+              </div>
+            </div>
+            <ul class="control-list compact-list">
+              <li>Level target hitboxes are in <code>scripts/levels.js</code>.</li>
+              <li>Start-screen button zones use the same <code>x1, y1, x2, y2</code> format.</li>
+              <li>Testing mode shows live pointer coordinates and button hitboxes.</li>
+              <li>The current home buttons are visually shifted upward by 300 image units.</li>
+            </ul>
+          </section>
+
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.080101</p>
-            <p class="subtle-text">Level hitbox editing lives in <code>scripts/levels.js</code>. Rectangles use <code>x1, y1</code> to <code>x2, y2</code>.</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.08067</p>
+            <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -330,6 +345,18 @@
       <div class="button-row">
         <button id="resumeButton" class="primary-button" type="button">Resume</button>
         <button id="pauseQuitButton" class="ghost-button" type="button">Quit Run</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="quitConfirmOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Leave Level</p>
+      <h2>Return to level select?</h2>
+      <p class="subtle-text">Your current attempt will be closed and you will go back to the selector.</p>
+      <div class="button-row">
+        <button id="confirmQuitButton" class="primary-button" type="button">Go To Level Select</button>
+        <button id="cancelQuitButton" class="ghost-button" type="button">Stay Here</button>
       </div>
     </div>
   </div>

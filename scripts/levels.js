@@ -124,15 +124,15 @@ export const LEVELS = [
   },
   {
     id: "bonus-03",
-    name: "Group Photo",
+    name: "StaticQuasar931",
     background: "Assets/Bakgrounds/bonus3.png",
     targetPreview: "",
-    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+    hitbox: { type: "rect", x1: 0, y1: 0, x2: 40, y2: 30 },
     isBonus: true,
   },
   {
     id: "bonus-04",
-    name: "Bonus 4",
+    name: "Group Photo",
     background: "Assets/Bakgrounds/bonus4.png",
     targetPreview: "Assets/Waldos/eps4.png",
     hitbox: { type: "rect", x1: 785, y1: 418, x2: 731, y2: 336 },

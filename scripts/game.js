@@ -2,7 +2,7 @@ import { LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
 import { loadSave, recordLevelResult, saveSettings } from "./storage.js";
 
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
-const DISCORD_URL = "";
+const DISCORD_URL = "https://discord.gg/jW2az4AQUH";
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 8;
 const WHEEL_ZOOM_STEP = 0.12;
@@ -12,7 +12,8 @@ const KEYBOARD_PAN_STEP = 18;
 const PAN_MARGIN = 120;
 const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
-const HOME_BUTTON_ANIMATION_MS = 520;
+const HOME_BUTTON_ANIMATION_MS = 980;
+const HOME_BUTTON_Y_OFFSET = -300;
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 
 const MAIN_LEVELS = LEVELS.filter((level) => !level.isBonus);
@@ -102,6 +103,7 @@ export class HiddenObjectGame {
         originY: 0,
         moved: false,
       },
+      quitPromptResumeTarget: false,
     };
 
     this.elements = this.getElements();
@@ -208,6 +210,9 @@ export class HiddenObjectGame {
       pauseOverlay: document.getElementById("pauseOverlay"),
       resumeButton: document.getElementById("resumeButton"),
       pauseQuitButton: document.getElementById("pauseQuitButton"),
+      quitConfirmOverlay: document.getElementById("quitConfirmOverlay"),
+      cancelQuitButton: document.getElementById("cancelQuitButton"),
+      confirmQuitButton: document.getElementById("confirmQuitButton"),
       resultOverlay: document.getElementById("resultOverlay"),
       resultEyebrow: document.getElementById("resultEyebrow"),
       resultTitle: document.getElementById("resultTitle"),
@@ -273,6 +278,8 @@ export class HiddenObjectGame {
     this.elements.togglePreviewButton.addEventListener("click", () => this.togglePreviewCard());
     this.elements.resumeButton.addEventListener("click", () => this.resumeGame());
     this.elements.pauseQuitButton.addEventListener("click", () => this.quitRun());
+    this.elements.cancelQuitButton.addEventListener("click", () => this.closeQuitPrompt());
+    this.elements.confirmQuitButton.addEventListener("click", () => this.confirmQuitRun());
     this.elements.startLevelButton.addEventListener("click", () => this.beginLevel());
     this.elements.resultPrimaryButton.addEventListener("click", () => this.handleResultPrimary());
     this.elements.resultRetryButton.addEventListener("click", () => this.retryCurrentLevel());
@@ -695,11 +702,22 @@ export class HiddenObjectGame {
     this.renderHomeDebugOverlay(drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
   }
 
+  getAdjustedHomeZone(zone) {
+    return {
+      x1: zone.x1,
+      x2: zone.x2,
+      y1: zone.y1 + HOME_BUTTON_Y_OFFSET,
+      y2: zone.y2 + HOME_BUTTON_Y_OFFSET,
+      color: zone.color,
+    };
+  }
+
   placeHomeButton(element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight) {
-    const left = Math.min(zone.x1, zone.x2);
-    const right = Math.max(zone.x1, zone.x2);
-    const top = Math.min(zone.y1, zone.y2);
-    const bottom = Math.max(zone.y1, zone.y2);
+    const adjusted = this.getAdjustedHomeZone(zone);
+    const left = Math.min(adjusted.x1, adjusted.x2);
+    const right = Math.max(adjusted.x1, adjusted.x2);
+    const top = Math.min(adjusted.y1, adjusted.y2);
+    const bottom = Math.max(adjusted.y1, adjusted.y2);
     const scaleX = drawWidth / naturalWidth;
     const scaleY = drawHeight / naturalHeight;
     element.style.position = "absolute";
@@ -759,10 +777,11 @@ export class HiddenObjectGame {
       return;
     }
 
-    const left = Math.min(zone.x1, zone.x2);
-    const right = Math.max(zone.x1, zone.x2);
-    const top = Math.min(zone.y1, zone.y2);
-    const bottom = Math.max(zone.y1, zone.y2);
+    const adjusted = this.getAdjustedHomeZone(zone);
+    const left = Math.min(adjusted.x1, adjusted.x2);
+    const right = Math.max(adjusted.x1, adjusted.x2);
+    const top = Math.min(adjusted.y1, adjusted.y2);
+    const bottom = Math.max(adjusted.y1, adjusted.y2);
     const targetLeft = left * (drawWidth / naturalWidth);
     const targetTop = top * (drawHeight / naturalHeight);
     const targetWidth = (right - left) * (drawWidth / naturalWidth);
@@ -831,17 +850,22 @@ export class HiddenObjectGame {
       ["settings", START_SCREEN_BUTTONS.settings],
       ["more", START_SCREEN_BUTTONS.moreGames],
     ].forEach(([label, zone]) => {
+      const adjusted = this.getAdjustedHomeZone(zone);
       const node = document.createElement("div");
       node.className = `home-debug-box color-${zone.color}`;
       const tag = document.createElement("span");
       tag.className = "home-debug-label";
       const scaleX = drawWidth / naturalWidth;
       const scaleY = drawHeight / naturalHeight;
-      node.style.left = `${zone.x1 * scaleX}px`;
-      node.style.top = `${zone.y1 * scaleY}px`;
-      node.style.width = `${(zone.x2 - zone.x1) * scaleX}px`;
-      node.style.height = `${(zone.y2 - zone.y1) * scaleY}px`;
-      tag.textContent = `${label}: ${zone.x1},${zone.y1} -> ${zone.x2},${zone.y2}`;
+      const left = Math.min(adjusted.x1, adjusted.x2);
+      const right = Math.max(adjusted.x1, adjusted.x2);
+      const top = Math.min(adjusted.y1, adjusted.y2);
+      const bottom = Math.max(adjusted.y1, adjusted.y2);
+      node.style.left = `${left * scaleX}px`;
+      node.style.top = `${top * scaleY}px`;
+      node.style.width = `${(right - left) * scaleX}px`;
+      node.style.height = `${(bottom - top) * scaleY}px`;
+      tag.textContent = `${label}: ${left},${top} -> ${right},${bottom}`;
       node.appendChild(tag);
       debug.appendChild(node);
     });
@@ -853,7 +877,10 @@ export class HiddenObjectGame {
     }
     const imagePoint = this.clientToHomeImage(event.clientX, event.clientY);
     const pointer = imagePoint ? `Pointer: ${imagePoint.x}, ${imagePoint.y}` : "Pointer: outside image";
-    this.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${START_SCREEN_BUTTONS.start.x1},${START_SCREEN_BUTTONS.start.y1} -> ${START_SCREEN_BUTTONS.start.x2},${START_SCREEN_BUTTONS.start.y2}\nsettings: ${START_SCREEN_BUTTONS.settings.x1},${START_SCREEN_BUTTONS.settings.y1} -> ${START_SCREEN_BUTTONS.settings.x2},${START_SCREEN_BUTTONS.settings.y2}\nmore: ${START_SCREEN_BUTTONS.moreGames.x1},${START_SCREEN_BUTTONS.moreGames.y1} -> ${START_SCREEN_BUTTONS.moreGames.x2},${START_SCREEN_BUTTONS.moreGames.y2}`;
+    const start = this.getAdjustedHomeZone(START_SCREEN_BUTTONS.start);
+    const settings = this.getAdjustedHomeZone(START_SCREEN_BUTTONS.settings);
+    const more = this.getAdjustedHomeZone(START_SCREEN_BUTTONS.moreGames);
+    this.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${start.x1},${start.y1} -> ${start.x2},${start.y2}\nsettings: ${settings.x1},${settings.y1} -> ${settings.x2},${settings.y2}\nmore: ${more.x1},${more.y1} -> ${more.x2},${more.y2}`;
   }
 
   clientToHomeImage(clientX, clientY) {
@@ -957,16 +984,36 @@ export class HiddenObjectGame {
   }
 
   quitRun() {
-    if (this.save.settings.confirmQuit === "on" && this.elements.screens.game.classList.contains("screen-active")) {
-      const leave = window.confirm("Leave this run and return to the menu?");
-      if (!leave) {
-        return;
-      }
+    if (this.elements.screens.game.classList.contains("screen-active")) {
+      this.openQuitPrompt();
+      return;
     }
+    this.confirmQuitRun();
+  }
+
+  openQuitPrompt() {
+    this.state.quitPromptResumeTarget = this.state.runActive && !this.state.paused;
+    if (this.state.quitPromptResumeTarget) {
+      this.pauseGame();
+    }
+    this.elements.quitConfirmOverlay.classList.remove("hidden");
+  }
+
+  closeQuitPrompt() {
+    this.elements.quitConfirmOverlay.classList.add("hidden");
+    if (this.elements.screens.game.classList.contains("screen-active") && this.state.quitPromptResumeTarget) {
+      this.resumeGame();
+    }
+    this.state.quitPromptResumeTarget = false;
+  }
+
+  confirmQuitRun() {
+    this.elements.quitConfirmOverlay.classList.add("hidden");
+    this.state.quitPromptResumeTarget = false;
     this.stopElapsedTimer();
     this.clearKeys();
     this.closeAllOverlays();
-    this.showScreen("home");
+    this.showScreen("levelSelect");
     this.renderLevelSelect();
   }
 
@@ -974,6 +1021,7 @@ export class HiddenObjectGame {
     [
       this.elements.levelIntroOverlay,
       this.elements.pauseOverlay,
+      this.elements.quitConfirmOverlay,
       this.elements.resultOverlay,
       this.elements.completionOverlay,
     ].forEach((node) => node.classList.add("hidden"));
