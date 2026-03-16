@@ -242,21 +242,21 @@ const ADVANCED_LEVELS_RAW = [
   // Advanced Level 12: Split Signal                    
   makeAdvancedLevel(12, [        
     makeTarget("advanced-12-a", "tru10", { type: "rect", x1: 1112, y1: 364, x2: 1072, y2: 317 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 16, y1: 255, x2: 0, y2: 221 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 892, y1: 258, x2: 869, y2: 231 }, "Assets/Waldos/advanced"),
   ], {
     name: "Split Signal",
   }),
   // Advanced Level 13: Crossed Paths       
   makeAdvancedLevel(13, [
     makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 892, y1: 258, x2: 869, y2: 231 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 16, y1: 255, x2: 0, y2: 221 }, "Assets/Waldos/advanced"),
   ], {
     name: "Crossed Paths",
   }),
-  // Advanced Level 14: Crimson Route
+  // Advanced Level 14: Crimson Route              
   makeAdvancedLevel(14, [
-    makeTarget("advanced-14-a", "di5", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-14-b", "ep1", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-14-a", "di5", { type: "rect", x1: 951, y1: 223, x2: 941, y2: 207 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-14-b", "ep1", { type: "rect", x1: 610, y1: 202, x2: 598, y2: 189 }, "Assets/Waldos/advanced"),
   ], {
     name: "Crimson Route",
     needsSetup: true,

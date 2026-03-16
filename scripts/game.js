@@ -20,6 +20,7 @@ const HOME_BUTTON_ANIMATION_MS = 1320;
 const HOME_BUTTON_X_OFFSET = -90;
 const HOME_BUTTON_Y_OFFSET = -180;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
+const HOME_EDITOR_NUDGE_STEP = 4;
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 const WALDO_SEQUENCE = ["w", "a", "l", "d", "o"];
 const PARTY_SEQUENCE = ["p", "a", "r", "t", "y"];
@@ -96,6 +97,10 @@ export class HiddenObjectGame {
     this.homeAssetsReady = false;
     this.homeBootStarted = false;
     this.speedrunRecentIds = [];
+    this.homeButtonEditorEnabled = false;
+    this.homeButtonEditorSelection = "start";
+    this.homeEditorDrag = null;
+    this.sceneNudgeTimerId = null;
     this.state = {
       levelIndex: 0,
       levelSelectPage: 1,
@@ -185,6 +190,7 @@ export class HiddenObjectGame {
       speedrunAverageTimeText: document.getElementById("speedrunAverageTimeText"),
       speedrunFastestText: document.getElementById("speedrunFastestText"),
       speedrunLastPickText: document.getElementById("speedrunLastPickText"),
+      speedrunRecentStrip: document.getElementById("speedrunRecentStrip"),
       levelSelectPageLabel: document.getElementById("levelSelectPageLabel"),
       levelSelectPrevPageButton: document.getElementById("levelSelectPrevPageButton"),
       levelSelectNextPageButton: document.getElementById("levelSelectNextPageButton"),
@@ -203,6 +209,7 @@ export class HiddenObjectGame {
       panTipSelect: document.getElementById("panTipSelect"),
       confirmQuitSelect: document.getElementById("confirmQuitSelect"),
       previewDefaultSelect: document.getElementById("previewDefaultSelect"),
+      foundFxSelect: document.getElementById("foundFxSelect"),
       settingsDiscordButton: document.getElementById("settingsDiscordButton"),
       settingsMoreGamesButton: document.getElementById("settingsMoreGamesButton"),
       settingsLevelSelectButton: document.getElementById("settingsLevelSelectButton"),
@@ -296,6 +303,7 @@ export class HiddenObjectGame {
     this.elements.panTipSelect.addEventListener("change", () => this.persistSettings());
     this.elements.confirmQuitSelect.addEventListener("change", () => this.persistSettings());
     this.elements.previewDefaultSelect.addEventListener("change", () => this.persistSettings());
+    this.elements.foundFxSelect.addEventListener("change", () => this.persistSettings());
     this.elements.settingsDiscordButton.addEventListener("click", () => this.openExternalLink(DISCORD_URL, "Add your Discord invite URL in scripts/game.js to enable this button."));
     this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
@@ -354,6 +362,9 @@ export class HiddenObjectGame {
     this.elements.sceneViewport.addEventListener("pointerup", (event) => this.onPointerUp(event));
     this.elements.sceneViewport.addEventListener("pointercancel", (event) => this.onPointerCancel(event));
     this.elements.homeViewport.addEventListener("pointermove", (event) => this.updateHomeDebug(event));
+    this.elements.homeDebugOverlay.addEventListener("pointerdown", (event) => this.onHomeEditorPointerDown(event));
+    window.addEventListener("pointermove", (event) => this.onHomeEditorPointerMove(event));
+    window.addEventListener("pointerup", () => this.onHomeEditorPointerUp());
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("keyup", (event) => this.onKeyUp(event));
@@ -375,10 +386,12 @@ export class HiddenObjectGame {
     this.elements.panTipSelect.value = this.save.settings.showPanTip;
     this.elements.confirmQuitSelect.value = this.save.settings.confirmQuit;
     this.elements.previewDefaultSelect.value = this.save.settings.previewDefault;
+    this.elements.foundFxSelect.value = this.save.settings.foundFx;
     this.elements.body.dataset.theme = this.save.settings.theme;
     this.elements.body.dataset.density = this.save.settings.density;
     this.elements.body.dataset.motion = this.save.settings.motion;
     this.elements.body.dataset.preview = this.save.settings.previewSize;
+    this.elements.body.dataset.foundfx = this.save.settings.foundFx;
     this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
     this.elements.skipLevelButton.classList.toggle("hidden", !this.sessionTestingUnlocked);
     this.elements.settingsDiscordButton.disabled = !DISCORD_URL;
@@ -397,6 +410,7 @@ export class HiddenObjectGame {
       showPanTip: this.elements.panTipSelect.value,
       confirmQuit: this.elements.confirmQuitSelect.value,
       previewDefault: this.elements.previewDefaultSelect.value,
+      foundFx: this.elements.foundFxSelect.value,
     });
     this.applySettings();
   }
@@ -441,7 +455,7 @@ export class HiddenObjectGame {
     ];
     this.elements.homeViewport.classList.remove("home-ready");
     this.elements.homeBootOverlay.classList.remove("hidden", "is-exiting");
-    this.elements.homeBootStatus.textContent = "Loading menu art and button assets.";
+    this.elements.homeBootStatus.textContent = "Loading menu art, buttons, and interface layers.";
     Promise.allSettled(assets.map(([key, element, src]) => this.preloadImageAsset(element, src, key))).then((results) => {
       const failures = results
         .filter((result) => result.status === "fulfilled" && !result.value.ok)
@@ -453,14 +467,14 @@ export class HiddenObjectGame {
       }
       this.elements.homeBootStatus.textContent = failures.length
         ? `Some menu art is missing: ${failures.join(" | ")}`
-        : "Ready.";
-      this.elements.homeViewport.classList.add("home-ready");
+        : "Start screen ready.";
       this.elements.homeBootOverlay.classList.add("is-exiting");
       window.setTimeout(() => {
         this.elements.homeBootOverlay.classList.add("hidden");
         this.elements.homeBootOverlay.classList.remove("is-exiting");
-      }, 520);
-      this.playHomeButtonIntro();
+        this.elements.homeViewport.classList.add("home-ready");
+        this.playHomeButtonIntro();
+      }, 620);
     });
   }
 
@@ -546,6 +560,7 @@ export class HiddenObjectGame {
     this.elements.speedrunLastPickText.textContent = speedrun.lastLevelId
       ? `Last random pick: ${this.getDisplayLabelForLevelId(speedrun.lastLevelId)}`
       : "Last random pick: none yet.";
+    this.renderSpeedrunRecentStrip(speedrun.recentLevelIds ?? []);
     this.elements.settingsMainClearsText.textContent = `${mainCleared} / ${MAIN_LEVELS.length}`;
     this.elements.settingsAdvancedClearsText.textContent = `${advancedCleared} / ${AUTHORED_ADVANCED_MAIN_LEVELS.length}`;
     this.elements.settingsTotalViewsText.textContent = String(totalViews);
@@ -556,6 +571,25 @@ export class HiddenObjectGame {
 
   showMenuToast(message, isBad = false) {
     showMenuToastUi(this, message, isBad);
+  }
+
+  renderSpeedrunRecentStrip(levelIds) {
+    const strip = this.elements.speedrunRecentStrip;
+    strip.innerHTML = "";
+    if (!levelIds.length) {
+      const empty = document.createElement("span");
+      empty.className = "speedrun-recent-empty";
+      empty.textContent = "No recent speedrun picks yet.";
+      strip.appendChild(empty);
+      return;
+    }
+
+    levelIds.forEach((levelId) => {
+      const chip = document.createElement("span");
+      chip.className = "speedrun-recent-chip";
+      chip.textContent = this.getDisplayLabelForLevelId(levelId);
+      strip.appendChild(chip);
+    });
   }
 
   renderLevelSelect() {
@@ -1269,6 +1303,29 @@ export class HiddenObjectGame {
     }
     const key = event.key.toLowerCase();
     this.trackEasterEggs(key);
+    if (key === "escape") {
+      event.preventDefault();
+      this.handleEscapeShortcut();
+      return;
+    }
+    if (key === "h" && this.sessionTestingUnlocked && this.elements.screens.home.classList.contains("screen-active")) {
+      event.preventDefault();
+      this.toggleHomeButtonEditor();
+      return;
+    }
+    if (this.homeButtonEditorEnabled && this.elements.screens.home.classList.contains("screen-active")) {
+      if (["1", "2", "3"].includes(key)) {
+        event.preventDefault();
+        this.homeButtonEditorSelection = key === "1" ? "start" : key === "2" ? "settings" : "more";
+        this.layoutHomeButtons();
+        return;
+      }
+      if (["arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
+        event.preventDefault();
+        this.nudgeHomeEditorZone(key, event.shiftKey ? 1 : HOME_EDITOR_NUDGE_STEP);
+        return;
+      }
+    }
     if (key === "l") {
       event.preventDefault();
       this.showScreen("levelSelect");
@@ -1353,6 +1410,112 @@ export class HiddenObjectGame {
     event.preventDefault();
     this.keyState.add(key);
     this.ensureKeyboardPanLoop();
+  }
+
+  handleEscapeShortcut() {
+    if (!this.elements.quitConfirmOverlay.classList.contains("hidden")) {
+      this.closeQuitPrompt();
+      return;
+    }
+    if (!this.elements.resultOverlay.classList.contains("hidden")) {
+      this.showScreen("levelSelect");
+      return;
+    }
+    if (!this.elements.pauseOverlay.classList.contains("hidden")) {
+      this.resumeGame();
+      return;
+    }
+    if (!this.elements.advancedInfoOverlay.classList.contains("hidden")) {
+      this.closeAdvancedInfo();
+      return;
+    }
+    if (!this.elements.levelIntroOverlay.classList.contains("hidden")) {
+      this.showScreen("levelSelect");
+      return;
+    }
+    if (this.elements.screens.settings.classList.contains("screen-active")) {
+      this.showScreen("home");
+      return;
+    }
+    if (this.elements.screens.levelSelect.classList.contains("screen-active")) {
+      this.showScreen("home");
+      return;
+    }
+    if (this.elements.screens.game.classList.contains("screen-active")) {
+      this.quitRun();
+    }
+  }
+
+  toggleHomeButtonEditor() {
+    this.homeButtonEditorEnabled = !this.homeButtonEditorEnabled;
+    this.layoutHomeButtons();
+    this.showMenuToast(this.homeButtonEditorEnabled
+      ? "Home button editor on. Drag boxes or use 1, 2, 3 with arrow keys."
+      : "Home button editor off.");
+  }
+
+  nudgeHomeEditorZone(key, amount) {
+    const zone = START_SCREEN_BUTTONS[this.homeButtonEditorSelection === "more" ? "moreGames" : this.homeButtonEditorSelection];
+    if (!zone) {
+      return;
+    }
+    if (key === "arrowup") {
+      zone.y1 -= amount;
+      zone.y2 -= amount;
+    } else if (key === "arrowdown") {
+      zone.y1 += amount;
+      zone.y2 += amount;
+    } else if (key === "arrowleft") {
+      zone.x1 -= amount;
+      zone.x2 -= amount;
+    } else if (key === "arrowright") {
+      zone.x1 += amount;
+      zone.x2 += amount;
+    }
+    this.layoutHomeButtons();
+  }
+
+  onHomeEditorPointerDown(event) {
+    if (!this.sessionTestingUnlocked || !this.homeButtonEditorEnabled) {
+      return;
+    }
+    const box = event.target.closest(".home-debug-box");
+    if (!box) {
+      return;
+    }
+    this.homeButtonEditorSelection = box.dataset.editorKey;
+    this.homeEditorDrag = {
+      key: box.dataset.editorKey,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+    event.preventDefault();
+  }
+
+  onHomeEditorPointerMove(event) {
+    if (!this.homeEditorDrag || !this.homeButtonEditorEnabled) {
+      return;
+    }
+    const overlayRect = this.elements.homeButtonOverlay.getBoundingClientRect();
+    const imageWidth = this.elements.startScreenImage.naturalWidth || 1;
+    const imageHeight = this.elements.startScreenImage.naturalHeight || 1;
+    const zone = START_SCREEN_BUTTONS[this.homeEditorDrag.key === "more" ? "moreGames" : this.homeEditorDrag.key];
+    if (!zone) {
+      return;
+    }
+    const deltaX = ((event.clientX - this.homeEditorDrag.startX) / overlayRect.width) * imageWidth;
+    const deltaY = ((event.clientY - this.homeEditorDrag.startY) / overlayRect.height) * imageHeight;
+    zone.x1 += deltaX;
+    zone.x2 += deltaX;
+    zone.y1 += deltaY;
+    zone.y2 += deltaY;
+    this.homeEditorDrag.startX = event.clientX;
+    this.homeEditorDrag.startY = event.clientY;
+    this.layoutHomeButtons();
+  }
+
+  onHomeEditorPointerUp() {
+    this.homeEditorDrag = null;
   }
 
   trackEasterEggs(key) {
@@ -1451,6 +1614,9 @@ export class HiddenObjectGame {
       if (this.state.foundTargetIds.size >= this.getCurrentLevelTargets().length) {
         this.completeLevel();
         return;
+      }
+      if (this.getCurrentLevelTargets().length > 1) {
+        this.nudgeCameraTowardTarget(matchedTarget);
       }
       this.showFeedback(`${this.state.foundTargetIds.size} of ${this.getCurrentLevelTargets().length} found. Keep going.`);
       return;
@@ -1655,6 +1821,36 @@ export class HiddenObjectGame {
     const pointer = this.state.pointerImage ? `Pointer: ${this.state.pointerImage.x}, ${this.state.pointerImage.y}` : "Pointer: outside image";
     const click = this.state.lastClickImage ? `Last click: ${this.state.lastClickImage.x}, ${this.state.lastClickImage.y}` : "Last click: none";
     this.elements.debugReadout.textContent = `${pointer}\n${click}`;
+  }
+
+  nudgeCameraTowardTarget(target) {
+    if (this.sceneNudgeTimerId) {
+      window.clearTimeout(this.sceneNudgeTimerId);
+      this.sceneNudgeTimerId = null;
+    }
+    const rect = this.elements.sceneViewport.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const hitbox = target.hitbox;
+    const targetX = hitbox.type === "circle" ? hitbox.x : (Math.min(hitbox.x1, hitbox.x2) + Math.max(hitbox.x1, hitbox.x2)) / 2;
+    const targetY = hitbox.type === "circle" ? hitbox.y : (Math.min(hitbox.y1, hitbox.y2) + Math.max(hitbox.y1, hitbox.y2)) / 2;
+    const original = { x: this.state.transform.x, y: this.state.transform.y };
+    const desiredX = centerX - (targetX * this.state.transform.scale);
+    const desiredY = centerY - (targetY * this.state.transform.scale);
+    this.elements.sceneContent.classList.add("scene-content-nudging");
+    this.state.transform.x += (desiredX - this.state.transform.x) * 0.12;
+    this.state.transform.y += (desiredY - this.state.transform.y) * 0.12;
+    this.clampTransform();
+    this.applyTransform();
+    this.sceneNudgeTimerId = window.setTimeout(() => {
+      this.state.transform.x = original.x;
+      this.state.transform.y = original.y;
+      this.applyTransform();
+      this.sceneNudgeTimerId = window.setTimeout(() => {
+        this.elements.sceneContent.classList.remove("scene-content-nudging");
+        this.sceneNudgeTimerId = null;
+      }, 220);
+    }, 180);
   }
 
   showFeedback(message, bad = false) {

@@ -1,5 +1,5 @@
-const STORAGE_KEY = "wheres-epstein-save-v7";
-const LEGACY_STORAGE_KEYS = ["wheres-epstein-save-v6", "wheres-epstein-save-v5"];
+const STORAGE_KEY = "wheres-epstein-save-v8";
+const LEGACY_STORAGE_KEYS = ["wheres-epstein-save-v7", "wheres-epstein-save-v6", "wheres-epstein-save-v5"];
 
 const DEFAULT_SAVE = {
   settings: {
@@ -11,6 +11,7 @@ const DEFAULT_SAVE = {
     showPanTip: "on",
     confirmQuit: "on",
     previewDefault: "shown",
+    foundFx: "strong",
   },
   meta: {
     advancedMultiSeen: false,
@@ -26,6 +27,7 @@ const DEFAULT_SAVE = {
       bestScore: 0,
       fastestTimeMs: 0,
       lastLevelId: "",
+      recentLevelIds: [],
     },
     levelResults: {},
   },
@@ -39,6 +41,7 @@ const DEFAULT_SAVE = {
       bestScore: 0,
       fastestTimeMs: 0,
       lastLevelId: "",
+      recentLevelIds: [],
     },
     levelResults: {},
   },
@@ -173,6 +176,8 @@ export function recordSpeedrunResult({ cheated, levelId, score, clearMs }) {
   const next = structuredClone(current);
   const bucket = cheated ? next.cheated : next.legit;
 
+  const previousRecent = bucket.speedrun?.recentLevelIds ?? [];
+  const nextRecent = [levelId, ...previousRecent.filter((item) => item !== levelId)].slice(0, 6);
   bucket.speedrun = {
     roundsPlayed: (bucket.speedrun?.roundsPlayed ?? 0) + 1,
     totalScore: (bucket.speedrun?.totalScore ?? 0) + score,
@@ -182,6 +187,7 @@ export function recordSpeedrunResult({ cheated, levelId, score, clearMs }) {
       ? Math.min(bucket.speedrun.fastestTimeMs, clearMs)
       : clearMs,
     lastLevelId: levelId,
+    recentLevelIds: nextRecent,
   };
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));

@@ -310,8 +310,16 @@ body.mode-game .site-topbar { display: flex; }
   height: 100%;
   object-fit: contain;
   object-position: center;
+  opacity: 0;
   animation: kb-ease 28s ease-in-out infinite alternate;
+  animation-play-state: paused;
   transform-origin: center center;
+  transition: opacity 420ms ease;
+}
+
+.home-viewport.home-ready .hero-background {
+  opacity: 1;
+  animation-play-state: running;
 }
 
 @keyframes kb-ease {
@@ -347,12 +355,6 @@ body.mode-game .site-topbar { display: flex; }
   background: rgba(8, 18, 30, 0.82);
   box-shadow: var(--shadow), 0 0 60px rgba(255, 216, 78, 0.06);
   text-align: center;
-  animation: boot-card-in 500ms var(--ease-bounce) both;
-}
-
-@keyframes boot-card-in {
-  from { opacity: 0; transform: scale(0.94) translateY(16px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 /* Spinner — glowing ring */
@@ -364,6 +366,15 @@ body.mode-game .site-topbar { display: flex; }
   border-top-color: var(--accent);
   box-shadow: 0 0 16px rgba(255, 216, 78, 0.22);
   animation: home-spin 0.9s linear infinite;
+}
+
+.boot-lore {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 /* Home button overlay */
@@ -403,6 +414,7 @@ body.mode-game .site-topbar { display: flex; }
 
 /* Debug overlay */
 .home-debug-overlay { pointer-events: none; }
+.home-debug-overlay.editor-active { pointer-events: auto; }
 
 .home-debug-box {
   position: absolute;
@@ -411,6 +423,10 @@ body.mode-game .site-topbar { display: flex; }
   background: rgba(0, 0, 0, 0.14);
   color: #fff;
   overflow: visible;
+}
+
+.home-debug-box.is-selected {
+  box-shadow: 0 0 0 3px rgba(255, 216, 78, 0.32), 0 0 18px rgba(255, 216, 78, 0.36);
 }
 
 .home-debug-label {
@@ -573,8 +589,10 @@ body.mode-game .site-topbar { display: flex; }
 #levelSelectScreen .menu-shell,
 #settingsScreen .menu-shell {
   background:
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)),
     radial-gradient(ellipse at top left, rgba(255,216,78,0.07) 0%, transparent 24%),
-    radial-gradient(ellipse at bottom right, rgba(111,227,168,0.06) 0%, transparent 22%);
+    radial-gradient(ellipse at bottom right, rgba(111,227,168,0.06) 0%, transparent 22%),
+    linear-gradient(160deg, rgba(7,16,28,0.32), rgba(16,33,52,0.18) 52%, rgba(7,16,28,0.28));
 }
 
 .menu-header, .menu-card-header {
@@ -735,8 +753,42 @@ body.mode-game .site-topbar { display: flex; }
    SPEEDRUN SECTION
    ============================================================ */
 .speedrun-card  { display: grid; gap: 1rem; }
+.speedrun-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+}
 .speedrun-button { justify-self: start; }
 .speedrun-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.speedrun-recent-block {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.speedrun-recent-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.speedrun-recent-chip,
+.speedrun-recent-empty {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.speedrun-recent-empty {
+  color: var(--muted);
+}
 
 /* ============================================================
    SETTINGS
@@ -799,6 +851,7 @@ body.mode-game .site-topbar { display: flex; }
   color: var(--muted);
   line-height: 1.65;
   font-size: 0.9rem;
+  text-wrap: pretty;
 }
 .compact-list { line-height: 1.55; font-size: 0.84rem; }
 
@@ -829,6 +882,11 @@ body.mode-game .site-topbar { display: flex; }
 #settingsScreen .menu-card-header { gap: 0.5rem; }
 #settingsScreen .menu-header .button-row,
 #settingsScreen .menu-card-header .button-row { margin-top: 0; }
+#settingsScreen #settingsDiscordButton,
+#settingsScreen #settingsMoreGamesButton,
+#settingsScreen #settingsLevelSelectButton {
+  min-width: 11rem;
+}
 
 /* ============================================================
    THEME-SPECIFIC TWEAKS
@@ -875,6 +933,10 @@ body[data-theme="light"] .setting-card select option {
   left: 0; top: 0;
   transform-origin: top left;
   will-change: transform;
+}
+
+.scene-content.scene-content-nudging {
+  transition: transform 220ms ease;
 }
 
 .level-image {
@@ -1222,6 +1284,7 @@ body.easter-party .home-viewport::after {
     align-items: start;
   }
   .settings-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .speedrun-hero { grid-template-columns: 1fr; align-items: stretch; }
 
   #mainLevelGrid  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   #advancedLevelGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1263,6 +1326,7 @@ body.easter-party .home-viewport::after {
   .speedrun-stats { grid-template-columns: 1fr; }
 
   .settings-stats-grid { grid-template-columns: 1fr; }
+  .speedrun-recent-strip { flex-direction: column; }
 
   #mainLevelGrid,
   #advancedLevelGrid,

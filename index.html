@@ -23,8 +23,12 @@
           <div class="home-boot-card">
             <div class="home-boot-spinner" aria-hidden="true"></div>
             <p class="eyebrow">Loading</p>
-            <h2>Preparing the start screen</h2>
-            <p id="homeBootStatus" class="subtle-text">Loading menu art and button assets.</p>
+            <h2>Loading Where's Epstein?</h2>
+            <p id="homeBootStatus" class="subtle-text">Loading menu art and scene layers.</p>
+            <div class="boot-lore">
+              <p>Made by StaticQuasar931 with help by Cheese_Cat.</p>
+              <p>Loading the start scene, buttons, and interface layers.</p>
+            </div>
           </div>
         </div>
         <img id="startScreenImage" class="hero-background" src="Assets/ui/nobuttonloadingscreen.jpg" alt="Start screen artwork" draggable="false">
@@ -124,13 +128,23 @@
               </div>
             </div>
             <div class="speedrun-card">
-              <p class="subtle-text">Pulls from normal, bonus, advanced, and advanced bonus levels. Repeats are possible, but nudged to feel less common.</p>
-              <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Random Level Speedrun</button>
+              <div class="speedrun-hero">
+                <div>
+                  <p class="subtle-text">Pulls from normal, bonus, advanced, and advanced bonus levels. Repeats can happen, but the picker nudges away from very recent rolls.</p>
+                </div>
+                <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Random Level Speedrun</button>
+              </div>
               <div class="stat-grid speedrun-stats">
                 <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
                 <div class="stat-card"><span>Average Score</span><strong id="speedrunAverageScoreText">0</strong></div>
                 <div class="stat-card"><span>Average Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
                 <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
+              </div>
+              <div class="speedrun-recent-block">
+                <p class="eyebrow">Recently Played</p>
+                <div id="speedrunRecentStrip" class="speedrun-recent-strip">
+                  <span class="speedrun-recent-empty">No recent speedrun picks yet.</span>
+                </div>
               </div>
               <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
             </div>
@@ -266,6 +280,14 @@
               <option value="hidden">Hidden</option>
             </select>
           </label>
+
+          <label class="setting-card">
+            <span>Found Target FX</span>
+            <select id="foundFxSelect">
+              <option value="strong">Strong</option>
+              <option value="subtle">Subtle</option>
+            </select>
+          </label>
         </div>
 
         <div class="level-select-groups">
@@ -284,6 +306,8 @@
               <li>`Enter` confirms the main action on popups</li>
               <li>`R` retries when retry is available</li>
               <li>`L` opens level select</li>
+              <li>`Esc` backs out of menus and prompts</li>
+              <li>`Esc` also opens the quit prompt while in a level</li>
               <li>Double click the level badge to open level select</li>
               <li>Use the preview toggle to hide the target card</li>
             </ul>
@@ -346,6 +370,7 @@
               <li>Level target hitboxes are in <code>scripts/levels.js</code>.</li>
               <li>Start-screen button zones use the same <code>x1, y1, x2, y2</code> format.</li>
               <li>Testing mode shows live pointer coordinates and button hitboxes.</li>
+              <li>Testing mode can drag the three home-screen button zones visually.</li>
               <li>Later routes can support two targets with separate preview images and hitboxes.</li>
             </ul>
           </section>
@@ -368,7 +393,7 @@
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.1.0</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.1.2</p>
             <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">

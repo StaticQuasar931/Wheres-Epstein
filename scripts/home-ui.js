@@ -140,7 +140,10 @@ export function updateHomeDebug(game, event, config) {
   const start = game.homeButtonZones.get("start");
   const settings = game.homeButtonZones.get("settings");
   const more = game.homeButtonZones.get("more");
-  game.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${formatZone(start)}\nsettings: ${formatZone(settings)}\nmore: ${formatZone(more)}`;
+  const editor = game.homeButtonEditorEnabled
+    ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box or use 1, 2, 3 with arrow keys.`
+    : "Editor: off (press H in testing mode)";
+  game.elements.homeDebugReadout.textContent = `${pointer}\n${editor}\nstart: ${formatZone(start)}\nsettings: ${formatZone(settings)}\nmore: ${formatZone(more)}`;
 }
 
 function clearHomeAnimationTimers(game) {
@@ -167,11 +170,14 @@ function scheduleIntroSheenSequence(game, sheenLayers, animationMs, staggerMs) {
 }
 
 function scheduleLoopingSheenSequence(game, sheenLayers, startDelayMs) {
-  const gapMs = 7500;
+  const perButtonGapMs = 1100;
+  const cycleCooldownMs = 7500;
   const queueNext = (index, delay) => {
     const timerId = window.setTimeout(() => {
       triggerSheenGlint(game, sheenLayers[index]);
-      queueNext((index + 1) % sheenLayers.length, gapMs);
+      const nextIndex = (index + 1) % sheenLayers.length;
+      const nextDelay = nextIndex === 0 ? cycleCooldownMs : perButtonGapMs;
+      queueNext(nextIndex, nextDelay);
     }, delay);
     game.homeAnimationTimers.push(timerId);
   };
@@ -336,6 +342,7 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
   debug.innerHTML = "";
   const active = game.sessionTestingUnlocked;
   debug.classList.toggle("hidden", !active);
+  debug.classList.toggle("editor-active", active && game.homeButtonEditorEnabled);
   game.elements.homeDebugReadout.classList.toggle("hidden", !active);
   if (!active) {
     return;
@@ -349,6 +356,8 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
     const actual = game.homeButtonZones.get(label);
     const node = document.createElement("div");
     node.className = `home-debug-box color-${label === "start" ? "green" : label === "settings" ? "blue" : "orange"}`;
+    node.dataset.editorKey = label;
+    node.classList.toggle("is-selected", game.homeButtonEditorEnabled && game.homeButtonEditorSelection === label);
     const tag = document.createElement("span");
     tag.className = "home-debug-label";
     const overlayRect = game.elements.homeButtonOverlay.getBoundingClientRect();
