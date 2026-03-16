@@ -662,25 +662,26 @@ export class HiddenObjectGame {
 
   playHomeButtonIntro() {
     this.clearHomeAnimationTimers();
-    const buttons = [
-      this.elements.startGameButton,
-      this.elements.openSettingsButton,
-      this.elements.moreGamesButton,
+    const artLayers = [
+      this.elements.startButtonArt,
+      this.elements.settingsButtonArt,
+      this.elements.moreGamesButtonArt,
     ];
 
-    buttons.forEach((button) => {
-      button.classList.remove("is-settled");
-      button.classList.add("is-prepping");
+    artLayers.forEach((layer) => {
+      layer.classList.remove("is-entering", "is-settled");
+      layer.classList.add("is-prepping");
     });
 
-    buttons.forEach((button, index) => {
+    artLayers.forEach((layer, index) => {
       const timerId = window.setTimeout(() => {
-        button.classList.remove("is-prepping");
-        button.classList.add("is-entering");
-        window.setTimeout(() => {
-          button.classList.remove("is-entering");
-          button.classList.add("is-settled");
+        layer.classList.remove("is-prepping");
+        layer.classList.add("is-entering");
+        const settleTimerId = window.setTimeout(() => {
+          layer.classList.remove("is-entering");
+          layer.classList.add("is-settled");
         }, HOME_BUTTON_ANIMATION_MS);
+        this.homeAnimationTimers.push(settleTimerId);
       }, index * HOME_BUTTON_STAGGER_MS);
       this.homeAnimationTimers.push(timerId);
     });

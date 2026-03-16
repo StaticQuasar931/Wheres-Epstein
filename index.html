@@ -18,15 +18,12 @@
       <div id="homeViewport" class="home-viewport">
         <img id="startScreenImage" class="hero-background" src="Assets/ui/nobuttonloadingscreen.jpg" alt="Start screen artwork" draggable="false">
         <div id="homeButtonOverlay" class="home-button-overlay">
-          <button id="startGameButton" class="image-button image-button-start" type="button" aria-label="Start game">
-            <img id="startButtonArt" class="home-button-art" src="Assets/ui/startbutton.png" alt="">
-          </button>
-          <button id="openSettingsButton" class="image-button image-button-settings" type="button" aria-label="Open settings">
-            <img id="settingsButtonArt" class="home-button-art" src="Assets/ui/settingsbutton.png" alt="">
-          </button>
-          <button id="moreGamesButton" class="image-button image-button-more" type="button" aria-label="Open more games">
-            <img id="moreGamesButtonArt" class="home-button-art" src="Assets/ui/moregbutton.png" alt="">
-          </button>
+          <img id="startButtonArt" class="home-button-art" src="Assets/ui/startbutton.png" alt="" aria-hidden="true">
+          <img id="settingsButtonArt" class="home-button-art" src="Assets/ui/settingsbutton.png" alt="" aria-hidden="true">
+          <img id="moreGamesButtonArt" class="home-button-art" src="Assets/ui/moregbutton.png" alt="" aria-hidden="true">
+          <button id="startGameButton" class="image-button image-button-start" type="button" aria-label="Start game"></button>
+          <button id="openSettingsButton" class="image-button image-button-settings" type="button" aria-label="Open settings"></button>
+          <button id="moreGamesButton" class="image-button image-button-more" type="button" aria-label="Open more games"></button>
         </div>
         <div id="homeDebugOverlay" class="home-debug-overlay hidden" aria-hidden="true"></div>
         <div id="startScreenFallback" class="hero-fallback hidden">
@@ -232,7 +229,7 @@
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.0801</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.0802</p>
             <p class="subtle-text">Level hitbox editing lives in <code>scripts/levels.js</code>. Rectangles use <code>x1, y1</code> to <code>x2, y2</code>.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
