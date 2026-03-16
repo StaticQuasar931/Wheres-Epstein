@@ -239,6 +239,20 @@ const ADVANCED_LEVELS_RAW = [
   ], {
     name: "Narrow Pursuit",
   }),
+  // Advanced Level 12: Split Signal
+  makeAdvancedLevel(12, [
+    makeTarget("advanced-12-a", "tru10", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Split Signal",
+  }),
+  // Advanced Level 13: Crossed Paths
+  makeAdvancedLevel(13, [
+    makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Crossed Paths",
+  }),
   makeAdvancedBonusLevel(1, [
     makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-bonus-01-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
@@ -253,7 +267,7 @@ const ADVANCED_LEVELS_RAW = [
   }),
 ];
 
-for (let number = 12; number <= 20; number += 1) {
+for (let number = 14; number <= 20; number += 1) {
   ADVANCED_LEVELS_RAW.push(
     makeAdvancedLevel(number, [
       makePlaceholderTarget(`advanced-${String(number).padStart(2, "0")}-a`),

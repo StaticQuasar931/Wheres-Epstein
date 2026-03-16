@@ -109,3 +109,28 @@ Safe places to change visuals later
   - `HOME_BUTTON_X_OFFSET` and `HOME_BUTTON_Y_OFFSET` in `scripts/game.js`
 - Change real home hitboxes:
   - `START_SCREEN_BUTTONS` in `scripts/levels.js`
+
+Frontend upgrade ideas for a future animation-focused tool
+
+- Replace the home PNG stack with layered parallax plates instead of one flat scene.
+- Add a real loading progress bar tied to the same boot assets the game already waits for.
+- Turn the current sheen into a per-button timeline:
+  - intro sweeps
+  - slower idle loops
+  - hover-triggered accent sweep
+- Add more depth to the home buttons:
+  - tiny rotation on hover
+  - stronger click squash
+  - per-button glow colors
+- Add a soft light-follow effect over the start screen based on pointer position.
+- Give level cards staggered row reveals instead of all appearing at once.
+- Add score count-up and star pop timing on the result screen.
+- Turn the settings page into a denser dashboard:
+  - gameplay options
+  - visual options
+  - local stats
+  - links and credits
+- Make page arrows slide in from the edges on unlock.
+- Keep gameplay logic isolated:
+  - leave progression, scoring, storage, and hit detection in `scripts/game.js`
+  - keep visual experimentation in `index.html`, `styles/*.css`, `scripts/home-ui.js`, and `scripts/game-renderer.js`

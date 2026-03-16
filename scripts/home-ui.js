@@ -98,7 +98,10 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
       layer.classList.remove("is-prepping", "is-entering");
       layer.classList.add("is-settled");
     });
-    sheenLayers.forEach((layer) => layer.classList.add("is-settled"));
+    sheenLayers.forEach((layer) => {
+      layer.classList.add("is-settled", "is-looping");
+      layer.classList.remove("is-glinting");
+    });
     return;
   }
 
@@ -107,7 +110,7 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
     layer.classList.add("is-prepping");
   });
   sheenLayers.forEach((layer) => {
-    layer.classList.remove("is-settled");
+    layer.classList.remove("is-settled", "is-looping", "is-glinting");
   });
 
   artLayers.forEach((layer, index) => {
@@ -123,6 +126,7 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
     }, index * staggerMs);
     game.homeAnimationTimers.push(timerId);
   });
+  scheduleIntroSheenSequence(game, sheenLayers, animationMs, staggerMs);
   game.homeIntroPlayed = true;
 }
 
@@ -141,6 +145,36 @@ export function updateHomeDebug(game, event, config) {
 function clearHomeAnimationTimers(game) {
   game.homeAnimationTimers.forEach((timerId) => window.clearTimeout(timerId));
   game.homeAnimationTimers = [];
+}
+
+function scheduleIntroSheenSequence(game, sheenLayers, animationMs, staggerMs) {
+  const singleSweepMs = 1100;
+  const settleDelayMs = 3000;
+  const introStartMs = ((sheenLayers.length - 1) * staggerMs) + animationMs + settleDelayMs;
+  let cursor = introStartMs;
+
+  for (let round = 0; round < 2; round += 1) {
+    sheenLayers.forEach((layer) => {
+      const startId = window.setTimeout(() => {
+        layer.classList.remove("is-glinting");
+        void layer.offsetWidth;
+        layer.classList.add("is-glinting");
+        const stopId = window.setTimeout(() => {
+          layer.classList.remove("is-glinting");
+        }, singleSweepMs);
+        game.homeAnimationTimers.push(stopId);
+      }, cursor);
+      game.homeAnimationTimers.push(startId);
+      cursor += singleSweepMs;
+    });
+  }
+
+  sheenLayers.forEach((layer) => {
+    const loopId = window.setTimeout(() => {
+      layer.classList.add("is-looping");
+    }, cursor);
+    game.homeAnimationTimers.push(loopId);
+  });
 }
 
 function getAdjustedHomeZone(zone, config) {

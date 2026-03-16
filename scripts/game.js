@@ -574,11 +574,13 @@ export class HiddenObjectGame {
       const result = this.save.legit.levelResults[level.id];
       const unlocked = this.isLevelUnlocked(level, options.kind);
       const bestStars = result ? starText(result.bestStars ?? 0) : starText(0);
-      const firstScore = result ? formatScore(result.firstScore ?? result.bestScore ?? 0) : "0";
-      const bestScore = result ? formatScore(result.bestScore ?? 0) : "0";
+      const firstScoreValue = result?.firstScore ?? result?.bestScore ?? 0;
+      const bestScoreValue = result?.bestScore ?? 0;
+      const firstScore = formatScore(firstScoreValue);
+      const bestScore = formatScore(bestScoreValue);
       const cardLabel = this.getLevelCardLabel(level, options.kind);
       const button = document.createElement("button");
-      const scoreMarkup = bestScore !== firstScore
+      const scoreMarkup = bestScoreValue !== firstScoreValue
         ? `<div class="level-meta level-best-score"><span>Best ${bestScore}</span><span>First ${firstScore}</span></div>`
         : `<div class="level-meta level-best-score"><span>First ${firstScore}</span></div>`;
       button.type = "button";
@@ -672,9 +674,9 @@ export class HiddenObjectGame {
     const remainingStars = Math.max(0, 50 - totalStars);
     const mainDone = MAIN_LEVELS.filter((level) => this.save.legit.levelResults[level.id]?.completed).length;
     if (mainDone < MAIN_LEVELS.length) {
-      return `Surprise unlocks after all 20 main levels are cleared and 50 stars are earned. Main clears: ${mainDone}/${MAIN_LEVELS.length}.`;
+      return `A surprise route unlocks after all 20 main levels are cleared and 50 stars are earned. Main clears: ${mainDone}/${MAIN_LEVELS.length}.`;
     }
-    return `Surprise unlocks at ${totalStars}/50 stars. ${remainingStars} more stars to reveal Advanced Levels.`;
+    return `A surprise route unlocks at ${totalStars}/50 stars. ${remainingStars} more stars to go.`;
   }
 
   getSpeedrunUnlockText() {
