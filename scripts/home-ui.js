@@ -99,9 +99,10 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
       layer.classList.add("is-settled");
     });
     sheenLayers.forEach((layer) => {
-      layer.classList.add("is-settled", "is-looping");
+      layer.classList.add("is-settled");
       layer.classList.remove("is-glinting");
     });
+    scheduleLoopingSheenSequence(game, sheenLayers, 0);
     return;
   }
 
@@ -110,7 +111,7 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
     layer.classList.add("is-prepping");
   });
   sheenLayers.forEach((layer) => {
-    layer.classList.remove("is-settled", "is-looping", "is-glinting");
+    layer.classList.remove("is-settled", "is-glinting");
   });
 
   artLayers.forEach((layer, index) => {
@@ -148,7 +149,6 @@ function clearHomeAnimationTimers(game) {
 }
 
 function scheduleIntroSheenSequence(game, sheenLayers, animationMs, staggerMs) {
-  const singleSweepMs = 1100;
   const settleDelayMs = 3000;
   const introStartMs = ((sheenLayers.length - 1) * staggerMs) + animationMs + settleDelayMs;
   let cursor = introStartMs;
@@ -156,25 +156,37 @@ function scheduleIntroSheenSequence(game, sheenLayers, animationMs, staggerMs) {
   for (let round = 0; round < 2; round += 1) {
     sheenLayers.forEach((layer) => {
       const startId = window.setTimeout(() => {
-        layer.classList.remove("is-glinting");
-        void layer.offsetWidth;
-        layer.classList.add("is-glinting");
-        const stopId = window.setTimeout(() => {
-          layer.classList.remove("is-glinting");
-        }, singleSweepMs);
-        game.homeAnimationTimers.push(stopId);
+        triggerSheenGlint(game, layer);
       }, cursor);
       game.homeAnimationTimers.push(startId);
-      cursor += singleSweepMs;
+      cursor += 1100;
     });
   }
 
-  sheenLayers.forEach((layer) => {
-    const loopId = window.setTimeout(() => {
-      layer.classList.add("is-looping");
-    }, cursor);
-    game.homeAnimationTimers.push(loopId);
-  });
+  scheduleLoopingSheenSequence(game, sheenLayers, cursor);
+}
+
+function scheduleLoopingSheenSequence(game, sheenLayers, startDelayMs) {
+  const gapMs = 7500;
+  const queueNext = (index, delay) => {
+    const timerId = window.setTimeout(() => {
+      triggerSheenGlint(game, sheenLayers[index]);
+      queueNext((index + 1) % sheenLayers.length, gapMs);
+    }, delay);
+    game.homeAnimationTimers.push(timerId);
+  };
+
+  queueNext(0, startDelayMs);
+}
+
+function triggerSheenGlint(game, layer) {
+  layer.classList.remove("is-glinting");
+  void layer.offsetWidth;
+  layer.classList.add("is-glinting");
+  const stopId = window.setTimeout(() => {
+    layer.classList.remove("is-glinting");
+  }, 1100);
+  game.homeAnimationTimers.push(stopId);
 }
 
 function getAdjustedHomeZone(zone, config) {

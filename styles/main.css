@@ -440,16 +440,16 @@ body.mode-game .site-topbar { display: flex; }
   left: 1rem;
   bottom: 1rem;
   z-index: 6;
-  min-width: 240px;
-  max-width: min(92vw, 400px);
+  min-width: 340px;
+  max-width: min(92vw, 560px);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 0.8rem 0.9rem;
+  padding: 1rem 1.1rem;
   background: var(--panel-strong);
   box-shadow: var(--shadow);
   white-space: pre-line;
-  font-size: 0.82rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.6;
   font-family: 'Courier New', monospace;
 }
 
@@ -1053,8 +1053,18 @@ body[data-preview="large"] .target-card {
   top: calc(var(--shell-padding) + 4.4rem);
   white-space: pre-line;
   font-family: 'Courier New', monospace;
-  font-size: 0.8rem;
+  font-size: 1rem;
+  padding: 0.9rem 1.15rem;
   border-radius: var(--radius-md);
+}
+
+.level-setup-note {
+  margin: -0.1rem 0 0;
+  color: var(--danger);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .asset-error { color: var(--danger); font-size: 0.82rem; }

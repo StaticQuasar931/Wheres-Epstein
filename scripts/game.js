@@ -6,14 +6,14 @@ import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewLis
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
 const DISCORD_URL = "https://discord.gg/jW2az4AQUH";
 const MIN_SCALE = 0.6;
-const MAX_SCALE = 8;
+const MAX_SCALE = 12;
 const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
 const KEYBOARD_PAN_STEP = 18;
 const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
-const PAN_MARGIN = 120;
+const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
 const HOME_BUTTON_ANIMATION_MS = 1320;
@@ -91,7 +91,7 @@ export class HiddenObjectGame {
     this.homeAnimationTimers = [];
     this.homeArtBounds = new Map();
     this.homeButtonZones = new Map();
-    this.preloadedAssets = new Set();
+    this.preloadedAssets = new Map();
     this.homeIntroPlayed = false;
     this.homeAssetsReady = false;
     this.homeBootStarted = false;
@@ -580,6 +580,9 @@ export class HiddenObjectGame {
       const bestScore = formatScore(bestScoreValue);
       const cardLabel = this.getLevelCardLabel(level, options.kind);
       const button = document.createElement("button");
+      const setupMarkup = level.needsSetup
+        ? '<p class="level-setup-note">Needs setup</p>'
+        : "";
       const scoreMarkup = bestScoreValue !== firstScoreValue
         ? `<div class="level-meta level-best-score"><span>Best ${bestScore}</span><span>First ${firstScore}</span></div>`
         : `<div class="level-meta level-best-score"><span>First ${firstScore}</span></div>`;
@@ -587,8 +590,8 @@ export class HiddenObjectGame {
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
       button.innerHTML = unlocked
-        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div>${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`
-        : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p>${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`;
+        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div>${setupMarkup}${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`
+        : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p>${setupMarkup}${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`;
       button.addEventListener("click", () => this.startSelectedLevel(level.id));
       container.appendChild(button);
     });
@@ -890,6 +893,7 @@ export class HiddenObjectGame {
     this.elements.hudLevelName.textContent = level.name;
     this.elements.targetPreviewLabel.textContent = level.targets.length > 1 ? "Find These People" : "Find This Person";
     this.elements.sceneFallback.classList.add("hidden");
+    this.preloadLevelAssets(this.state.levelIndex);
     this.renderPreviewList(this.elements.targetPreviewList, this.elements.previewErrorText, level.targets);
     this.prepareSceneImageLoad();
     this.elements.levelImage.src = level.background;
@@ -959,8 +963,10 @@ export class HiddenObjectGame {
       return;
     }
     const image = new Image();
+    image.decoding = "async";
+    image.loading = "eager";
     image.src = path;
-    this.preloadedAssets.add(path);
+    this.preloadedAssets.set(path, image);
   }
 
   preloadLevelAssets(levelIndex) {
