@@ -1,4 +1,5 @@
-const STORAGE_KEY = "wheres-epstein-save-v5";
+const STORAGE_KEY = "wheres-epstein-save-v6";
+const LEGACY_STORAGE_KEY = "wheres-epstein-save-v5";
 
 const DEFAULT_SAVE = {
   settings: {
@@ -10,6 +11,9 @@ const DEFAULT_SAVE = {
     showPanTip: "on",
     confirmQuit: "on",
     previewDefault: "shown",
+  },
+  meta: {
+    advancedMultiSeen: false,
   },
   legit: {
     bestScore: 0,
@@ -29,6 +33,10 @@ function mergeSave(parsed) {
     settings: {
       ...DEFAULT_SAVE.settings,
       ...(parsed?.settings ?? {}),
+    },
+    meta: {
+      ...DEFAULT_SAVE.meta,
+      ...(parsed?.meta ?? {}),
     },
     legit: {
       ...DEFAULT_SAVE.legit,
@@ -51,7 +59,7 @@ function mergeSave(parsed) {
 
 export function loadSave() {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) {
       return structuredClone(DEFAULT_SAVE);
     }
@@ -69,6 +77,20 @@ export function saveSettings(partialSettings) {
     settings: {
       ...current.settings,
       ...partialSettings,
+    },
+  };
+
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  return next;
+}
+
+export function saveMeta(partialMeta) {
+  const current = loadSave();
+  const next = {
+    ...current,
+    meta: {
+      ...current.meta,
+      ...partialMeta,
     },
   };
 

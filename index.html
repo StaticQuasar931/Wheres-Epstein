@@ -40,13 +40,15 @@
         <div class="menu-header">
           <div>
             <p class="eyebrow">Level Select</p>
-            <h2>Choose your next scene</h2>
+            <h2 id="levelSelectPageLabel">Main Levels</h2>
           </div>
-          <button id="closeLevelSelectButton" class="ghost-button" type="button">Back</button>
+          <div class="button-row">
+            <button id="closeLevelSelectButton" class="ghost-button" type="button">Back</button>
+          </div>
         </div>
 
         <div class="level-select-groups">
-          <section class="menu-card">
+          <section id="mainRouteSection" class="menu-card">
             <div class="menu-card-header">
               <div>
                 <p class="eyebrow">Main Route</p>
@@ -57,7 +59,7 @@
             <div id="mainLevelGrid" class="level-grid"></div>
           </section>
 
-          <section class="menu-card">
+          <section id="bonusRouteSection" class="menu-card">
             <div class="menu-card-header">
               <div>
                 <p class="eyebrow">Bonus Route</p>
@@ -66,6 +68,27 @@
               <span id="bonusUnlockText" class="chip-label">Locked</span>
             </div>
             <div id="bonusLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section id="advancedRouteSection" class="menu-card hidden">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Advanced Route</p>
+                <h3>Harder Scenes</h3>
+              </div>
+              <button id="levelSelectPrevPageButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to main levels">&#8592;</button>
+            </div>
+            <div id="advancedLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section id="advancedBonusSection" class="menu-card hidden">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Advanced Bonus</p>
+                <h3>Extra Challenge</h3>
+              </div>
+            </div>
+            <div id="advancedBonusLevelGrid" class="level-grid"></div>
           </section>
 
           <section class="menu-card">
@@ -82,8 +105,10 @@
               <div class="stat-card"><span>Total Stars</span><strong id="homeStarCount">0</strong></div>
             </div>
             <p id="bonusRuleText" class="subtle-text">Bonuses unlock after clearing normal level 5 or collecting 10 total stars.</p>
+            <p id="advancedRevealText" class="subtle-text">Surprise unlock info will appear here.</p>
           </section>
         </div>
+        <button id="levelSelectNextPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open advanced levels">&#8594;</button>
       </div>
     </section>
 
@@ -239,12 +264,12 @@
               <li>Level target hitboxes are in <code>scripts/levels.js</code>.</li>
               <li>Start-screen button zones use the same <code>x1, y1, x2, y2</code> format.</li>
               <li>Testing mode shows live pointer coordinates and button hitboxes.</li>
-              <li>The current home buttons are visually shifted upward by 300 image units.</li>
+              <li>Advanced levels support two targets with separate preview images and hitboxes.</li>
             </ul>
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.08067.2.2.4</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.0</p>
             <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
@@ -294,12 +319,10 @@
 
         <aside class="target-card">
           <div class="target-card-header">
-            <p class="eyebrow">Find This Person</p>
+            <p id="targetPreviewLabel" class="eyebrow">Find This Person</p>
             <button id="togglePreviewButton" class="overlay-button preview-toggle" type="button">Hide</button>
           </div>
-          <div class="target-preview-frame">
-            <img id="targetPreviewImage" alt="Target preview">
-          </div>
+          <div id="targetPreviewList" class="target-preview-list"></div>
           <p id="previewErrorText" class="asset-error hidden"></p>
         </aside>
 
@@ -329,12 +352,21 @@
       <p class="eyebrow">Level Start</p>
       <h2 id="introLevelLabel">Level 1</h2>
       <h3 id="introLevelName">Welcome Party</h3>
-      <div class="intro-preview-frame">
-        <img id="introPreviewImage" alt="Target preview for upcoming level">
-      </div>
+      <div id="introPreviewList" class="target-preview-list intro-preview-list"></div>
       <p id="introPreviewErrorText" class="asset-error hidden"></p>
-      <p>Find the exact preview target in the full crowd scene as quickly as you can.</p>
+      <p id="introPreviewHint">Find the exact preview target in the full crowd scene as quickly as you can.</p>
       <button id="startLevelButton" class="primary-button" type="button">Begin Level</button>
+    </div>
+  </div>
+
+  <div id="advancedInfoOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Advanced Tip</p>
+      <h2 id="advancedInfoTitle">Things just got more exciting</h2>
+      <p id="advancedInfoBody">From here on, some advanced levels hide two people. You need both before the level clears.</p>
+      <div class="button-row">
+        <button id="advancedInfoButton" class="primary-button" type="button">Got It</button>
+      </div>
     </div>
   </div>
 
