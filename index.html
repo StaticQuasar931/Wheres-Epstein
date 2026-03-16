@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Where's Epstein?</title>
   <meta name="description" content="A browser-based hidden-object game with zoom, touch support, keyboard pan, level select, and hidden testing tools.">
   <link rel="icon" href="Assets/favicon.png" type="image/png">
+  <!-- Fonts: preconnect for speed, then load Bebas Neue + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/effects.css">
 </head>
@@ -17,42 +18,58 @@
   </header>
 
   <main class="screen-shell">
+
+    <!-- =========================================================
+         HOME SCREEN
+         ========================================================= -->
     <section id="homeScreen" class="screen screen-active hero-screen">
       <div id="homeViewport" class="home-viewport">
+
+        <!-- Ambient floating orbs (CSS-only, no JS interaction) -->
+        <div class="home-ambient" aria-hidden="true"></div>
+
+        <!-- Boot overlay — shown until assets load -->
         <div id="homeBootOverlay" class="home-boot-overlay">
           <div class="home-boot-card">
             <div class="home-boot-spinner" aria-hidden="true"></div>
             <p class="eyebrow">Loading</p>
-            <h2>Loading Where's Epstein?</h2>
-            <p id="homeBootStatus" class="subtle-text">Loading menu art and scene layers.</p>
-            <div class="boot-lore">
-              <p>Made by StaticQuasar931 with help by Cheese_Cat.</p>
-              <p>Loading the start scene, buttons, and interface layers.</p>
-            </div>
+            <h2>Preparing the start screen</h2>
+            <p id="homeBootStatus" class="subtle-text">Loading menu art and button assets.</p>
           </div>
         </div>
+
+        <!-- Start screen artwork -->
         <img id="startScreenImage" class="hero-background" src="Assets/ui/nobuttonloadingscreen.jpg" alt="Start screen artwork" draggable="false">
+
+        <!-- Invisible button overlay (positioned by home-ui.js) -->
         <div id="homeButtonOverlay" class="home-button-overlay">
-          <img id="startButtonArt" class="home-button-art" src="Assets/ui/startbutton.png" alt="" aria-hidden="true">
-          <div id="startButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
+          <img id="startButtonArt"    class="home-button-art" src="Assets/ui/startbutton.png"    alt="" aria-hidden="true">
+          <div id="startButtonSheen"  class="home-button-sheen" aria-hidden="true"></div>
           <img id="settingsButtonArt" class="home-button-art" src="Assets/ui/settingsbutton.png" alt="" aria-hidden="true">
           <div id="settingsButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
-          <img id="moreGamesButtonArt" class="home-button-art" src="Assets/ui/moregbutton.png" alt="" aria-hidden="true">
+          <img id="moreGamesButtonArt"  class="home-button-art" src="Assets/ui/moregbutton.png"  alt="" aria-hidden="true">
           <div id="moreGamesButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
-          <button id="startGameButton" class="image-button image-button-start" type="button" aria-label="Start game"></button>
+          <button id="startGameButton"    class="image-button image-button-start"    type="button" aria-label="Start game"></button>
           <button id="openSettingsButton" class="image-button image-button-settings" type="button" aria-label="Open settings"></button>
-          <button id="moreGamesButton" class="image-button image-button-more" type="button" aria-label="Open more games"></button>
+          <button id="moreGamesButton"    class="image-button image-button-more"     type="button" aria-label="Open more games"></button>
         </div>
+
         <div id="homeDebugOverlay" class="home-debug-overlay hidden" aria-hidden="true"></div>
+
+        <!-- Fallback when start art is missing -->
         <div id="startScreenFallback" class="hero-fallback hidden">
           <p class="eyebrow">Missing Start Screen Art</p>
           <h2>Add `Assets/ui/nobuttonloadingscreen.jpg`</h2>
           <p id="startScreenErrorText">The home screen will use that exact file path.</p>
         </div>
+
         <div id="homeDebugReadout" class="home-debug-readout hidden" aria-live="polite"></div>
       </div>
     </section>
 
+    <!-- =========================================================
+         LEVEL SELECT
+         ========================================================= -->
     <section id="levelSelectScreen" class="screen" aria-hidden="true">
       <div class="menu-shell">
         <div class="menu-header">
@@ -66,6 +83,7 @@
         </div>
 
         <div class="level-select-groups">
+
           <section id="mainRouteSection" class="menu-card">
             <div class="menu-card-header">
               <div>
@@ -128,23 +146,13 @@
               </div>
             </div>
             <div class="speedrun-card">
-              <div class="speedrun-hero">
-                <div>
-                  <p class="subtle-text">Pulls from normal, bonus, advanced, and advanced bonus levels. Repeats can happen, but the picker nudges away from very recent rolls.</p>
-                </div>
-                <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Random Level Speedrun</button>
-              </div>
+              <p class="subtle-text">Pulls from normal, bonus, advanced, and advanced bonus levels. Repeats are possible, but nudged to feel less common.</p>
+              <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Random Level Speedrun</button>
               <div class="stat-grid speedrun-stats">
                 <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
                 <div class="stat-card"><span>Average Score</span><strong id="speedrunAverageScoreText">0</strong></div>
                 <div class="stat-card"><span>Average Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
                 <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
-              </div>
-              <div class="speedrun-recent-block">
-                <p class="eyebrow">Recently Played</p>
-                <div id="speedrunRecentStrip" class="speedrun-recent-strip">
-                  <span class="speedrun-recent-empty">No recent speedrun picks yet.</span>
-                </div>
               </div>
               <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
             </div>
@@ -166,7 +174,10 @@
             <p id="bonusRuleText" class="subtle-text">Bonuses unlock after clearing normal level 5 or collecting 10 total stars.</p>
             <p id="advancedRevealText" class="subtle-text">Surprise unlock info will appear here.</p>
           </section>
-        </div>
+
+        </div><!-- /.level-select-groups -->
+
+        <!-- Page-navigation arrows — positioned by game.js visibility toggles -->
         <button id="levelSelectNextPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open advanced levels">
           <span class="page-arrow-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
@@ -179,6 +190,7 @@
             <span>Advanced</span>
           </span>
         </button>
+
         <button id="levelSelectThirdPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open speedrun levels">
           <span class="page-arrow-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
@@ -191,6 +203,7 @@
             <span>Speedrun</span>
           </span>
         </button>
+
         <button id="levelSelectBackFromSpeedrunButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to advanced levels">
           <span class="page-arrow-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
@@ -203,9 +216,13 @@
             <span>Page Two</span>
           </span>
         </button>
-      </div>
+
+      </div><!-- /.menu-shell -->
     </section>
 
+    <!-- =========================================================
+         SETTINGS
+         ========================================================= -->
     <section id="settingsScreen" class="screen" aria-hidden="true">
       <div class="menu-shell">
         <div class="menu-header">
@@ -224,7 +241,6 @@
               <option value="light">Light</option>
             </select>
           </label>
-
           <label class="setting-card">
             <span>UI Size</span>
             <select id="densitySelect">
@@ -232,7 +248,6 @@
               <option value="compact">Compact</option>
             </select>
           </label>
-
           <label class="setting-card">
             <span>Motion</span>
             <select id="motionSelect">
@@ -240,7 +255,6 @@
               <option value="reduced">Reduced</option>
             </select>
           </label>
-
           <label class="setting-card">
             <span>Target Card Size</span>
             <select id="previewSizeSelect">
@@ -248,7 +262,6 @@
               <option value="large">Large</option>
             </select>
           </label>
-
           <label class="setting-card">
             <span>Pre-Level Preview</span>
             <select id="levelIntroSelect">
@@ -256,7 +269,6 @@
               <option value="off">Skip</option>
             </select>
           </label>
-
           <label class="setting-card">
             <span>Pan Tip</span>
             <select id="panTipSelect">
@@ -264,7 +276,6 @@
               <option value="off">Hide</option>
             </select>
           </label>
-
           <label class="setting-card">
             <span>Quit Confirmation</span>
             <select id="confirmQuitSelect">
@@ -272,7 +283,6 @@
               <option value="off">Instant</option>
             </select>
           </label>
-
           <label class="setting-card">
             <span>Preview Default</span>
             <select id="previewDefaultSelect">
@@ -280,17 +290,10 @@
               <option value="hidden">Hidden</option>
             </select>
           </label>
-
-          <label class="setting-card">
-            <span>Found Target FX</span>
-            <select id="foundFxSelect">
-              <option value="strong">Strong</option>
-              <option value="subtle">Subtle</option>
-            </select>
-          </label>
         </div>
 
         <div class="level-select-groups">
+
           <section class="menu-card">
             <div class="menu-card-header">
               <div>
@@ -306,8 +309,6 @@
               <li>`Enter` confirms the main action on popups</li>
               <li>`R` retries when retry is available</li>
               <li>`L` opens level select</li>
-              <li>`Esc` backs out of menus and prompts</li>
-              <li>`Esc` also opens the quit prompt while in a level</li>
               <li>Double click the level badge to open level select</li>
               <li>Use the preview toggle to hide the target card</li>
             </ul>
@@ -331,8 +332,8 @@
           <section class="menu-card">
             <div class="menu-card-header">
               <div>
-                <p class="eyebrow">About</p>
-                <h3>Project notes</h3>
+                <p class="eyebrow">Content Note</p>
+                <h3>About the assets</h3>
               </div>
             </div>
             <ul class="control-list">
@@ -340,7 +341,6 @@
               <li>This is not meant to discredit human artists or replace real art.</li>
               <li>This game is for entertainment only and is not meant to make light of victims or real harm.</li>
               <li>No graphic imagery is intended for normal gameplay presentation.</li>
-              <li>Thank you to Cheese_Cat for the start screen art and image layer work.</li>
             </ul>
           </section>
 
@@ -352,9 +352,9 @@
               </div>
             </div>
             <div class="button-row">
-              <button id="settingsDiscordButton" class="secondary-button" type="button">Join Discord</button>
-              <button id="settingsMoreGamesButton" class="ghost-button" type="button">More Games</button>
-              <button id="settingsLevelSelectButton" class="ghost-button" type="button">Open Level Select</button>
+              <button id="settingsDiscordButton"    class="secondary-button" type="button">Join Discord</button>
+              <button id="settingsMoreGamesButton"  class="ghost-button"     type="button">More Games</button>
+              <button id="settingsLevelSelectButton" class="ghost-button"    type="button">Open Level Select</button>
             </div>
             <p id="settingsLinkHint" class="subtle-text">Community links open in a new tab when configured.</p>
           </section>
@@ -370,8 +370,7 @@
               <li>Level target hitboxes are in <code>scripts/levels.js</code>.</li>
               <li>Start-screen button zones use the same <code>x1, y1, x2, y2</code> format.</li>
               <li>Testing mode shows live pointer coordinates and button hitboxes.</li>
-              <li>Testing mode can drag the three home-screen button zones visually.</li>
-              <li>Later routes can support two targets with separate preview images and hitboxes.</li>
+              <li>Advanced levels support two targets with separate preview images and hitboxes.</li>
             </ul>
           </section>
 
@@ -384,7 +383,7 @@
             </div>
             <div class="stat-grid settings-stats-grid">
               <div class="stat-card"><span>Main Cleared</span><strong id="settingsMainClearsText">0 / 20</strong></div>
-              <div class="stat-card"><span>Surprise Cleared</span><strong id="settingsAdvancedClearsText">0 / 20</strong></div>
+              <div class="stat-card"><span>Advanced Cleared</span><strong id="settingsAdvancedClearsText">0 / 20</strong></div>
               <div class="stat-card"><span>Total Views</span><strong id="settingsTotalViewsText">0</strong></div>
               <div class="stat-card"><span>Best Clear</span><strong id="settingsFastestClearText">0.0s</strong></div>
               <div class="stat-card"><span>Speedrun Avg</span><strong id="settingsSpeedrunAverageText">0.0s</strong></div>
@@ -393,7 +392,7 @@
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.1.2</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.22</p>
             <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
@@ -403,10 +402,14 @@
               <p id="diagnosticMessage" class="subtle-text"></p>
             </div>
           </div>
-        </div>
-      </div>
+
+        </div><!-- /.level-select-groups -->
+      </div><!-- /.menu-shell -->
     </section>
 
+    <!-- =========================================================
+         GAME SCREEN
+         ========================================================= -->
     <section id="gameScreen" class="screen game-screen" aria-hidden="true">
       <div id="sceneViewport" class="scene-viewport">
         <div id="sceneContent" class="scene-content">
@@ -420,27 +423,29 @@
           <p id="sceneFallbackText">Check the image path and filename.</p>
         </div>
 
+        <!-- HUD topbar -->
         <div class="play-topbar">
           <div class="play-top-left">
-            <button id="zoomOutButton" class="overlay-button" type="button">-</button>
-            <button id="zoomInButton" class="overlay-button" type="button">+</button>
-            <button id="fitZoomButton" class="overlay-button" type="button">Fit</button>
+            <button id="zoomOutButton" class="overlay-button" type="button">−</button>
+            <button id="zoomInButton"  class="overlay-button" type="button">+</button>
+            <button id="fitZoomButton"   class="overlay-button" type="button">Fit</button>
             <button id="resetZoomButton" class="overlay-button" type="button">Reset</button>
           </div>
           <div class="play-top-middle-left">
-            <span id="panTipText" class="overlay-pill">Pan with drag, `WASD`, or arrows</span>
+            <span id="panTipText" class="overlay-pill">Pan with drag, WASD, or arrows</span>
           </div>
           <div class="play-top-middle-right">
-            <span id="hudLevelText" class="overlay-pill">Level 1</span>
+            <span id="hudLevelText" class="overlay-pill" title="Click to open level select">Level 1</span>
             <span id="hudLevelName" class="overlay-pill">Welcome Party</span>
           </div>
           <div class="play-top-right">
-            <button id="skipLevelButton" class="overlay-button hidden" type="button">Skip</button>
-            <button id="pauseButton" class="overlay-button" type="button">Pause</button>
-            <button id="returnHomeButton" class="overlay-button danger-button" type="button">Quit</button>
+            <button id="skipLevelButton"   class="overlay-button hidden"       type="button">Skip</button>
+            <button id="pauseButton"       class="overlay-button"              type="button">Pause</button>
+            <button id="returnHomeButton"  class="overlay-button danger-button" type="button">Quit</button>
           </div>
         </div>
 
+        <!-- Target preview card -->
         <aside class="target-card">
           <div class="target-card-header">
             <p id="targetPreviewLabel" class="eyebrow">Find This Person</p>
@@ -450,6 +455,7 @@
           <p id="previewErrorText" class="asset-error hidden"></p>
         </aside>
 
+        <!-- Stats HUD -->
         <div class="play-stats">
           <div class="overlay-pill stat-pill">
             <span>Stars</span>
@@ -466,11 +472,17 @@
         </div>
 
         <div id="sceneFeedback" class="scene-feedback" aria-live="polite"></div>
-        <div id="debugReadout" class="debug-readout hidden" aria-live="polite"></div>
+        <div id="debugReadout"  class="debug-readout hidden" aria-live="polite"></div>
       </div>
     </section>
-  </main>
 
+  </main><!-- /.screen-shell -->
+
+  <!-- =========================================================
+       MODALS / OVERLAYS (outside main so they sit above everything)
+       ========================================================= -->
+
+  <!-- Level intro -->
   <div id="levelIntroOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card intro-card">
       <p class="eyebrow">Level Start</p>
@@ -483,6 +495,7 @@
     </div>
   </div>
 
+  <!-- Advanced info -->
   <div id="advancedInfoOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Advanced Tip</p>
@@ -494,17 +507,19 @@
     </div>
   </div>
 
+  <!-- Pause -->
   <div id="pauseOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Paused</p>
       <h2>Take your time. The score clock is frozen.</h2>
       <div class="button-row">
-        <button id="resumeButton" class="primary-button" type="button">Resume</button>
-        <button id="pauseQuitButton" class="ghost-button" type="button">Quit Run</button>
+        <button id="resumeButton"    class="primary-button" type="button">Resume</button>
+        <button id="pauseQuitButton" class="ghost-button"   type="button">Quit Run</button>
       </div>
     </div>
   </div>
 
+  <!-- Quit confirm -->
   <div id="quitConfirmOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Leave Level</p>
@@ -512,11 +527,12 @@
       <p class="subtle-text">Your current attempt will be closed and you will go back to the selector.</p>
       <div class="button-row">
         <button id="confirmQuitButton" class="primary-button" type="button">Go To Level Select</button>
-        <button id="cancelQuitButton" class="ghost-button" type="button">Stay Here</button>
+        <button id="cancelQuitButton"  class="ghost-button"   type="button">Stay Here</button>
       </div>
     </div>
   </div>
 
+  <!-- Result -->
   <div id="resultOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p id="resultEyebrow" class="eyebrow">Level Cleared</p>
@@ -534,13 +550,14 @@
         </div>
       </div>
       <div class="button-row">
-        <button id="resultPrimaryButton" class="primary-button" type="button">Next Level</button>
-        <button id="resultRetryButton" class="secondary-button" type="button">Retry</button>
-        <button id="resultSecondaryButton" class="ghost-button" type="button">Level Select</button>
+        <button id="resultPrimaryButton"   class="primary-button"   type="button">Next Level</button>
+        <button id="resultRetryButton"     class="secondary-button" type="button">Retry</button>
+        <button id="resultSecondaryButton" class="ghost-button"     type="button">Level Select</button>
       </div>
     </div>
   </div>
 
+  <!-- Campaign completion -->
   <div id="completionOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Campaign Complete</p>
@@ -557,12 +574,13 @@
         </div>
       </div>
       <div class="button-row">
-        <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
-        <button id="completionLevelSelectButton" class="ghost-button" type="button">Level Select</button>
+        <button id="playAgainButton"              class="primary-button" type="button">Play Again</button>
+        <button id="completionLevelSelectButton"  class="ghost-button"   type="button">Level Select</button>
       </div>
     </div>
   </div>
 
+  <!-- Toast notification -->
   <div id="menuToast" class="menu-toast hidden" aria-live="polite"></div>
 
   <script type="module" src="scripts/app.js"></script>

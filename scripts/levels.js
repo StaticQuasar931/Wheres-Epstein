@@ -167,7 +167,7 @@ const ADVANCED_LEVELS_RAW = [
   makeAdvancedLevel(1, [
     makeTarget("advanced-01-a", "di4", { type: "rect", x1: 715, y1: 450, x2: 749, y2: 493 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Opening Search",
+    name: "Diddy Festival",
   }),
   // Advanced Level 2: Double Elephant
   makeAdvancedLevel(2, [
@@ -181,75 +181,75 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-03-a", "ep3", { type: "rect", x1: 1172, y1: 336, x2: 1136, y2: 294 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-03-b", "tru2", { type: "rect", x1: 311, y1: 413, x2: 288, y2: 381 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Split Crowd",
+    name: "Blue 11",
   }),
   // Advanced Level 4: Tight Corners
   makeAdvancedLevel(4, [
     makeTarget("advanced-04-a", "di5", { type: "rect", x1: 384, y1: 287, x2: 425, y2: 321 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-04-b", "ep6", { type: "rect", x1: 929, y1: 278, x2: 917, y2: 255 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Corner Watch",
+    name: "TECHover",
   }),
   // Advanced Level 5: Harder Reads
   makeAdvancedLevel(5, [
     makeTarget("advanced-05-a", "tru4", { type: "rect", x1: 1450, y1: 252, x2: 1416, y2: 216 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-05-b", "ep2", { type: "rect", x1: 293, y1: 317, x2: 230, y2: 230 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Festival Tangle",
+    name: "Hawwian Punch",
   }),
   // Advanced Level 6: Final Pairing
   makeAdvancedLevel(6, [
     makeTarget("advanced-06-a", "tru2", { type: "rect", x1: 1315, y1: 279, x2: 1295, y2: 254 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-06-b", "ep10", { type: "rect", x1: 475, y1: 300, x2: 500, y2: 336 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Double Vision",
+    name: "Medivevl Crowd",
   }),
   // Advanced Level 7: Masked Pair          
   makeAdvancedLevel(7, [
     makeTarget("advanced-07-a", "tru3", { type: "rect", x1: 505, y1: 252, x2: 482, y2: 230 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-07-b", "ep12", { type: "rect", x1: 871, y1: 515, x2: 818, y2: 444 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Masked Crossing",
+    name: "Smile and Wave",
   }),
   // Advanced Level 8: Final Double Take           
   makeAdvancedLevel(8, [
     makeTarget("advanced-08-a", "tru10", { type: "rect", x1: 653, y1: 960, x2: 633, y2: 935 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-08-b", "ep7", { type: "rect", x1: 892, y1: 346, x2: 872, y2: 315 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Deep Crowd",
+    name: "Rainbow-Fall",
   }),
   // Advanced Level 9: Crowd Pressure
   makeAdvancedLevel(9, [
     makeTarget("advanced-09-a", "di1", { type: "rect", x1: 563, y1: 321, x2: 575, y2: 339 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-09-b", "tru9", { type: "rect", x1: 949, y1: 330, x2: 939, y2: 317 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Pressure Point",
+    name: "Ski Lift",
   }),
   // Advanced Level 10: Twin Watch         
   makeAdvancedLevel(10, [
     makeTarget("advanced-10-a", "ep12", { type: "rect", x1: 680, y1: 302, x2: 656, y2: 273 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 1021, y1: 286, x2: 991, y2: 251 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Balcony Watch",
+    name: "Cruisin’ Balcony",
   }),
   // Advanced Level 11: Narrow Pursuit              
   makeAdvancedLevel(11, [
     makeTarget("advanced-11-a", "di2", { type: "rect", x1: 497, y1: 307, x2: 480, y2: 282 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-11-b", "tru7", { type: "rect", x1: 1065, y1: 317, x2: 1043, y2: 285 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Narrow Pursuit",
+    name: "Mellow Market",
   }),
-  // Advanced Level 12: Split Signal                    
+  // Advanced Level 12: LEGO Party                    
   makeAdvancedLevel(12, [        
     makeTarget("advanced-12-a", "tru10", { type: "rect", x1: 1112, y1: 364, x2: 1072, y2: 317 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 892, y1: 258, x2: 869, y2: 231 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
   ], {
     name: "Split Signal",
   }),
-  // Advanced Level 13: Crossed Paths       
+  // Advanced Level 13: Crossed Paths               
   makeAdvancedLevel(13, [
-    makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 16, y1: 255, x2: 0, y2: 221 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 16, y1: 255, x2: 0, y2: 221 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 894, y1: 258, x2: 869, y2: 230 }, "Assets/Waldos/advanced"),
   ], {
     name: "Crossed Paths",
   }),
@@ -258,8 +258,8 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-14-a", "di5", { type: "rect", x1: 951, y1: 223, x2: 941, y2: 207 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-14-b", "ep1", { type: "rect", x1: 610, y1: 202, x2: 598, y2: 189 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Crimson Route",
-    needsSetup: true,
+    name: "Horse Party",
+    needsSetup: false,
   }),
   makeAdvancedBonusLevel(1, [
     makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
