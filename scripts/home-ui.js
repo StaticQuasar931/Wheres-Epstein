@@ -1,0 +1,242 @@
+export function layoutHomeButtons(game, config) {
+  const image = game.elements.startScreenImage;
+  const overlay = game.elements.homeButtonOverlay;
+  if (!image.naturalWidth || !overlay || !game.elements.homeViewport) {
+    return;
+  }
+
+  const rect = game.elements.homeViewport.getBoundingClientRect();
+  const imageRatio = image.naturalWidth / image.naturalHeight;
+  const viewportRatio = rect.width / rect.height;
+  let drawWidth;
+  let drawHeight;
+  let offsetX;
+  let offsetY;
+
+  if (viewportRatio > imageRatio) {
+    drawHeight = rect.height;
+    drawWidth = drawHeight * imageRatio;
+    offsetX = (rect.width - drawWidth) / 2;
+    offsetY = 0;
+  } else {
+    drawWidth = rect.width;
+    drawHeight = drawWidth / imageRatio;
+    offsetX = 0;
+    offsetY = (rect.height - drawHeight) / 2;
+  }
+
+  overlay.style.left = `${offsetX}px`;
+  overlay.style.top = `${offsetY}px`;
+  overlay.style.width = `${drawWidth}px`;
+  overlay.style.height = `${drawHeight}px`;
+
+  placeHomeButton(game.elements.startGameButton, config.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeButton(game.elements.openSettingsButton, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeButton(game.elements.moreGamesButton, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeArt(game, game.elements.startButtonArt, config.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeArt(game, game.elements.settingsButtonArt, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeArt(game, game.elements.moreGamesButtonArt, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  renderHomeDebugOverlay(game, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+}
+
+export function playHomeButtonIntro(game, animationMs, staggerMs) {
+  clearHomeAnimationTimers(game);
+  const artLayers = [
+    game.elements.startButtonArt,
+    game.elements.settingsButtonArt,
+    game.elements.moreGamesButtonArt,
+  ];
+
+  if (game.homeIntroPlayed) {
+    artLayers.forEach((layer) => {
+      layer.classList.remove("is-prepping", "is-entering");
+      layer.classList.add("is-settled");
+    });
+    return;
+  }
+
+  artLayers.forEach((layer) => {
+    layer.classList.remove("is-entering", "is-settled");
+    layer.classList.add("is-prepping");
+  });
+
+  artLayers.forEach((layer, index) => {
+    const timerId = window.setTimeout(() => {
+      layer.classList.remove("is-prepping");
+      layer.classList.add("is-entering");
+      const settleTimerId = window.setTimeout(() => {
+        layer.classList.remove("is-entering");
+        layer.classList.add("is-settled");
+      }, animationMs);
+      game.homeAnimationTimers.push(settleTimerId);
+    }, index * staggerMs);
+    game.homeAnimationTimers.push(timerId);
+  });
+  game.homeIntroPlayed = true;
+}
+
+export function updateHomeDebug(game, event, config) {
+  if (!game.sessionTestingUnlocked) {
+    return;
+  }
+  const imagePoint = clientToHomeImage(game, event.clientX, event.clientY);
+  const pointer = imagePoint ? `Pointer: ${imagePoint.x}, ${imagePoint.y}` : "Pointer: outside image";
+  const start = getAdjustedHomeZone(config.start, config);
+  const settings = getAdjustedHomeZone(config.settings, config);
+  const more = getAdjustedHomeZone(config.moreGames, config);
+  game.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${start.x1},${start.y1} -> ${start.x2},${start.y2}\nsettings: ${settings.x1},${settings.y1} -> ${settings.x2},${settings.y2}\nmore: ${more.x1},${more.y1} -> ${more.x2},${more.y2}`;
+}
+
+function clearHomeAnimationTimers(game) {
+  game.homeAnimationTimers.forEach((timerId) => window.clearTimeout(timerId));
+  game.homeAnimationTimers = [];
+}
+
+function getAdjustedHomeZone(zone, config) {
+  return {
+    x1: zone.x1 + config.xOffset,
+    x2: zone.x2 + config.xOffset,
+    y1: zone.y1 + config.yOffset,
+    y2: zone.y2 + config.yOffset,
+    color: zone.color,
+  };
+}
+
+function placeHomeButton(element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
+  const adjusted = getAdjustedHomeZone(zone, config);
+  const left = Math.min(adjusted.x1, adjusted.x2);
+  const right = Math.max(adjusted.x1, adjusted.x2);
+  const top = Math.min(adjusted.y1, adjusted.y2);
+  const bottom = Math.max(adjusted.y1, adjusted.y2);
+  const scaleX = drawWidth / naturalWidth;
+  const scaleY = drawHeight / naturalHeight;
+  element.style.position = "absolute";
+  element.style.display = "block";
+  element.style.cursor = "pointer";
+  element.style.left = `${left * scaleX}px`;
+  element.style.top = `${top * scaleY}px`;
+  element.style.width = `${(right - left) * scaleX}px`;
+  element.style.height = `${(bottom - top) * scaleY}px`;
+}
+
+function getHomeArtBounds(game, imageElement, alphaThreshold) {
+  const existing = game.homeArtBounds.get(imageElement.id);
+  if (existing) {
+    return existing;
+  }
+  if (!imageElement.complete || !imageElement.naturalWidth || !imageElement.naturalHeight) {
+    return null;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = imageElement.naturalWidth;
+  canvas.height = imageElement.naturalHeight;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(imageElement, 0, 0);
+  const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
+
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let index = 3; index < data.length; index += 4) {
+    if (data[index] < alphaThreshold) {
+      continue;
+    }
+    const pixelIndex = (index - 3) / 4;
+    const x = pixelIndex % width;
+    const y = Math.floor(pixelIndex / width);
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+
+  const bounds = maxX >= 0
+    ? { left: minX, top: minY, width: Math.max(1, (maxX - minX) + 1), height: Math.max(1, (maxY - minY) + 1) }
+    : { left: 0, top: 0, width: imageElement.naturalWidth, height: imageElement.naturalHeight };
+
+  game.homeArtBounds.set(imageElement.id, bounds);
+  return bounds;
+}
+
+function placeHomeArt(game, imageElement, zone, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
+  const bounds = getHomeArtBounds(game, imageElement, config.alphaThreshold);
+  if (!bounds) {
+    return;
+  }
+
+  const adjusted = getAdjustedHomeZone(zone, config);
+  const left = Math.min(adjusted.x1, adjusted.x2);
+  const right = Math.max(adjusted.x1, adjusted.x2);
+  const top = Math.min(adjusted.y1, adjusted.y2);
+  const bottom = Math.max(adjusted.y1, adjusted.y2);
+  const targetLeft = left * (drawWidth / naturalWidth);
+  const targetTop = top * (drawHeight / naturalHeight);
+  const targetWidth = (right - left) * (drawWidth / naturalWidth);
+  const targetHeight = (bottom - top) * (drawHeight / naturalHeight);
+  const scale = Math.min(targetWidth / bounds.width, targetHeight / bounds.height);
+  const targetCenterX = targetLeft + (targetWidth / 2);
+  const targetCenterY = targetTop + (targetHeight / 2);
+  const artCenterX = (bounds.left + (bounds.width / 2)) * scale;
+  const artCenterY = (bounds.top + (bounds.height / 2)) * scale;
+  const finalLeft = targetCenterX - artCenterX;
+  const finalTop = targetCenterY - artCenterY;
+  const startOffset = Math.max(drawHeight - targetTop + targetHeight + 48, 120);
+
+  imageElement.style.left = `${finalLeft}px`;
+  imageElement.style.top = `${finalTop}px`;
+  imageElement.style.width = `${imageElement.naturalWidth * scale}px`;
+  imageElement.style.height = `${imageElement.naturalHeight * scale}px`;
+  imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
+}
+
+function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
+  const debug = game.elements.homeDebugOverlay;
+  debug.innerHTML = "";
+  const active = game.sessionTestingUnlocked;
+  debug.classList.toggle("hidden", !active);
+  game.elements.homeDebugReadout.classList.toggle("hidden", !active);
+  if (!active) {
+    return;
+  }
+
+  [
+    ["start", config.start, game.elements.startGameButton],
+    ["settings", config.settings, game.elements.openSettingsButton],
+    ["more", config.moreGames, game.elements.moreGamesButton],
+  ].forEach(([label, zone, buttonElement]) => {
+    const adjusted = getAdjustedHomeZone(zone, config);
+    const node = document.createElement("div");
+    node.className = `home-debug-box color-${zone.color}`;
+    const tag = document.createElement("span");
+    tag.className = "home-debug-label";
+    const overlayRect = game.elements.homeButtonOverlay.getBoundingClientRect();
+    const buttonRect = buttonElement.getBoundingClientRect();
+    node.style.left = `${buttonRect.left - overlayRect.left}px`;
+    node.style.top = `${buttonRect.top - overlayRect.top}px`;
+    node.style.width = `${buttonRect.width}px`;
+    node.style.height = `${buttonRect.height}px`;
+    tag.textContent = `${label}: ${Math.min(adjusted.x1, adjusted.x2)},${Math.min(adjusted.y1, adjusted.y2)} -> ${Math.max(adjusted.x1, adjusted.x2)},${Math.max(adjusted.y1, adjusted.y2)}`;
+    node.appendChild(tag);
+    debug.appendChild(node);
+  });
+}
+
+function clientToHomeImage(game, clientX, clientY) {
+  const rect = game.elements.homeButtonOverlay.getBoundingClientRect();
+  const image = game.elements.startScreenImage;
+  if (!image.naturalWidth || !rect.width || !rect.height) {
+    return null;
+  }
+  const localX = clientX - rect.left;
+  const localY = clientY - rect.top;
+  if (localX < 0 || localY < 0 || localX > rect.width || localY > rect.height) {
+    return null;
+  }
+  return {
+    x: Math.round((localX / rect.width) * image.naturalWidth),
+    y: Math.round((localY / rect.height) * image.naturalHeight),
+  };
+}

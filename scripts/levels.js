@@ -128,37 +128,37 @@ const BONUS_LEVELS_RAW = [
 
 const ADVANCED_LEVELS_RAW = [
   makeAdvancedLevel(1, [
-    makeTarget("advanced-01-a", "di4", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-01-a", "di4", { type: "rect", x1: 715, y1: 450, x2: 749, y2: 493 }, "Assets/Waldos/advanced"),
   ], {
     name: "Advanced Arrival",
   }),
   makeAdvancedLevel(2, [
-    makeTarget("advanced-02-a", "ep1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-02-b", "tru6", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-02-a", "ep1", { type: "rect", x1: 1103, y1: 400, x2: 1070, y2: 369 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-02-b", "tru6", { type: "rect", x1: 470, y1: 300, x2: 378, y2: 371 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Double Trouble",
+    name: "Double Elephant",    
   }),
   makeAdvancedLevel(3, [
-    makeTarget("advanced-03-a", "ep3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-03-b", "tru2", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-03-a", "ep3", { type: "rect", x1: 1103, y1: 400, x2: 1070, y2: 369 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-03-b", "tru2", { type: "rect", x1: 311, y1: 413, x2: 288, y2: 381 }, "Assets/Waldos/advanced"),
   ], {
     name: "Crowd Split",
   }),
   makeAdvancedLevel(4, [
-    makeTarget("advanced-04-a", "di5", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-04-b", "ep6", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-04-a", "di5", { type: "rect", x1: 384, y1: 287, x2: 425, y2: 321 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-04-b", "ep6", { type: "rect", x1: 929, y1: 278, x2: 917, y2: 255 }, "Assets/Waldos/advanced"),
   ], {
     name: "Tight Corners",
   }),
   makeAdvancedLevel(5, [
-    makeTarget("advanced-05-a", "tru4", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-05-b", "ep2", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-05-a", "tru4", { type: "rect", x1: 1450, y1: 252, x2: 1416, y2: 216 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-05-b", "ep2", { type: "rect", x1: 293, y1: 317, x2: 230, y2: 230 }, "Assets/Waldos/advanced"),
   ], {
     name: "Harder Reads",
   }),
   makeAdvancedLevel(6, [
-    makeTarget("advanced-06-a", "tru2", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-06-b", "ep10", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-06-a", "tru2", { type: "rect", x1: 1315, y1: 279, x2: 1295, y2: 254 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-06-b", "ep10", { type: "rect", x1: 475, y1: 300, x2: 500, y2: 336 }, "Assets/Waldos/advanced"),
   ], {
     name: "Final Pairing",
   }),

@@ -1,5 +1,7 @@
 import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
 import { loadSave, recordLevelResult, saveSettings, saveMeta } from "./storage.js";
+import { layoutHomeButtons as layoutHomeButtonsUi, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
+import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
 
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
 const DISCORD_URL = "https://discord.gg/jW2az4AQUH";
@@ -437,16 +439,7 @@ export class HiddenObjectGame {
   }
 
   showMenuToast(message, isBad = false) {
-    const node = this.elements.menuToast;
-    node.textContent = message;
-    node.classList.remove("hidden", "bad");
-    if (isBad) {
-      node.classList.add("bad");
-    }
-    window.clearTimeout(this.menuToastTimerId);
-    this.menuToastTimerId = window.setTimeout(() => {
-      node.classList.add("hidden");
-    }, 2200);
+    showMenuToastUi(this, message, isBad);
   }
 
   renderLevelSelect() {
@@ -688,57 +681,11 @@ export class HiddenObjectGame {
   }
 
   renderPreviewList(container, errorElement, targets) {
-    container.innerHTML = "";
-    errorElement.classList.add("hidden");
-    errorElement.textContent = "";
-    if (!targets.length) {
-      errorElement.textContent = "Tried to load: [empty preview path]";
-      errorElement.classList.remove("hidden");
-      return;
-    }
-
-    const missing = [];
-    targets.forEach((target, index) => {
-      const item = document.createElement("div");
-      item.className = "preview-item";
-      item.dataset.targetId = target.id;
-      const image = document.createElement("img");
-      image.alt = `Target preview ${index + 1}`;
-      image.className = "preview-image asset-loading";
-      image.addEventListener("load", () => {
-        image.classList.remove("asset-loading");
-      });
-      image.addEventListener("error", () => {
-        image.removeAttribute("src");
-        image.classList.remove("asset-loading");
-        missing.push(target.preview || "[empty preview path]");
-        errorElement.textContent = `Tried to load: ${missing.join(" | ")}`;
-        errorElement.classList.remove("hidden");
-      });
-      if (target.preview) {
-        image.src = target.preview;
-      } else {
-        missing.push("[empty preview path]");
-      }
-
-      const badge = document.createElement("span");
-      badge.className = "preview-badge";
-      badge.textContent = targets.length > 1 ? `Target ${index + 1}` : "Target";
-      item.append(image, badge);
-      container.appendChild(item);
-    });
-
-    if (missing.length) {
-      errorElement.textContent = `Tried to load: ${missing.join(" | ")}`;
-      errorElement.classList.remove("hidden");
-    }
+    renderPreviewListUi(container, errorElement, targets);
   }
 
   syncFoundPreviewState() {
-    const targetCardItems = this.elements.targetPreviewList.querySelectorAll(".preview-item");
-    targetCardItems.forEach((item) => {
-      item.classList.toggle("is-found", this.state.foundTargetIds.has(item.dataset.targetId));
-    });
+    syncFoundPreviewStateUi(this);
   }
 
   prepareSceneImageLoad() {
@@ -827,185 +774,18 @@ export class HiddenObjectGame {
   }
 
   layoutHomeButtons() {
-    const image = this.elements.startScreenImage;
-    const overlay = this.elements.homeButtonOverlay;
-    if (!image.naturalWidth || !overlay || !this.elements.homeViewport) {
-      return;
-    }
-
-    const rect = this.elements.homeViewport.getBoundingClientRect();
-    const imageRatio = image.naturalWidth / image.naturalHeight;
-    const viewportRatio = rect.width / rect.height;
-    let drawWidth;
-    let drawHeight;
-    let offsetX;
-    let offsetY;
-
-    if (viewportRatio > imageRatio) {
-      drawHeight = rect.height;
-      drawWidth = drawHeight * imageRatio;
-      offsetX = (rect.width - drawWidth) / 2;
-      offsetY = 0;
-    } else {
-      drawWidth = rect.width;
-      drawHeight = drawWidth / imageRatio;
-      offsetX = 0;
-      offsetY = (rect.height - drawHeight) / 2;
-    }
-
-    overlay.style.left = `${offsetX}px`;
-    overlay.style.top = `${offsetY}px`;
-    overlay.style.width = `${drawWidth}px`;
-    overlay.style.height = `${drawHeight}px`;
-
-    this.placeHomeButton(this.elements.startGameButton, START_SCREEN_BUTTONS.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
-    this.placeHomeButton(this.elements.openSettingsButton, START_SCREEN_BUTTONS.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
-    this.placeHomeButton(this.elements.moreGamesButton, START_SCREEN_BUTTONS.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
-    this.placeHomeArt(this.elements.startButtonArt, START_SCREEN_BUTTONS.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
-    this.placeHomeArt(this.elements.settingsButtonArt, START_SCREEN_BUTTONS.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
-    this.placeHomeArt(this.elements.moreGamesButtonArt, START_SCREEN_BUTTONS.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
-    this.renderHomeDebugOverlay(drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
-  }
-
-  getAdjustedHomeZone(zone) {
-    return {
-      x1: zone.x1 + HOME_BUTTON_X_OFFSET,
-      x2: zone.x2 + HOME_BUTTON_X_OFFSET,
-      y1: zone.y1 + HOME_BUTTON_Y_OFFSET,
-      y2: zone.y2 + HOME_BUTTON_Y_OFFSET,
-      color: zone.color,
-    };
-  }
-
-  placeHomeButton(element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight) {
-    const adjusted = this.getAdjustedHomeZone(zone);
-    const left = Math.min(adjusted.x1, adjusted.x2);
-    const right = Math.max(adjusted.x1, adjusted.x2);
-    const top = Math.min(adjusted.y1, adjusted.y2);
-    const bottom = Math.max(adjusted.y1, adjusted.y2);
-    const scaleX = drawWidth / naturalWidth;
-    const scaleY = drawHeight / naturalHeight;
-    element.style.position = "absolute";
-    element.style.display = "block";
-    element.style.cursor = "pointer";
-    element.style.left = `${left * scaleX}px`;
-    element.style.top = `${top * scaleY}px`;
-    element.style.width = `${(right - left) * scaleX}px`;
-    element.style.height = `${(bottom - top) * scaleY}px`;
-  }
-
-  getHomeArtBounds(imageElement) {
-    const existing = this.homeArtBounds.get(imageElement.id);
-    if (existing) {
-      return existing;
-    }
-    if (!imageElement.complete || !imageElement.naturalWidth || !imageElement.naturalHeight) {
-      return null;
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = imageElement.naturalWidth;
-    canvas.height = imageElement.naturalHeight;
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-    context.drawImage(imageElement, 0, 0);
-    const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
-
-    let minX = width;
-    let minY = height;
-    let maxX = -1;
-    let maxY = -1;
-
-    for (let index = 3; index < data.length; index += 4) {
-      if (data[index] < HOME_BUTTON_ALPHA_THRESHOLD) {
-        continue;
-      }
-      const pixelIndex = (index - 3) / 4;
-      const x = pixelIndex % width;
-      const y = Math.floor(pixelIndex / width);
-      minX = Math.min(minX, x);
-      minY = Math.min(minY, y);
-      maxX = Math.max(maxX, x);
-      maxY = Math.max(maxY, y);
-    }
-
-    const bounds = maxX >= 0
-      ? { left: minX, top: minY, width: Math.max(1, (maxX - minX) + 1), height: Math.max(1, (maxY - minY) + 1) }
-      : { left: 0, top: 0, width: imageElement.naturalWidth, height: imageElement.naturalHeight };
-
-    this.homeArtBounds.set(imageElement.id, bounds);
-    return bounds;
-  }
-
-  placeHomeArt(imageElement, zone, drawWidth, drawHeight, naturalWidth, naturalHeight) {
-    const bounds = this.getHomeArtBounds(imageElement);
-    if (!bounds) {
-      return;
-    }
-
-    const adjusted = this.getAdjustedHomeZone(zone);
-    const left = Math.min(adjusted.x1, adjusted.x2);
-    const right = Math.max(adjusted.x1, adjusted.x2);
-    const top = Math.min(adjusted.y1, adjusted.y2);
-    const bottom = Math.max(adjusted.y1, adjusted.y2);
-    const targetLeft = left * (drawWidth / naturalWidth);
-    const targetTop = top * (drawHeight / naturalHeight);
-    const targetWidth = (right - left) * (drawWidth / naturalWidth);
-    const targetHeight = (bottom - top) * (drawHeight / naturalHeight);
-    const scale = Math.min(targetWidth / bounds.width, targetHeight / bounds.height);
-    const targetCenterX = targetLeft + (targetWidth / 2);
-    const targetCenterY = targetTop + (targetHeight / 2);
-    const artCenterX = (bounds.left + (bounds.width / 2)) * scale;
-    const artCenterY = (bounds.top + (bounds.height / 2)) * scale;
-    const finalLeft = targetCenterX - artCenterX;
-    const finalTop = targetCenterY - artCenterY;
-    const startOffset = Math.max(drawHeight - targetTop + targetHeight + 48, 120);
-
-    imageElement.style.left = `${finalLeft}px`;
-    imageElement.style.top = `${finalTop}px`;
-    imageElement.style.width = `${imageElement.naturalWidth * scale}px`;
-    imageElement.style.height = `${imageElement.naturalHeight * scale}px`;
-    imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
-  }
-
-  clearHomeAnimationTimers() {
-    this.homeAnimationTimers.forEach((timerId) => window.clearTimeout(timerId));
-    this.homeAnimationTimers = [];
+    layoutHomeButtonsUi(this, {
+      start: START_SCREEN_BUTTONS.start,
+      settings: START_SCREEN_BUTTONS.settings,
+      moreGames: START_SCREEN_BUTTONS.moreGames,
+      xOffset: HOME_BUTTON_X_OFFSET,
+      yOffset: HOME_BUTTON_Y_OFFSET,
+      alphaThreshold: HOME_BUTTON_ALPHA_THRESHOLD,
+    });
   }
 
   playHomeButtonIntro() {
-    this.clearHomeAnimationTimers();
-    const artLayers = [
-      this.elements.startButtonArt,
-      this.elements.settingsButtonArt,
-      this.elements.moreGamesButtonArt,
-    ];
-
-    if (this.homeIntroPlayed) {
-      artLayers.forEach((layer) => {
-        layer.classList.remove("is-prepping", "is-entering");
-        layer.classList.add("is-settled");
-      });
-      return;
-    }
-
-    artLayers.forEach((layer) => {
-      layer.classList.remove("is-entering", "is-settled");
-      layer.classList.add("is-prepping");
-    });
-
-    artLayers.forEach((layer, index) => {
-      const timerId = window.setTimeout(() => {
-        layer.classList.remove("is-prepping");
-        layer.classList.add("is-entering");
-        const settleTimerId = window.setTimeout(() => {
-          layer.classList.remove("is-entering");
-          layer.classList.add("is-settled");
-        }, HOME_BUTTON_ANIMATION_MS);
-        this.homeAnimationTimers.push(settleTimerId);
-      }, index * HOME_BUTTON_STAGGER_MS);
-      this.homeAnimationTimers.push(timerId);
-    });
-    this.homeIntroPlayed = true;
+    playHomeButtonIntroUi(this, HOME_BUTTON_ANIMATION_MS, HOME_BUTTON_STAGGER_MS);
   }
 
   isUiEventTarget(target) {
@@ -1045,63 +825,18 @@ export class HiddenObjectGame {
   }
 
   updateHomeDebug(event) {
-    if (!this.sessionTestingUnlocked) {
-      return;
-    }
-    const imagePoint = this.clientToHomeImage(event.clientX, event.clientY);
-    const pointer = imagePoint ? `Pointer: ${imagePoint.x}, ${imagePoint.y}` : "Pointer: outside image";
-    const start = this.getAdjustedHomeZone(START_SCREEN_BUTTONS.start);
-    const settings = this.getAdjustedHomeZone(START_SCREEN_BUTTONS.settings);
-    const more = this.getAdjustedHomeZone(START_SCREEN_BUTTONS.moreGames);
-    this.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${start.x1},${start.y1} -> ${start.x2},${start.y2}\nsettings: ${settings.x1},${settings.y1} -> ${settings.x2},${settings.y2}\nmore: ${more.x1},${more.y1} -> ${more.x2},${more.y2}`;
-  }
-
-  clientToHomeImage(clientX, clientY) {
-    const rect = this.elements.homeButtonOverlay.getBoundingClientRect();
-    const image = this.elements.startScreenImage;
-    if (!image.naturalWidth || !rect.width || !rect.height) {
-      return null;
-    }
-    const localX = clientX - rect.left;
-    const localY = clientY - rect.top;
-    if (localX < 0 || localY < 0 || localX > rect.width || localY > rect.height) {
-      return null;
-    }
-    return {
-      x: Math.round((localX / rect.width) * image.naturalWidth),
-      y: Math.round((localY / rect.height) * image.naturalHeight),
-    };
+    updateHomeDebugUi(this, event, {
+      start: START_SCREEN_BUTTONS.start,
+      settings: START_SCREEN_BUTTONS.settings,
+      moreGames: START_SCREEN_BUTTONS.moreGames,
+      xOffset: HOME_BUTTON_X_OFFSET,
+      yOffset: HOME_BUTTON_Y_OFFSET,
+      alphaThreshold: HOME_BUTTON_ALPHA_THRESHOLD,
+    });
   }
 
   renderHitboxes(targets, foundTargetIds = new Set()) {
-    this.elements.hitboxOverlay.innerHTML = "";
-    targets.forEach((target) => {
-      const node = document.createElement("div");
-      node.className = "hitbox-shape";
-      if (foundTargetIds.has(target.id)) {
-        node.classList.add("hitbox-shape-found");
-      }
-      if (target.hitbox.type === "circle") {
-        node.style.left = `${target.hitbox.x - target.hitbox.radius}px`;
-        node.style.top = `${target.hitbox.y - target.hitbox.radius}px`;
-        node.style.width = `${target.hitbox.radius * 2}px`;
-        node.style.height = `${target.hitbox.radius * 2}px`;
-        node.style.borderRadius = "50%";
-      } else {
-        const left = Math.min(target.hitbox.x1, target.hitbox.x2);
-        const right = Math.max(target.hitbox.x1, target.hitbox.x2);
-        const top = Math.min(target.hitbox.y1, target.hitbox.y2);
-        const bottom = Math.max(target.hitbox.y1, target.hitbox.y2);
-        node.style.left = `${left}px`;
-        node.style.top = `${top}px`;
-        node.style.width = `${right - left}px`;
-        node.style.height = `${bottom - top}px`;
-        node.style.borderRadius = "12px";
-      }
-      this.elements.hitboxOverlay.appendChild(node);
-    });
-    this.elements.hitboxOverlay.classList.toggle("hidden", !this.sessionTestingUnlocked);
-    this.elements.debugReadout.classList.toggle("hidden", !this.sessionTestingUnlocked);
+    renderHitboxesUi(this, targets, foundTargetIds);
   }
 
   startElapsedTimer() {
