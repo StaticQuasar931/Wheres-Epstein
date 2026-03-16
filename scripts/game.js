@@ -75,6 +75,7 @@ export class HiddenObjectGame {
     this.keyboardPanFrame = null;
     this.konamiInput = [];
     this.homeAnimationTimers = [];
+    this.homeArtBounds = new Map();
     this.preloadedAssets = new Set();
     this.state = {
       levelIndex: 0,
@@ -258,6 +259,9 @@ export class HiddenObjectGame {
       this.hideStartImageError();
       this.layoutHomeButtons();
       this.playHomeButtonIntro();
+    });
+    [this.elements.startButtonArt, this.elements.settingsButtonArt, this.elements.moreGamesButtonArt].forEach((image) => {
+      image.addEventListener("load", () => this.layoutHomeButtons());
     });
     this.elements.zoomOutButton.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
     this.elements.zoomInButton.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
@@ -685,19 +689,95 @@ export class HiddenObjectGame {
     this.placeHomeButton(this.elements.startGameButton, START_SCREEN_BUTTONS.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
     this.placeHomeButton(this.elements.openSettingsButton, START_SCREEN_BUTTONS.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
     this.placeHomeButton(this.elements.moreGamesButton, START_SCREEN_BUTTONS.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
+    this.placeHomeArt(this.elements.startButtonArt, START_SCREEN_BUTTONS.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
+    this.placeHomeArt(this.elements.settingsButtonArt, START_SCREEN_BUTTONS.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
+    this.placeHomeArt(this.elements.moreGamesButtonArt, START_SCREEN_BUTTONS.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
     this.renderHomeDebugOverlay(drawWidth, drawHeight, image.naturalWidth, image.naturalHeight);
   }
 
   placeHomeButton(element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight) {
+    const left = Math.min(zone.x1, zone.x2);
+    const right = Math.max(zone.x1, zone.x2);
+    const top = Math.min(zone.y1, zone.y2);
+    const bottom = Math.max(zone.y1, zone.y2);
     const scaleX = drawWidth / naturalWidth;
     const scaleY = drawHeight / naturalHeight;
     element.style.position = "absolute";
     element.style.display = "block";
     element.style.cursor = "pointer";
-    element.style.left = `${zone.x1 * scaleX}px`;
-    element.style.top = `${zone.y1 * scaleY}px`;
-    element.style.width = `${(zone.x2 - zone.x1) * scaleX}px`;
-    element.style.height = `${(zone.y2 - zone.y1) * scaleY}px`;
+    element.style.left = `${left * scaleX}px`;
+    element.style.top = `${top * scaleY}px`;
+    element.style.width = `${(right - left) * scaleX}px`;
+    element.style.height = `${(bottom - top) * scaleY}px`;
+  }
+
+  getHomeArtBounds(imageElement) {
+    const existing = this.homeArtBounds.get(imageElement.id);
+    if (existing) {
+      return existing;
+    }
+    if (!imageElement.complete || !imageElement.naturalWidth || !imageElement.naturalHeight) {
+      return null;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = imageElement.naturalWidth;
+    canvas.height = imageElement.naturalHeight;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    context.drawImage(imageElement, 0, 0);
+    const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
+
+    let minX = width;
+    let minY = height;
+    let maxX = -1;
+    let maxY = -1;
+
+    for (let index = 3; index < data.length; index += 4) {
+      if (data[index] <= 8) {
+        continue;
+      }
+      const pixelIndex = (index - 3) / 4;
+      const x = pixelIndex % width;
+      const y = Math.floor(pixelIndex / width);
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+
+    const bounds = maxX >= 0
+      ? { left: minX, top: minY, width: Math.max(1, (maxX - minX) + 1), height: Math.max(1, (maxY - minY) + 1) }
+      : { left: 0, top: 0, width: imageElement.naturalWidth, height: imageElement.naturalHeight };
+
+    this.homeArtBounds.set(imageElement.id, bounds);
+    return bounds;
+  }
+
+  placeHomeArt(imageElement, zone, drawWidth, drawHeight, naturalWidth, naturalHeight) {
+    const bounds = this.getHomeArtBounds(imageElement);
+    if (!bounds) {
+      return;
+    }
+
+    const left = Math.min(zone.x1, zone.x2);
+    const right = Math.max(zone.x1, zone.x2);
+    const top = Math.min(zone.y1, zone.y2);
+    const bottom = Math.max(zone.y1, zone.y2);
+    const targetLeft = left * (drawWidth / naturalWidth);
+    const targetTop = top * (drawHeight / naturalHeight);
+    const targetWidth = (right - left) * (drawWidth / naturalWidth);
+    const targetHeight = (bottom - top) * (drawHeight / naturalHeight);
+    const scaleX = targetWidth / bounds.width;
+    const scaleY = targetHeight / bounds.height;
+    const finalLeft = targetLeft - (bounds.left * scaleX);
+    const finalTop = targetTop - (bounds.top * scaleY);
+    const startOffset = Math.max(drawHeight - targetTop + targetHeight + 48, 120);
+
+    imageElement.style.left = `${finalLeft}px`;
+    imageElement.style.top = `${finalTop}px`;
+    imageElement.style.width = `${imageElement.naturalWidth * scaleX}px`;
+    imageElement.style.height = `${imageElement.naturalHeight * scaleY}px`;
+    imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
   }
 
   clearHomeAnimationTimers() {
