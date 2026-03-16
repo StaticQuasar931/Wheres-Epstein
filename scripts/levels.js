@@ -79,6 +79,7 @@ export const START_SCREEN_BUTTONS = {
   start: { x1: 143, y1: 815, x2: 530, y2: 922, color: "green" },
   settings: { x1: 557, y1: 814, x2: 935, y2: 922, color: "blue" },
   moreGames: { x1: 961, y1: 814, x2: 1365, y2: 918, color: "orange" },
+  nameLink: { x1: 566, y1: 166, x2: 765, y2: 204, color: "gold" },
 };
 
 const MAIN_LEVELS_RAW = [

@@ -152,6 +152,7 @@ export class HiddenObjectGame {
       },
       topMenuButton: document.getElementById("topMenuButton"),
       startGameButton: document.getElementById("startGameButton"),
+      homeNameButton: document.getElementById("homeNameButton"),
       closeLevelSelectButton: document.getElementById("closeLevelSelectButton"),
       openSettingsButton: document.getElementById("openSettingsButton"),
       closeSettingsButton: document.getElementById("closeSettingsButton"),
@@ -290,6 +291,7 @@ export class HiddenObjectGame {
 
   bindEvents() {
     this.elements.startGameButton.addEventListener("click", () => this.showScreen("levelSelect"));
+    this.elements.homeNameButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.closeLevelSelectButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.openSettingsButton.addEventListener("click", () => this.showScreen("settings"));
     this.elements.closeSettingsButton.addEventListener("click", () => this.showScreen("home"));

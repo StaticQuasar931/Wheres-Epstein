@@ -33,8 +33,12 @@
           <div class="home-boot-card">
             <div class="home-boot-spinner" aria-hidden="true"></div>
             <p class="eyebrow">Loading</p>
-            <h2>Preparing the start screen</h2>
-            <p id="homeBootStatus" class="subtle-text">Loading menu art and button assets.</p>
+            <h2>Loading Where's Epstein?</h2>
+            <p id="homeBootStatus" class="subtle-text">Loading menu art, scene layers, and interface assets.</p>
+            <div class="boot-lore">
+              <p>Made by StaticQuasar931 with help by Cheese_Cat.</p>
+              <p>Warming up the start screen, buttons, and hidden-object scenes.</p>
+            </div>
           </div>
         </div>
 
@@ -52,6 +56,7 @@
           <button id="startGameButton"    class="image-button image-button-start"    type="button" aria-label="Start game"></button>
           <button id="openSettingsButton" class="image-button image-button-settings" type="button" aria-label="Open settings"></button>
           <button id="moreGamesButton"    class="image-button image-button-more"     type="button" aria-label="Open more games"></button>
+          <button id="homeNameButton"     class="image-button image-button-hidden-link" type="button" aria-label="Open more games"></button>
         </div>
 
         <div id="homeDebugOverlay" class="home-debug-overlay hidden" aria-hidden="true"></div>
@@ -146,13 +151,21 @@
               </div>
             </div>
             <div class="speedrun-card">
-              <p class="subtle-text">Pulls from normal, bonus, advanced, and advanced bonus levels. Repeats are possible, but nudged to feel less common.</p>
-              <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Random Level Speedrun</button>
+              <div class="speedrun-hero">
+                <p class="subtle-text">Pulls from normal, bonus, advanced, and advanced bonus levels. Repeats can happen, but the picker nudges away from very recent rolls.</p>
+                <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Random Level Speedrun</button>
+              </div>
               <div class="stat-grid speedrun-stats">
                 <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
                 <div class="stat-card"><span>Average Score</span><strong id="speedrunAverageScoreText">0</strong></div>
                 <div class="stat-card"><span>Average Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
                 <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
+              </div>
+              <div class="speedrun-recent-block">
+                <p class="eyebrow">Recently Played</p>
+                <div id="speedrunRecentStrip" class="speedrun-recent-strip">
+                  <span class="speedrun-recent-empty">No recent speedrun picks yet.</span>
+                </div>
               </div>
               <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
             </div>
@@ -290,6 +303,20 @@
               <option value="hidden">Hidden</option>
             </select>
           </label>
+          <label class="setting-card">
+            <span>Found Target FX</span>
+            <select id="foundFxSelect">
+              <option value="strong">Strong</option>
+              <option value="subtle">Subtle</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Magnifier Shape</span>
+            <select id="magnifierShapeSelect">
+              <option value="circle">Circle</option>
+              <option value="square">Square</option>
+            </select>
+          </label>
         </div>
 
         <div class="level-select-groups">
@@ -309,6 +336,9 @@
               <li>`Enter` confirms the main action on popups</li>
               <li>`R` retries when retry is available</li>
               <li>`L` opens level select</li>
+              <li>`Esc` backs out of menus and prompts</li>
+              <li>`Esc` opens the quit prompt during gameplay</li>
+              <li>`H` opens the home-button editor in testing mode</li>
               <li>Double click the level badge to open level select</li>
               <li>Use the preview toggle to hide the target card</li>
             </ul>
@@ -362,21 +392,6 @@
           <section class="menu-card">
             <div class="menu-card-header">
               <div>
-                <p class="eyebrow">Editing</p>
-                <h3>Useful file info</h3>
-              </div>
-            </div>
-            <ul class="control-list compact-list">
-              <li>Level target hitboxes are in <code>scripts/levels.js</code>.</li>
-              <li>Start-screen button zones use the same <code>x1, y1, x2, y2</code> format.</li>
-              <li>Testing mode shows live pointer coordinates and button hitboxes.</li>
-              <li>Advanced levels support two targets with separate preview images and hitboxes.</li>
-            </ul>
-          </section>
-
-          <section class="menu-card">
-            <div class="menu-card-header">
-              <div>
                 <p class="eyebrow">Stats</p>
                 <h3>Local progress</h3>
               </div>
@@ -392,8 +407,7 @@
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.22</p>
-            <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
+            <p id="versionTapTarget" class="version-label version-text-inline">Alpha Version 0.0.0.1.1.4</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -422,6 +436,7 @@
           <h3 id="sceneFallbackTitle">Unable to load level background</h3>
           <p id="sceneFallbackText">Check the image path and filename.</p>
         </div>
+        <div id="magnifierLens" class="magnifier-lens hidden" aria-hidden="true"></div>
 
         <!-- HUD topbar -->
         <div class="play-topbar">

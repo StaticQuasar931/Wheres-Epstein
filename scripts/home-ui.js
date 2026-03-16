@@ -36,6 +36,7 @@ export function layoutHomeButtons(game, config) {
   placeHomeButton(game, "start", game.elements.startGameButton, startPlacement);
   placeHomeButton(game, "settings", game.elements.openSettingsButton, settingsPlacement);
   placeHomeButton(game, "more", game.elements.moreGamesButton, morePlacement);
+  placeHomeZoneButton(game, "nameLink", game.elements.homeNameButton, config.nameLink, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
   placeHomeSheen(game, game.elements.startButtonSheen, startPlacement);
   placeHomeSheen(game, game.elements.settingsButtonSheen, settingsPlacement);
   placeHomeSheen(game, game.elements.moreGamesButtonSheen, morePlacement);
@@ -230,6 +231,33 @@ function placeHomeButton(game, key, element, placement) {
     y1: Math.round((clickTop / overlayHeight) * naturalHeight),
     x2: Math.round(((clickLeft + clickWidth) / overlayWidth) * naturalWidth),
     y2: Math.round(((clickTop + clickHeight) / overlayHeight) * naturalHeight),
+  });
+}
+
+function placeHomeZoneButton(game, key, element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
+  if (!element || !zone) {
+    return;
+  }
+
+  const adjusted = getAdjustedHomeZone(zone, config);
+  const left = Math.min(adjusted.x1, adjusted.x2) * (drawWidth / naturalWidth);
+  const top = Math.min(adjusted.y1, adjusted.y2) * (drawHeight / naturalHeight);
+  const width = Math.abs(adjusted.x2 - adjusted.x1) * (drawWidth / naturalWidth);
+  const height = Math.abs(adjusted.y2 - adjusted.y1) * (drawHeight / naturalHeight);
+
+  element.style.position = "absolute";
+  element.style.display = "block";
+  element.style.cursor = "pointer";
+  element.style.left = `${left}px`;
+  element.style.top = `${top}px`;
+  element.style.width = `${width}px`;
+  element.style.height = `${height}px`;
+
+  game.homeButtonZones.set(key, {
+    x1: Math.round((left / drawWidth) * naturalWidth),
+    y1: Math.round((top / drawHeight) * naturalHeight),
+    x2: Math.round(((left + width) / drawWidth) * naturalWidth),
+    y2: Math.round(((top + height) / drawHeight) * naturalHeight),
   });
 }
 
