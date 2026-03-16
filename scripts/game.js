@@ -107,10 +107,14 @@ export class HiddenObjectGame {
     this.applySettings();
     this.renderHomeStats();
     this.renderLevelSelect();
-    window.requestAnimationFrame(() => this.layoutHomeButtons());
+    window.requestAnimationFrame(() => {
+      this.layoutHomeButtons();
+      this.playHomeButtonIntro();
+    });
     if (this.elements.startScreenImage.complete) {
       if (this.elements.startScreenImage.naturalWidth > 0) {
         this.layoutHomeButtons();
+        this.playHomeButtonIntro();
       } else {
         this.showStartImageError();
       }
@@ -252,6 +256,7 @@ export class HiddenObjectGame {
     this.elements.startScreenImage.addEventListener("load", () => {
       this.hideStartImageError();
       this.layoutHomeButtons();
+      this.playHomeButtonIntro();
     });
     this.elements.zoomOutButton.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
     this.elements.zoomInButton.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
@@ -593,7 +598,7 @@ export class HiddenObjectGame {
 
   showStartImageError() {
     this.elements.startScreenFallback.classList.remove("hidden");
-    this.elements.startScreenErrorText.textContent = "Tried to load: Assets/ui/nobuttonloadingscreen.png";
+    this.elements.startScreenErrorText.textContent = "Tried to load: Assets/ui/nobuttonloadingscreen.jpg";
   }
 
   hideStartImageError() {

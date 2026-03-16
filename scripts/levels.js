@@ -143,7 +143,7 @@ export const LEVELS = [
     name: "Class Photo",
     background: "Assets/Bakgrounds/bonus5.png",
     targetPreview: "Assets/Waldos/trum3.png",
-    hitbox: { type: "rect", x1: 352, y1: 261aw, x2: 364, y2: 278 },
+    hitbox: { type: "rect", x1: 352, y1: 261, x2: 364, y2: 278 },
     isBonus: true,
   },
 ];
