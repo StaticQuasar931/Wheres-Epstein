@@ -14,7 +14,7 @@ const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
 const HOME_BUTTON_ANIMATION_MS = 980;
 const HOME_BUTTON_X_OFFSET = -90;
-const HOME_BUTTON_Y_OFFSET = -200;
+const HOME_BUTTON_Y_OFFSET = -180;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 
