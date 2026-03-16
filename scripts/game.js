@@ -75,6 +75,7 @@ export class HiddenObjectGame {
     this.keyboardPanFrame = null;
     this.konamiInput = [];
     this.homeAnimationTimers = [];
+    this.preloadedAssets = new Set();
     this.state = {
       levelIndex: 0,
       totalScore: 0,
@@ -426,13 +427,17 @@ export class HiddenObjectGame {
       const result = this.save.legit.levelResults[level.id];
       const unlocked = isBonus ? this.isBonusUnlocked() : this.isMainLevelUnlocked(level);
       const bestStars = result ? starText(result.bestStars ?? 0) : starText(0);
+      const bestScore = result ? formatScore(result.bestScore ?? 0) : "0";
+      const cardLabel = level.isBonus
+        ? `Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`
+        : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
       const button = document.createElement("button");
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
       button.innerHTML = unlocked
-        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${level.isBonus ? "Bonus" : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`}</span></div><p class="level-meta level-stars">${bestStars}</p>`
-        : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${level.isBonus ? "Bonus" : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p><p class="level-meta level-stars">${bestStars}</p>`;
+        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-meta level-best-score">Best score: ${bestScore}</p><p class="level-meta level-stars">${bestStars}</p>`
+        : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p><p class="level-meta level-best-score">Best score: ${bestScore}</p><p class="level-meta level-stars">${bestStars}</p>`;
       button.addEventListener("click", () => this.startSelectedLevel(level.id));
       container.appendChild(button);
     });
@@ -534,7 +539,9 @@ export class HiddenObjectGame {
       ? "Bonus"
       : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     this.elements.hudLevelName.textContent = level.name;
+    this.elements.sceneFallback.classList.add("hidden");
     this.loadPreviewImage(this.elements.targetPreviewImage, this.elements.previewErrorText, level.targetPreview);
+    this.prepareSceneImageLoad();
     this.elements.levelImage.src = level.background;
     this.renderHitbox(level.hitbox);
     this.setPreviewVisibility(this.save.settings.previewDefault !== "hidden");
@@ -542,10 +549,11 @@ export class HiddenObjectGame {
   }
 
   loadPreviewImage(imageElement, errorElement, path) {
+    imageElement.classList.add("asset-loading");
+    imageElement.removeAttribute("src");
     errorElement.classList.add("hidden");
     errorElement.textContent = "";
     if (!path) {
-      imageElement.removeAttribute("src");
       errorElement.textContent = "Tried to load: [empty preview path]";
       errorElement.classList.remove("hidden");
       return;
@@ -553,7 +561,17 @@ export class HiddenObjectGame {
     imageElement.src = path;
   }
 
+  prepareSceneImageLoad() {
+    this.elements.levelImage.classList.add("asset-loading");
+    this.elements.levelImage.removeAttribute("src");
+    this.elements.sceneContent.style.width = "1px";
+    this.elements.sceneContent.style.height = "1px";
+    this.elements.hitboxOverlay.style.width = "1px";
+    this.elements.hitboxOverlay.style.height = "1px";
+  }
+
   onLevelImageLoaded() {
+    this.elements.levelImage.classList.remove("asset-loading");
     this.state.naturalWidth = this.elements.levelImage.naturalWidth || 1;
     this.state.naturalHeight = this.elements.levelImage.naturalHeight || 1;
     this.elements.sceneContent.style.width = `${this.state.naturalWidth}px`;
@@ -565,10 +583,13 @@ export class HiddenObjectGame {
     this.state.startTimestamp = performance.now();
     this.state.runActive = true;
     this.startElapsedTimer();
+    this.preloadLevelAssets(this.getNextLevelIndex());
   }
 
   onLevelImageError() {
     const path = this.getCurrentLevel().background;
+    this.elements.levelImage.classList.remove("asset-loading");
+    this.elements.levelImage.removeAttribute("src");
     this.elements.sceneFallbackTitle.textContent = "Unable to load level background";
     this.elements.sceneFallbackText.textContent = `Tried to load: ${path}`;
     this.elements.sceneFallback.classList.remove("hidden");
@@ -577,23 +598,47 @@ export class HiddenObjectGame {
   }
 
   showPreviewError(path) {
+    this.elements.targetPreviewImage.classList.remove("asset-loading");
+    this.elements.targetPreviewImage.removeAttribute("src");
     this.elements.previewErrorText.textContent = `Tried to load: ${path}`;
     this.elements.previewErrorText.classList.remove("hidden");
   }
 
   clearPreviewError() {
+    this.elements.targetPreviewImage.classList.remove("asset-loading");
     this.elements.previewErrorText.classList.add("hidden");
     this.elements.previewErrorText.textContent = "";
   }
 
   showIntroPreviewError(path) {
+    this.elements.introPreviewImage.classList.remove("asset-loading");
+    this.elements.introPreviewImage.removeAttribute("src");
     this.elements.introPreviewErrorText.textContent = `Tried to load: ${path}`;
     this.elements.introPreviewErrorText.classList.remove("hidden");
   }
 
   clearIntroPreviewError() {
+    this.elements.introPreviewImage.classList.remove("asset-loading");
     this.elements.introPreviewErrorText.classList.add("hidden");
     this.elements.introPreviewErrorText.textContent = "";
+  }
+
+  preloadImage(path) {
+    if (!path || this.preloadedAssets.has(path)) {
+      return;
+    }
+    const image = new Image();
+    image.src = path;
+    this.preloadedAssets.add(path);
+  }
+
+  preloadLevelAssets(levelIndex) {
+    if (levelIndex === null || levelIndex < 0 || levelIndex >= LEVELS.length) {
+      return;
+    }
+    const nextLevel = LEVELS[levelIndex];
+    this.preloadImage(nextLevel.background);
+    this.preloadImage(nextLevel.targetPreview);
   }
 
   showStartImageError() {
@@ -1144,6 +1189,10 @@ export class HiddenObjectGame {
     const currentMainIndex = MAIN_LEVELS.findIndex((item) => item.id === current.id);
     if (currentMainIndex >= 0 && currentMainIndex < MAIN_LEVELS.length - 1) {
       return LEVELS.findIndex((item) => item.id === MAIN_LEVELS[currentMainIndex + 1].id);
+    }
+    const currentBonusIndex = BONUS_LEVELS.findIndex((item) => item.id === current.id);
+    if (currentBonusIndex >= 0 && currentBonusIndex < BONUS_LEVELS.length - 1) {
+      return LEVELS.findIndex((item) => item.id === BONUS_LEVELS[currentBonusIndex + 1].id);
     }
     return null;
   }

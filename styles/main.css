@@ -586,6 +586,11 @@ p {
   font-size: 0.98rem;
 }
 
+.level-best-score {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
 .level-stars {
   color: var(--accent);
   letter-spacing: 0.18rem;
@@ -736,6 +741,10 @@ code {
   width: 100%;
   height: auto;
   pointer-events: none;
+}
+
+.asset-loading {
+  opacity: 0;
 }
 
 .hitbox-overlay {
