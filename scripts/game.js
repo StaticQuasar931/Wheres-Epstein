@@ -2,6 +2,7 @@ import { LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
 import { loadSave, recordLevelResult, saveSettings } from "./storage.js";
 
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
+const DISCORD_URL = "";
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 8;
 const WHEEL_ZOOM_STEP = 0.12;
@@ -10,6 +11,9 @@ const DRAG_THRESHOLD = 8;
 const KEYBOARD_PAN_STEP = 18;
 const PAN_MARGIN = 120;
 const DIAGNOSTIC_CODE = "5278";
+const HOME_BUTTON_STAGGER_MS = 260;
+const HOME_BUTTON_ANIMATION_MS = 520;
+const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 
 const MAIN_LEVELS = LEVELS.filter((level) => !level.isBonus);
 const BONUS_LEVELS = LEVELS.filter((level) => level.isBonus);
@@ -69,6 +73,8 @@ export class HiddenObjectGame {
     this.diagnosticTapCount = 0;
     this.keyState = new Set();
     this.keyboardPanFrame = null;
+    this.konamiInput = [];
+    this.homeAnimationTimers = [];
     this.state = {
       levelIndex: 0,
       totalScore: 0,
@@ -130,6 +136,9 @@ export class HiddenObjectGame {
       homeButtonOverlay: document.getElementById("homeButtonOverlay"),
       homeDebugOverlay: document.getElementById("homeDebugOverlay"),
       homeDebugReadout: document.getElementById("homeDebugReadout"),
+      startButtonArt: document.getElementById("startButtonArt"),
+      settingsButtonArt: document.getElementById("settingsButtonArt"),
+      moreGamesButtonArt: document.getElementById("moreGamesButtonArt"),
       startScreenImage: document.getElementById("startScreenImage"),
       startScreenFallback: document.getElementById("startScreenFallback"),
       startScreenErrorText: document.getElementById("startScreenErrorText"),
@@ -150,6 +159,10 @@ export class HiddenObjectGame {
       panTipSelect: document.getElementById("panTipSelect"),
       confirmQuitSelect: document.getElementById("confirmQuitSelect"),
       previewDefaultSelect: document.getElementById("previewDefaultSelect"),
+      settingsDiscordButton: document.getElementById("settingsDiscordButton"),
+      settingsMoreGamesButton: document.getElementById("settingsMoreGamesButton"),
+      settingsLevelSelectButton: document.getElementById("settingsLevelSelectButton"),
+      settingsLinkHint: document.getElementById("settingsLinkHint"),
       versionTapTarget: document.getElementById("versionTapTarget"),
       diagnosticUnlock: document.getElementById("diagnosticUnlock"),
       diagnosticCodeInput: document.getElementById("diagnosticCodeInput"),
@@ -205,6 +218,7 @@ export class HiddenObjectGame {
       completionStars: document.getElementById("completionStars"),
       playAgainButton: document.getElementById("playAgainButton"),
       completionLevelSelectButton: document.getElementById("completionLevelSelectButton"),
+      menuToast: document.getElementById("menuToast"),
     };
   }
 
@@ -213,7 +227,7 @@ export class HiddenObjectGame {
     this.elements.closeLevelSelectButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.openSettingsButton.addEventListener("click", () => this.showScreen("settings"));
     this.elements.closeSettingsButton.addEventListener("click", () => this.showScreen("home"));
-    this.elements.moreGamesButton.addEventListener("click", () => window.open(MORE_GAMES_URL, "_blank", "noopener"));
+    this.elements.moreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.topMenuButton.addEventListener("click", () => this.handleTopMenu());
     this.elements.themeSelect.addEventListener("change", () => this.persistSettings());
     this.elements.densitySelect.addEventListener("change", () => this.persistSettings());
@@ -223,6 +237,9 @@ export class HiddenObjectGame {
     this.elements.panTipSelect.addEventListener("change", () => this.persistSettings());
     this.elements.confirmQuitSelect.addEventListener("change", () => this.persistSettings());
     this.elements.previewDefaultSelect.addEventListener("change", () => this.persistSettings());
+    this.elements.settingsDiscordButton.addEventListener("click", () => this.openExternalLink(DISCORD_URL, "Add your Discord invite URL in scripts/game.js to enable this button."));
+    this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
+    this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.versionTapTarget.addEventListener("click", () => this.handleVersionTap());
     this.elements.unlockDiagnosticButton.addEventListener("click", () => this.unlockDiagnostics());
     this.elements.levelImage.addEventListener("load", () => this.onLevelImageLoaded());
@@ -293,6 +310,10 @@ export class HiddenObjectGame {
     this.elements.body.dataset.preview = this.save.settings.previewSize;
     this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
     this.elements.skipLevelButton.classList.toggle("hidden", !this.sessionTestingUnlocked);
+    this.elements.settingsDiscordButton.disabled = !DISCORD_URL;
+    this.elements.settingsLinkHint.textContent = DISCORD_URL
+      ? "Community links open in a new tab."
+      : "Set your Discord invite URL in scripts/game.js to turn on the Discord button.";
   }
 
   persistSettings() {
@@ -327,6 +348,17 @@ export class HiddenObjectGame {
       this.renderLevelSelect();
     }
     this.layoutHomeButtons();
+    if (name === "home" && this.elements.startScreenImage.naturalWidth > 0) {
+      this.playHomeButtonIntro();
+    }
+  }
+
+  openExternalLink(url, emptyMessage) {
+    if (!url) {
+      this.showMenuToast(emptyMessage, true);
+      return;
+    }
+    window.open(url, "_blank", "noopener");
   }
 
   handleTopMenu() {
@@ -364,6 +396,19 @@ export class HiddenObjectGame {
     this.elements.bonusRuleText.textContent = `Bonuses unlock after normal level 5 or 10 total stars. Current stars: ${starCount}.`;
   }
 
+  showMenuToast(message, isBad = false) {
+    const node = this.elements.menuToast;
+    node.textContent = message;
+    node.classList.remove("hidden", "bad");
+    if (isBad) {
+      node.classList.add("bad");
+    }
+    window.clearTimeout(this.menuToastTimerId);
+    this.menuToastTimerId = window.setTimeout(() => {
+      node.classList.add("hidden");
+    }, 2200);
+  }
+
   renderLevelSelect() {
     this.renderLevelGrid(this.elements.mainLevelGrid, MAIN_LEVELS, false);
     this.renderLevelGrid(this.elements.bonusLevelGrid, BONUS_LEVELS, true);
@@ -389,11 +434,17 @@ export class HiddenObjectGame {
   }
 
   isMainLevelUnlocked(level) {
+    if (this.sessionTestingUnlocked) {
+      return true;
+    }
     const index = MAIN_LEVELS.findIndex((item) => item.id === level.id);
     return index < this.save.legit.highestLevelCleared;
   }
 
   isBonusUnlocked() {
+    if (this.sessionTestingUnlocked) {
+      return true;
+    }
     return this.save.legit.highestLevelCleared >= 6 || getTotalStars(this.save.legit) >= 10;
   }
 
@@ -542,7 +593,7 @@ export class HiddenObjectGame {
 
   showStartImageError() {
     this.elements.startScreenFallback.classList.remove("hidden");
-    this.elements.startScreenErrorText.textContent = "Tried to load: Assets/startscreen.png";
+    this.elements.startScreenErrorText.textContent = "Tried to load: Assets/ui/nobuttonloadingscreen.png";
   }
 
   hideStartImageError() {
@@ -597,6 +648,37 @@ export class HiddenObjectGame {
     element.style.top = `${zone.y1 * scaleY}px`;
     element.style.width = `${(zone.x2 - zone.x1) * scaleX}px`;
     element.style.height = `${(zone.y2 - zone.y1) * scaleY}px`;
+  }
+
+  clearHomeAnimationTimers() {
+    this.homeAnimationTimers.forEach((timerId) => window.clearTimeout(timerId));
+    this.homeAnimationTimers = [];
+  }
+
+  playHomeButtonIntro() {
+    this.clearHomeAnimationTimers();
+    const buttons = [
+      this.elements.startGameButton,
+      this.elements.openSettingsButton,
+      this.elements.moreGamesButton,
+    ];
+
+    buttons.forEach((button) => {
+      button.classList.remove("is-settled");
+      button.classList.add("is-prepping");
+    });
+
+    buttons.forEach((button, index) => {
+      const timerId = window.setTimeout(() => {
+        button.classList.remove("is-prepping");
+        button.classList.add("is-entering");
+        window.setTimeout(() => {
+          button.classList.remove("is-entering");
+          button.classList.add("is-settled");
+        }, HOME_BUTTON_ANIMATION_MS);
+      }, index * HOME_BUTTON_STAGGER_MS);
+      this.homeAnimationTimers.push(timerId);
+    });
   }
 
   isUiEventTarget(target) {
@@ -859,6 +941,7 @@ export class HiddenObjectGame {
       return;
     }
     const key = event.key.toLowerCase();
+    this.trackEasterEggs(key);
     if (key === "l") {
       event.preventDefault();
       this.showScreen("levelSelect");
@@ -921,6 +1004,23 @@ export class HiddenObjectGame {
     event.preventDefault();
     this.keyState.add(key);
     this.ensureKeyboardPanLoop();
+  }
+
+  trackEasterEggs(key) {
+    this.konamiInput.push(key);
+    if (this.konamiInput.length > KONAMI_SEQUENCE.length) {
+      this.konamiInput.shift();
+    }
+
+    if (KONAMI_SEQUENCE.every((value, index) => this.konamiInput[index] === value)) {
+      document.body.classList.toggle("easter-arcade");
+      this.showMenuToast(document.body.classList.contains("easter-arcade") ? "Arcade glow enabled." : "Arcade glow disabled.");
+      this.konamiInput = [];
+    }
+
+    if (key === "n" && this.sessionTestingUnlocked && this.elements.screens.game.classList.contains("screen-active")) {
+      this.skipLevel();
+    }
   }
 
   onKeyUp(event) {
