@@ -13,8 +13,8 @@ const PAN_MARGIN = 120;
 const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
 const HOME_BUTTON_ANIMATION_MS = 980;
-const HOME_BUTTON_X_OFFSET = -10;
-const HOME_BUTTON_Y_OFFSET = -300;
+const HOME_BUTTON_X_OFFSET = -20;
+const HOME_BUTTON_Y_OFFSET = -270;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 
@@ -708,8 +708,8 @@ export class HiddenObjectGame {
     return {
       x1: zone.x1 + HOME_BUTTON_X_OFFSET,
       x2: zone.x2 + HOME_BUTTON_X_OFFSET,
-      y1: zone.y1 + HOME_BUTTON_Y_OFFSET + 30,
-      y2: zone.y2 + HOME_BUTTON_Y_OFFSET + 30,
+      y1: zone.y1 + HOME_BUTTON_Y_OFFSET,
+      y2: zone.y2 + HOME_BUTTON_Y_OFFSET,
       color: zone.color,
     };
   }
@@ -851,26 +851,22 @@ export class HiddenObjectGame {
     }
 
     [
-      ["start", START_SCREEN_BUTTONS.start],
-      ["settings", START_SCREEN_BUTTONS.settings],
-      ["more", START_SCREEN_BUTTONS.moreGames],
-    ].forEach(([label, zone]) => {
+      ["start", START_SCREEN_BUTTONS.start, this.elements.startGameButton],
+      ["settings", START_SCREEN_BUTTONS.settings, this.elements.openSettingsButton],
+      ["more", START_SCREEN_BUTTONS.moreGames, this.elements.moreGamesButton],
+    ].forEach(([label, zone, buttonElement]) => {
       const adjusted = this.getAdjustedHomeZone(zone);
       const node = document.createElement("div");
       node.className = `home-debug-box color-${zone.color}`;
       const tag = document.createElement("span");
       tag.className = "home-debug-label";
-      const scaleX = drawWidth / naturalWidth;
-      const scaleY = drawHeight / naturalHeight;
-      const left = Math.min(adjusted.x1, adjusted.x2);
-      const right = Math.max(adjusted.x1, adjusted.x2);
-      const top = Math.min(adjusted.y1, adjusted.y2);
-      const bottom = Math.max(adjusted.y1, adjusted.y2);
-      node.style.left = `${left * scaleX}px`;
-      node.style.top = `${top * scaleY}px`;
-      node.style.width = `${(right - left) * scaleX}px`;
-      node.style.height = `${(bottom - top) * scaleY}px`;
-      tag.textContent = `${label}: ${left},${top} -> ${right},${bottom}`;
+      const overlayRect = this.elements.homeButtonOverlay.getBoundingClientRect();
+      const buttonRect = buttonElement.getBoundingClientRect();
+      node.style.left = `${buttonRect.left - overlayRect.left}px`;
+      node.style.top = `${buttonRect.top - overlayRect.top}px`;
+      node.style.width = `${buttonRect.width}px`;
+      node.style.height = `${buttonRect.height}px`;
+      tag.textContent = `${label}: ${Math.min(adjusted.x1, adjusted.x2)},${Math.min(adjusted.y1, adjusted.y2)} -> ${Math.max(adjusted.x1, adjusted.x2)},${Math.max(adjusted.y1, adjusted.y2)}`;
       node.appendChild(tag);
       debug.appendChild(node);
     });
