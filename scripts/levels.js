@@ -66,25 +66,45 @@ export const START_SCREEN_BUTTONS = {
 };
 
 const MAIN_LEVELS_RAW = [
+  // Level 1: Welcome Party
   makeLevel(1, "eps1", { name: "Welcome Party", targets: [makeTarget("level-01-a", "eps1", { type: "rect", x1: 991, y1: 583, x2: 1069, y2: 688 })] }),
+  // Level 2: Rainbow Bunny
   makeLevel(2, "eps2", { name: "Rainbow Bunny", targets: [makeTarget("level-02-a", "eps2", { type: "rect", x1: 892, y1: 377, x2: 929, y2: 425 })] }),
+  // Level 3: Medieval Beer
   makeLevel(3, "trum1", { name: "Medieval Beer", targets: [makeTarget("level-03-a", "trum1", { type: "rect", x1: 944, y1: 223, x2: 965, y2: 250 })] }),
+  // Level 4: Big Party
   makeLevel(4, "eps3", { name: "Big Party", targets: [makeTarget("level-04-a", "eps3", { type: "rect", x1: 35, y1: 126, x2: 69, y2: 159 })] }),
+  // Level 5: July 4th
   makeLevel(5, "eps5", { name: "July 4th", targets: [makeTarget("level-05-a", "eps5", { type: "rect", x1: 593, y1: 278, x2: 614, y2: 306 })] }),
+  // Level 6: Waldo's Beach
   makeLevel(6, "trum2", { name: "Waldo's Beach", targets: [makeTarget("level-06-a", "trum2", { type: "rect", x1: 751, y1: 660, x2: 802, y2: 711 })] }),
+  // Level 7: Waldo's Briefcase
   makeLevel(7, "trum5", { name: "Waldo's Briefcase", targets: [makeTarget("level-07-a", "trum5", { type: "rect", x1: 531, y1: 204, x2: 554, y2: 225 })] }),
+  // Level 8: Popcorn Park
   makeLevel(8, "eps4", { name: "Popcorn Park", targets: [makeTarget("level-08-a", "eps4", { type: "rect", x1: 1375, y1: 271, x2: 1352, y2: 237 })] }),
+  // Level 9: Harbor Chaos
   makeLevel(9, "eps2", { name: "Harbor Chaos", targets: [makeTarget("level-09-a", "eps2", { type: "rect", x1: 425, y1: 697, x2: 394, y2: 650 })] }),
+  // Level 10: Airport Travel
   makeLevel(10, "eps5", { name: "Airport Travel", targets: [makeTarget("level-10-a", "eps5", { type: "rect", x1: 929, y1: 267, x2: 907, y2: 240 })] }),
+  // Level 11: Bridge Wave
   makeLevel(11, "eps7", { name: "Bridge Wave", targets: [makeTarget("level-11-a", "eps7", { type: "rect", x1: 373, y1: 494, x2: 343, y2: 445 })] }),
+  // Level 12: Dragon Castle
   makeLevel(12, "eps7", { name: "Dragon Castle", targets: [makeTarget("level-12-a", "eps7", { type: "rect", x1: 567, y1: 340, x2: 538, y2: 301 })] }),
+  // Level 13: Waterfall Hike
   makeLevel(13, "trum2", { name: "Waterfall Hike", targets: [makeTarget("level-13-a", "trum2", { type: "rect", x1: 700, y1: 472, x2: 663, y2: 428 })] }),
+  // Level 14: Halloween Party
   makeLevel(14, "eps6", { name: "Halloween Party", targets: [makeTarget("level-14-a", "eps6", { type: "rect", x1: 1313, y1: 370, x2: 1276, y2: 330 })] }),
+  // Level 15: NASA Launch
   makeLevel(15, "trum5", { name: "NASA Launch", targets: [makeTarget("level-15-a", "trum5", { type: "rect", x1: 1085, y1: 531, x2: 1055, y2: 502 })] }),
+  // Level 16: Hogwarts
   makeLevel(16, "eps6", { name: "Hogwarts", targets: [makeTarget("level-16-a", "eps6", { type: "rect", x1: 1462, y1: 334, x2: 1446, y2: 316 })] }),
+  // Level 17: City Forest
   makeLevel(17, "trum4", { name: "City Forest", targets: [makeTarget("level-17-a", "trum4", { type: "rect", x1: 1535, y1: 278, x2: 1502, y2: 248 })] }),
+  // Level 18: Bone Archive
   makeLevel(18, "trum3", { name: "Bone Archive", targets: [makeTarget("level-18-a", "trum3", { type: "rect", x1: 596, y1: 672, x2: 540, y2: 604 })] }),
+  // Level 19: New York Pizza
   makeLevel(19, "eps4", { name: "New York Pizza", targets: [makeTarget("level-19-a", "eps4", { type: "rect", x1: 787, y1: 687, x2: 731, y2: 612 })] }),
+  // Level 20: NASA Hike
   makeLevel(20, "eps2", { name: "NASA Hike", targets: [makeTarget("level-20-a", "eps2", { type: "rect", x1: 815, y1: 295, x2: 789, y2: 258 })] }),
 ];
 
@@ -127,35 +147,41 @@ const BONUS_LEVELS_RAW = [
 ];
 
 const ADVANCED_LEVELS_RAW = [
+  // Advanced Level 1: Advanced Arrival
   makeAdvancedLevel(1, [
     makeTarget("advanced-01-a", "di4", { type: "rect", x1: 715, y1: 450, x2: 749, y2: 493 }, "Assets/Waldos/advanced"),
   ], {
     name: "Advanced Arrival",
   }),
+  // Advanced Level 2: Double Elephant
   makeAdvancedLevel(2, [
     makeTarget("advanced-02-a", "ep1", { type: "rect", x1: 1103, y1: 400, x2: 1070, y2: 369 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-02-b", "tru6", { type: "rect", x1: 470, y1: 300, x2: 378, y2: 371 }, "Assets/Waldos/advanced"),
   ], {
     name: "Double Elephant",    
   }),
+  // Advanced Level 3: Crowd Split
   makeAdvancedLevel(3, [
     makeTarget("advanced-03-a", "ep3", { type: "rect", x1: 1103, y1: 400, x2: 1070, y2: 369 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-03-b", "tru2", { type: "rect", x1: 311, y1: 413, x2: 288, y2: 381 }, "Assets/Waldos/advanced"),
   ], {
     name: "Crowd Split",
   }),
+  // Advanced Level 4: Tight Corners
   makeAdvancedLevel(4, [
     makeTarget("advanced-04-a", "di5", { type: "rect", x1: 384, y1: 287, x2: 425, y2: 321 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-04-b", "ep6", { type: "rect", x1: 929, y1: 278, x2: 917, y2: 255 }, "Assets/Waldos/advanced"),
   ], {
     name: "Tight Corners",
   }),
+  // Advanced Level 5: Harder Reads
   makeAdvancedLevel(5, [
     makeTarget("advanced-05-a", "tru4", { type: "rect", x1: 1450, y1: 252, x2: 1416, y2: 216 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-05-b", "ep2", { type: "rect", x1: 293, y1: 317, x2: 230, y2: 230 }, "Assets/Waldos/advanced"),
   ], {
     name: "Harder Reads",
   }),
+  // Advanced Level 6: Final Pairing
   makeAdvancedLevel(6, [
     makeTarget("advanced-06-a", "tru2", { type: "rect", x1: 1315, y1: 279, x2: 1295, y2: 254 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-06-b", "ep10", { type: "rect", x1: 475, y1: 300, x2: 500, y2: 336 }, "Assets/Waldos/advanced"),

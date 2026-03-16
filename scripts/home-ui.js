@@ -39,6 +39,23 @@ export function layoutHomeButtons(game, config) {
   renderHomeDebugOverlay(game, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
 }
 
+export function bindHomeButtonHoverEffects(game) {
+  const mappings = [
+    [game.elements.startGameButton, game.elements.startButtonArt],
+    [game.elements.openSettingsButton, game.elements.settingsButtonArt],
+    [game.elements.moreGamesButton, game.elements.moreGamesButtonArt],
+  ];
+
+  mappings.forEach(([button, art]) => {
+    const activate = () => art.classList.add("is-hovered");
+    const deactivate = () => art.classList.remove("is-hovered");
+    button.addEventListener("pointerenter", activate);
+    button.addEventListener("pointerleave", deactivate);
+    button.addEventListener("focus", activate);
+    button.addEventListener("blur", deactivate);
+  });
+}
+
 export function playHomeButtonIntro(game, animationMs, staggerMs) {
   clearHomeAnimationTimers(game);
   const artLayers = [
@@ -46,6 +63,10 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
     game.elements.settingsButtonArt,
     game.elements.moreGamesButtonArt,
   ];
+
+  if (artLayers.some((layer) => !layer.complete || !layer.naturalWidth)) {
+    return;
+  }
 
   if (game.homeIntroPlayed) {
     artLayers.forEach((layer) => {

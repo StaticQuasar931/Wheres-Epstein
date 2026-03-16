@@ -106,6 +106,7 @@ export function recordLevelResult({ cheated, levelId, score, stars, clearMs, hig
 
   bucket.levelResults[levelId] = {
     completed: true,
+    firstScore: previous.firstScore ?? score,
     bestScore: Math.max(previous.bestScore ?? 0, score),
     bestStars: Math.max(previous.bestStars ?? 0, stars),
     bestTimeMs: previous.bestTimeMs ? Math.min(previous.bestTimeMs, clearMs) : clearMs,

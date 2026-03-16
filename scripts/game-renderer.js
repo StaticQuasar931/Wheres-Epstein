@@ -59,9 +59,14 @@ export function renderPreviewList(container, errorElement, targets) {
 }
 
 export function syncFoundPreviewState(game) {
-  const targetCardItems = game.elements.targetPreviewList.querySelectorAll(".preview-item");
-  targetCardItems.forEach((item) => {
-    item.classList.toggle("is-found", game.state.foundTargetIds.has(item.dataset.targetId));
+  const targetCardItems = Array.from(game.elements.targetPreviewList.querySelectorAll(".preview-item"));
+  targetCardItems.forEach((item, index) => {
+    const found = game.state.foundTargetIds.has(item.dataset.targetId);
+    item.classList.toggle("is-found", found);
+    const badge = item.querySelector(".preview-badge");
+    if (badge) {
+      badge.textContent = found ? "Found" : (targetCardItems.length > 1 ? `Target ${index + 1}` : "Target");
+    }
   });
 }
 

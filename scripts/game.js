@@ -1,6 +1,6 @@
 import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
 import { loadSave, recordLevelResult, saveSettings, saveMeta } from "./storage.js";
-import { layoutHomeButtons as layoutHomeButtonsUi, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
+import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
 
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
@@ -117,6 +117,7 @@ export class HiddenObjectGame {
 
     this.elements = this.getElements();
     this.bindEvents();
+    bindHomeButtonHoverEffects(this);
     this.applySettings();
     this.renderHomeStats();
     this.renderLevelSelect();
@@ -289,7 +290,10 @@ export class HiddenObjectGame {
       this.playHomeButtonIntro();
     });
     [this.elements.startButtonArt, this.elements.settingsButtonArt, this.elements.moreGamesButtonArt].forEach((image) => {
-      image.addEventListener("load", () => this.layoutHomeButtons());
+      image.addEventListener("load", () => {
+        this.layoutHomeButtons();
+        this.playHomeButtonIntro();
+      });
     });
     this.elements.zoomOutButton.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
     this.elements.zoomInButton.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
@@ -457,15 +461,17 @@ export class HiddenObjectGame {
       const result = this.save.legit.levelResults[level.id];
       const unlocked = this.isLevelUnlocked(level, options.kind);
       const bestStars = result ? starText(result.bestStars ?? 0) : starText(0);
+      const firstScore = result ? formatScore(result.firstScore ?? result.bestScore ?? 0) : "0";
       const bestScore = result ? formatScore(result.bestScore ?? 0) : "0";
       const cardLabel = this.getLevelCardLabel(level, options.kind);
       const button = document.createElement("button");
+      const scoreMarkup = `<p class="level-meta level-best-score"><span>First ${firstScore}</span><span>Best ${bestScore}</span></p>`;
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
       button.innerHTML = unlocked
-        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-meta level-best-score">Best score: ${bestScore}</p><p class="level-meta level-stars">${bestStars}</p>`
-        : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p><p class="level-meta level-best-score">Best score: ${bestScore}</p><p class="level-meta level-stars">${bestStars}</p>`;
+        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div>${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`
+        : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p>${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`;
       button.addEventListener("click", () => this.startSelectedLevel(level.id));
       container.appendChild(button);
     });
@@ -647,18 +653,19 @@ export class HiddenObjectGame {
     this.elements.introLevelName.textContent = level.name;
     this.clearIntroPreviewError();
     this.renderPreviewList(this.elements.introPreviewList, this.elements.introPreviewErrorText, level.targets);
-    this.elements.introPreviewHint.textContent = level.targets.length > 1
-      ? `Find both targets before the level clears. ${level.targets.length} total.`
-      : "Find the exact preview target in the crowd scene.";
+    if (level.id === "advanced-02" && !this.save.meta.advancedMultiSeen) {
+      this.elements.introPreviewHint.textContent = "Things just got a little harder. From here on, some advanced levels hide two people, and you need to click both before the level clears.";
+      this.save = saveMeta({ advancedMultiSeen: true });
+    } else {
+      this.elements.introPreviewHint.textContent = level.targets.length > 1
+        ? `Find both targets before the level clears. ${level.targets.length} total.`
+        : "Find the exact preview target in the crowd scene.";
+    }
     this.elements.levelIntroOverlay.classList.remove("hidden");
   }
 
   beginLevel() {
     const level = this.getCurrentLevel();
-    if (this.shouldShowAdvancedInfo(level)) {
-      this.openAdvancedInfo();
-      return;
-    }
     this.elements.levelIntroOverlay.classList.add("hidden");
     this.state.elapsedMs = 0;
     this.state.wrongClicks = 0;
@@ -748,7 +755,7 @@ export class HiddenObjectGame {
   }
 
   shouldShowAdvancedInfo(level) {
-    return level.id === "advanced-02" && !this.save.meta.advancedMultiSeen && !this.sessionTestingUnlocked;
+    return false;
   }
 
   openAdvancedInfo() {
@@ -1039,6 +1046,18 @@ export class HiddenObjectGame {
       event.preventDefault();
       this.showScreen("levelSelect");
       return;
+    }
+    if (key === "n") {
+      if (!this.elements.levelIntroOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.beginLevel();
+        return;
+      }
+      if (!this.elements.resultOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.handleResultPrimary();
+        return;
+      }
     }
     if (event.code === "Space") {
       if (!this.elements.advancedInfoOverlay.classList.contains("hidden")) {

@@ -77,7 +77,11 @@
                 <p class="eyebrow">Advanced Route</p>
                 <h3>Harder Scenes</h3>
               </div>
-              <button id="levelSelectPrevPageButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to main levels">&#8592;</button>
+              <button id="levelSelectPrevPageButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to main levels">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M14.75 5.75L8.5 12l6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
             </div>
             <div id="advancedLevelGrid" class="level-grid"></div>
           </section>
@@ -109,7 +113,11 @@
             <p id="advancedRevealText" class="subtle-text">Surprise unlock info will appear here.</p>
           </section>
         </div>
-        <button id="levelSelectNextPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open advanced levels">&#8594;</button>
+        <button id="levelSelectNextPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open advanced levels">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9.25 5.75L15.5 12l-6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     </section>
 
@@ -201,6 +209,7 @@
               <li>Mouse wheel or buttons to zoom</li>
               <li>Drag, `WASD`, or arrows to pan</li>
               <li>`Space` pauses and resumes</li>
+              <li>`N` starts the level intro or moves to the next level when available</li>
               <li>`Enter` confirms the main action on popups</li>
               <li>`R` retries when retry is available</li>
               <li>`L` opens level select</li>
@@ -270,7 +279,7 @@
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.0.2</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.0.3</p>
             <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
@@ -353,9 +362,9 @@
       <p class="eyebrow">Level Start</p>
       <h2 id="introLevelLabel">Level 1</h2>
       <h3 id="introLevelName">Welcome Party</h3>
+      <p id="introPreviewHint">Find the exact preview target in the full crowd scene as quickly as you can.</p>
       <div id="introPreviewList" class="target-preview-list intro-preview-list"></div>
       <p id="introPreviewErrorText" class="asset-error hidden"></p>
-      <p id="introPreviewHint">Find the exact preview target in the full crowd scene as quickly as you can.</p>
       <button id="startLevelButton" class="primary-button" type="button">Begin Level</button>
     </div>
   </div>
