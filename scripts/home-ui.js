@@ -30,15 +30,15 @@ export function layoutHomeButtons(game, config) {
   overlay.style.width = `${drawWidth}px`;
   overlay.style.height = `${drawHeight}px`;
 
-  placeHomeButton(game.elements.startGameButton, config.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeButton(game.elements.openSettingsButton, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeButton(game.elements.moreGamesButton, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeArt(game, game.elements.startButtonArt, config.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeSheen(game, game.elements.startButtonSheen, game.elements.startButtonArt, config.alphaThreshold);
-  placeHomeArt(game, game.elements.settingsButtonArt, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeSheen(game, game.elements.settingsButtonSheen, game.elements.settingsButtonArt, config.alphaThreshold);
-  placeHomeArt(game, game.elements.moreGamesButtonArt, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeSheen(game, game.elements.moreGamesButtonSheen, game.elements.moreGamesButtonArt, config.alphaThreshold);
+  const startPlacement = placeHomeArt(game, game.elements.startButtonArt, config.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  const settingsPlacement = placeHomeArt(game, game.elements.settingsButtonArt, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  const morePlacement = placeHomeArt(game, game.elements.moreGamesButtonArt, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  placeHomeButton(game, "start", game.elements.startGameButton, startPlacement);
+  placeHomeButton(game, "settings", game.elements.openSettingsButton, settingsPlacement);
+  placeHomeButton(game, "more", game.elements.moreGamesButton, morePlacement);
+  placeHomeSheen(game, game.elements.startButtonSheen, startPlacement);
+  placeHomeSheen(game, game.elements.settingsButtonSheen, settingsPlacement);
+  placeHomeSheen(game, game.elements.moreGamesButtonSheen, morePlacement);
   renderHomeDebugOverlay(game, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
 }
 
@@ -132,10 +132,10 @@ export function updateHomeDebug(game, event, config) {
   }
   const imagePoint = clientToHomeImage(game, event.clientX, event.clientY);
   const pointer = imagePoint ? `Pointer: ${imagePoint.x}, ${imagePoint.y}` : "Pointer: outside image";
-  const start = getAdjustedHomeZone(config.start, config);
-  const settings = getAdjustedHomeZone(config.settings, config);
-  const more = getAdjustedHomeZone(config.moreGames, config);
-  game.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${start.x1},${start.y1} -> ${start.x2},${start.y2}\nsettings: ${settings.x1},${settings.y1} -> ${settings.x2},${settings.y2}\nmore: ${more.x1},${more.y1} -> ${more.x2},${more.y2}`;
+  const start = game.homeButtonZones.get("start");
+  const settings = game.homeButtonZones.get("settings");
+  const more = game.homeButtonZones.get("more");
+  game.elements.homeDebugReadout.textContent = `${pointer}\nstart: ${formatZone(start)}\nsettings: ${formatZone(settings)}\nmore: ${formatZone(more)}`;
 }
 
 function clearHomeAnimationTimers(game) {
@@ -153,21 +153,32 @@ function getAdjustedHomeZone(zone, config) {
   };
 }
 
-function placeHomeButton(element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
-  const adjusted = getAdjustedHomeZone(zone, config);
-  const left = Math.min(adjusted.x1, adjusted.x2);
-  const right = Math.max(adjusted.x1, adjusted.x2);
-  const top = Math.min(adjusted.y1, adjusted.y2);
-  const bottom = Math.max(adjusted.y1, adjusted.y2);
-  const scaleX = drawWidth / naturalWidth;
-  const scaleY = drawHeight / naturalHeight;
+function placeHomeButton(game, key, element, placement) {
+  if (!placement) {
+    return;
+  }
+  const expand = 6;
+  const clickLeft = placement.rendered.left - expand;
+  const clickTop = placement.rendered.top - expand;
+  const clickWidth = placement.rendered.width + (expand * 2);
+  const clickHeight = placement.rendered.height + (expand * 2);
+  const overlayWidth = game.elements.homeButtonOverlay.clientWidth || 1;
+  const overlayHeight = game.elements.homeButtonOverlay.clientHeight || 1;
+  const naturalWidth = game.elements.startScreenImage.naturalWidth || 1;
+  const naturalHeight = game.elements.startScreenImage.naturalHeight || 1;
   element.style.position = "absolute";
   element.style.display = "block";
   element.style.cursor = "pointer";
-  element.style.left = `${left * scaleX}px`;
-  element.style.top = `${top * scaleY}px`;
-  element.style.width = `${(right - left) * scaleX}px`;
-  element.style.height = `${(bottom - top) * scaleY}px`;
+  element.style.left = `${clickLeft}px`;
+  element.style.top = `${clickTop}px`;
+  element.style.width = `${clickWidth}px`;
+  element.style.height = `${clickHeight}px`;
+  game.homeButtonZones.set(key, {
+    x1: Math.round((clickLeft / overlayWidth) * naturalWidth),
+    y1: Math.round((clickTop / overlayHeight) * naturalHeight),
+    x2: Math.round(((clickLeft + clickWidth) / overlayWidth) * naturalWidth),
+    y2: Math.round(((clickTop + clickHeight) / overlayHeight) * naturalHeight),
+  });
 }
 
 function getHomeArtBounds(game, imageElement, alphaThreshold) {
@@ -235,32 +246,43 @@ function placeHomeArt(game, imageElement, zone, drawWidth, drawHeight, naturalWi
   const finalLeft = targetCenterX - artCenterX;
   const finalTop = targetCenterY - artCenterY;
   const startOffset = Math.max(drawHeight - targetTop + targetHeight + 48, 120);
+  const visibleLeft = finalLeft + (bounds.left * scale);
+  const visibleTop = finalTop + (bounds.top * scale);
+  const visibleWidth = bounds.width * scale;
+  const visibleHeight = bounds.height * scale;
+  const sourceScaleX = naturalWidth / drawWidth;
+  const sourceScaleY = naturalHeight / drawHeight;
 
   imageElement.style.left = `${finalLeft}px`;
   imageElement.style.top = `${finalTop}px`;
   imageElement.style.width = `${imageElement.naturalWidth * scale}px`;
   imageElement.style.height = `${imageElement.naturalHeight * scale}px`;
   imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
+  return {
+    rendered: {
+      left: visibleLeft,
+      top: visibleTop,
+      width: visibleWidth,
+      height: visibleHeight,
+    },
+    source: {
+      x1: visibleLeft * sourceScaleX,
+      y1: visibleTop * sourceScaleY,
+      x2: (visibleLeft + visibleWidth) * sourceScaleX,
+      y2: (visibleTop + visibleHeight) * sourceScaleY,
+    },
+  };
 }
 
-function placeHomeSheen(game, sheenElement, imageElement, alphaThreshold) {
-  if (!sheenElement || !imageElement.style.width) {
+function placeHomeSheen(game, sheenElement, placement) {
+  if (!sheenElement || !placement) {
     return;
   }
-  const bounds = getHomeArtBounds(game, imageElement, alphaThreshold);
-  const renderedWidth = Number.parseFloat(imageElement.style.width);
-  const renderedHeight = Number.parseFloat(imageElement.style.height);
-  if (!bounds || !renderedWidth || !renderedHeight) {
-    return;
-  }
-  const scale = renderedWidth / imageElement.naturalWidth;
-  const imageLeft = Number.parseFloat(imageElement.style.left);
-  const imageTop = Number.parseFloat(imageElement.style.top);
-  sheenElement.style.left = `${imageLeft + (bounds.left * scale)}px`;
-  sheenElement.style.top = `${imageTop + (bounds.top * scale)}px`;
-  sheenElement.style.width = `${bounds.width * scale}px`;
-  sheenElement.style.height = `${bounds.height * scale}px`;
-  sheenElement.style.setProperty("--home-enter-offset", imageElement.style.getPropertyValue("--home-enter-offset"));
+  sheenElement.style.left = `${placement.rendered.left}px`;
+  sheenElement.style.top = `${placement.rendered.top}px`;
+  sheenElement.style.width = `${placement.rendered.width}px`;
+  sheenElement.style.height = `${placement.rendered.height}px`;
+  sheenElement.style.setProperty("--home-enter-offset", `${Math.max(placement.rendered.top + placement.rendered.height + 120, 120)}px`);
 }
 
 function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
@@ -274,13 +296,13 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
   }
 
   [
-    ["start", config.start, game.elements.startGameButton],
-    ["settings", config.settings, game.elements.openSettingsButton],
-    ["more", config.moreGames, game.elements.moreGamesButton],
-  ].forEach(([label, zone, buttonElement]) => {
-    const adjusted = getAdjustedHomeZone(zone, config);
+    ["start", game.elements.startGameButton],
+    ["settings", game.elements.openSettingsButton],
+    ["more", game.elements.moreGamesButton],
+  ].forEach(([label, buttonElement]) => {
+    const actual = game.homeButtonZones.get(label);
     const node = document.createElement("div");
-    node.className = `home-debug-box color-${zone.color}`;
+    node.className = `home-debug-box color-${label === "start" ? "green" : label === "settings" ? "blue" : "orange"}`;
     const tag = document.createElement("span");
     tag.className = "home-debug-label";
     const overlayRect = game.elements.homeButtonOverlay.getBoundingClientRect();
@@ -289,7 +311,9 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
     node.style.top = `${buttonRect.top - overlayRect.top}px`;
     node.style.width = `${buttonRect.width}px`;
     node.style.height = `${buttonRect.height}px`;
-    tag.textContent = `${label}: ${Math.min(adjusted.x1, adjusted.x2)},${Math.min(adjusted.y1, adjusted.y2)} -> ${Math.max(adjusted.x1, adjusted.x2)},${Math.max(adjusted.y1, adjusted.y2)}`;
+    tag.textContent = actual
+      ? `${label}: ${Math.min(actual.x1, actual.x2)},${Math.min(actual.y1, actual.y2)} -> ${Math.max(actual.x1, actual.x2)},${Math.max(actual.y1, actual.y2)}`
+      : `${label}: unavailable`;
     node.appendChild(tag);
     debug.appendChild(node);
   });
@@ -310,4 +334,11 @@ function clientToHomeImage(game, clientX, clientY) {
     x: Math.round((localX / rect.width) * image.naturalWidth),
     y: Math.round((localY / rect.height) * image.naturalHeight),
   };
+}
+
+function formatZone(zone) {
+  if (!zone) {
+    return "unavailable";
+  }
+  return `${Math.min(zone.x1, zone.x2)},${Math.min(zone.y1, zone.y2)} -> ${Math.max(zone.x1, zone.x2)},${Math.max(zone.y1, zone.y2)}`;
 }

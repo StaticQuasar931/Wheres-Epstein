@@ -204,31 +204,40 @@ const ADVANCED_LEVELS_RAW = [
   ], {
     name: "Final Pairing",
   }),
-  // Advanced Level 7: Masked Pair
+  // Advanced Level 7: Masked Pair          
   makeAdvancedLevel(7, [
-    makeTarget("advanced-07-a", "tru3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-07-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-07-a", "tru3", { type: "rect", x1: 505, y1: 252, x2: 482, y2: 230 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-07-b", "ep12", { type: "rect", x1: 871, y1: 515, x2: 818, y2: 444 }, "Assets/Waldos/advanced"),
   ], {
     name: "Masked Pair",
   }),
-  // Advanced Level 8: Final Double Take
+  // Advanced Level 8: Final Double Take           
   makeAdvancedLevel(8, [
-    makeTarget("advanced-08-a", "tru10", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-08-b", "ep7", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-08-a", "tru10", { type: "rect", x1: 653, y1: 960, x2: 633, y2: 935 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-08-b", "ep7", { type: "rect", x1: 892, y1: 346, x2: 872, y2: 315 }, "Assets/Waldos/advanced"),
   ], {
     name: "Final Double Take",
   }),
+  // Advanced Level 9: Crowd Pressure
   makeAdvancedLevel(9, [
-    makeTarget("advanced-09-a", "di1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-09-b", "tru9", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-09-a", "di1", { type: "rect", x1: 563, y1: 321, x2: 575, y2: 339 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-09-b", "tru9", { type: "rect", x1: 949, y1: 330, x2: 939, y2: 317 }, "Assets/Waldos/advanced"),
   ], {
     name: "Crowd Pressure",
   }),
+  // Advanced Level 10: Twin Watch
   makeAdvancedLevel(10, [
     makeTarget("advanced-10-a", "ep12", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 680, y1: 302, x2: 656, y2: 273 }, "Assets/Waldos/advanced"),
   ], {
     name: "Twin Watch",
+  }),
+  // Advanced Level 11: Narrow Pursuit
+  makeAdvancedLevel(11, [
+    makeTarget("advanced-11-a", "di2", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-11-b", "tru7", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Narrow Pursuit",
   }),
   makeAdvancedBonusLevel(1, [
     makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
@@ -244,7 +253,7 @@ const ADVANCED_LEVELS_RAW = [
   }),
 ];
 
-for (let number = 11; number <= 20; number += 1) {
+for (let number = 12; number <= 20; number += 1) {
   ADVANCED_LEVELS_RAW.push(
     makeAdvancedLevel(number, [
       makePlaceholderTarget(`advanced-${String(number).padStart(2, "0")}-a`),

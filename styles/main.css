@@ -97,7 +97,7 @@ img {
   left: 0;
   right: 0;
   z-index: 30;
-  display: flex;
+  display: none;
   justify-content: space-between;
   align-items: center;
   padding: 0.9rem 1rem 0;
@@ -109,7 +109,7 @@ img {
 }
 
 body.mode-game .site-topbar {
-  display: none;
+  display: flex;
 }
 
 .site-brand {
@@ -535,12 +535,13 @@ p {
 }
 
 #settingsScreen .level-select-groups {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
 }
 
 #settingsScreen .version-card {
   margin-top: 0;
+  grid-column: 1 / -1;
 }
 
 #settingsScreen .menu-card,
@@ -555,6 +556,13 @@ p {
   background: var(--panel-soft);
   color: var(--text);
   font-weight: 700;
+}
+
+.settings-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.9rem;
 }
 
 
@@ -702,6 +710,19 @@ p {
   gap: 0.42rem;
   padding: 0.85rem;
   align-content: start;
+}
+
+#settingsScreen .menu-card {
+  padding: 1rem 1.05rem;
+}
+
+#settingsScreen .setting-card {
+  padding: 0.8rem 0.9rem;
+}
+
+#settingsScreen .menu-header,
+#settingsScreen .menu-card-header {
+  gap: 0.5rem;
 }
 
 .setting-card span {
@@ -950,6 +971,11 @@ body[data-preview="large"] .target-card {
   margin-top: 1rem;
 }
 
+#settingsScreen .menu-header .button-row,
+#settingsScreen .menu-card-header .button-row {
+  margin-top: 0;
+}
+
 .scene-feedback,
 .debug-readout {
   position: absolute;
@@ -1042,6 +1068,10 @@ body[data-preview="large"] .target-card {
     align-items: start;
   }
 
+  .settings-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   #mainLevelGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -1094,6 +1124,10 @@ body[data-preview="large"] .target-card {
   #levelSelectScreen .level-select-groups,
   #settingsScreen .level-select-groups,
   .speedrun-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-stats-grid {
     grid-template-columns: 1fr;
   }
 

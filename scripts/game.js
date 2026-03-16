@@ -11,6 +11,8 @@ const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
 const KEYBOARD_PAN_STEP = 18;
+const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
+const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 120;
 const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
@@ -88,6 +90,7 @@ export class HiddenObjectGame {
     this.konamiInput = [];
     this.homeAnimationTimers = [];
     this.homeArtBounds = new Map();
+    this.homeButtonZones = new Map();
     this.preloadedAssets = new Set();
     this.homeIntroPlayed = false;
     this.homeAssetsReady = false;
@@ -575,7 +578,9 @@ export class HiddenObjectGame {
       const bestScore = result ? formatScore(result.bestScore ?? 0) : "0";
       const cardLabel = this.getLevelCardLabel(level, options.kind);
       const button = document.createElement("button");
-      const scoreMarkup = `<div class="level-meta level-best-score"><span>Best ${bestScore}</span><span>First ${firstScore}</span></div>`;
+      const scoreMarkup = bestScore !== firstScore
+        ? `<div class="level-meta level-best-score"><span>Best ${bestScore}</span><span>First ${firstScore}</span></div>`
+        : `<div class="level-meta level-best-score"><span>First ${firstScore}</span></div>`;
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
@@ -871,6 +876,8 @@ export class HiddenObjectGame {
     this.state.foundTargetIds = new Set();
     this.state.runActive = false;
     this.stopElapsedTimer();
+    this.elements.levelImage.classList.add("asset-loading");
+    this.elements.levelImage.style.visibility = "hidden";
     this.save = recordLevelView({
       cheated: this.sessionTestingUnlocked,
       levelId: level.id,
@@ -900,7 +907,9 @@ export class HiddenObjectGame {
 
   prepareSceneImageLoad() {
     this.elements.levelImage.classList.add("asset-loading");
+    this.elements.levelImage.style.visibility = "hidden";
     this.elements.levelImage.removeAttribute("src");
+    this.elements.levelImage.setAttribute("src", "");
     this.elements.sceneContent.style.width = "1px";
     this.elements.sceneContent.style.height = "1px";
     this.elements.hitboxOverlay.style.width = "1px";
@@ -909,6 +918,7 @@ export class HiddenObjectGame {
 
   onLevelImageLoaded() {
     this.elements.levelImage.classList.remove("asset-loading");
+    this.elements.levelImage.style.visibility = "visible";
     this.state.naturalWidth = this.elements.levelImage.naturalWidth || 1;
     this.state.naturalHeight = this.elements.levelImage.naturalHeight || 1;
     this.elements.sceneContent.style.width = `${this.state.naturalWidth}px`;
@@ -928,6 +938,7 @@ export class HiddenObjectGame {
   onLevelImageError() {
     const path = this.getCurrentLevel().background;
     this.elements.levelImage.classList.remove("asset-loading");
+    this.elements.levelImage.style.visibility = "hidden";
     this.elements.levelImage.removeAttribute("src");
     this.elements.sceneFallbackTitle.textContent = "Unable to load level background";
     this.elements.sceneFallbackText.textContent = `Tried to load: ${path}`;
@@ -1325,7 +1336,7 @@ export class HiddenObjectGame {
       }
       return;
     }
-    if (!["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
+    if (!["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift", "control"].includes(key)) {
       return;
     }
     if (!this.elements.screens.game.classList.contains("screen-active")) {
@@ -1385,19 +1396,24 @@ export class HiddenObjectGame {
     if (this.state.transform.scale <= this.state.fitScale || this.state.paused) {
       return;
     }
+    const step = this.keyState.has("control")
+      ? KEYBOARD_PAN_STEP * KEYBOARD_PAN_FAST_MULTIPLIER
+      : this.keyState.has("shift")
+        ? KEYBOARD_PAN_STEP * KEYBOARD_PAN_SLOW_MULTIPLIER
+        : KEYBOARD_PAN_STEP;
     let deltaX = 0;
     let deltaY = 0;
     if (this.keyState.has("a") || this.keyState.has("arrowleft")) {
-      deltaX += KEYBOARD_PAN_STEP;
+      deltaX += step;
     }
     if (this.keyState.has("d") || this.keyState.has("arrowright")) {
-      deltaX -= KEYBOARD_PAN_STEP;
+      deltaX -= step;
     }
     if (this.keyState.has("w") || this.keyState.has("arrowup")) {
-      deltaY += KEYBOARD_PAN_STEP;
+      deltaY += step;
     }
     if (this.keyState.has("s") || this.keyState.has("arrowdown")) {
-      deltaY -= KEYBOARD_PAN_STEP;
+      deltaY -= step;
     }
     this.state.transform.x += deltaX;
     this.state.transform.y += deltaY;
