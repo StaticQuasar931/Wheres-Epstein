@@ -91,7 +91,8 @@
               <button id="levelSelectPrevPageButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to main levels">
                 <span class="page-arrow-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" focusable="false">
-                    <path d="M14.75 5.75L8.5 12l6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20 12H7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M11.5 7.25L6.75 12l4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </span>
                 <span class="page-arrow-text">
@@ -111,6 +112,26 @@
               </div>
             </div>
             <div id="advancedBonusLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section id="speedrunRouteSection" class="menu-card hidden">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Page Three</p>
+                <h3>Random Level Speedrun</h3>
+              </div>
+            </div>
+            <div class="speedrun-card">
+              <p class="subtle-text">Pulls from normal, bonus, advanced, and advanced bonus levels. Repeats are possible, but nudged to feel less common.</p>
+              <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Random Level Speedrun</button>
+              <div class="stat-grid speedrun-stats">
+                <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
+                <div class="stat-card"><span>Average Score</span><strong id="speedrunAverageScoreText">0</strong></div>
+                <div class="stat-card"><span>Average Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
+                <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
+              </div>
+              <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
+            </div>
           </section>
 
           <section id="progressRouteSection" class="menu-card">
@@ -133,12 +154,37 @@
         <button id="levelSelectNextPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open advanced levels">
           <span class="page-arrow-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M9.25 5.75L15.5 12l-6.25 6.25" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 12h12.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M12.5 7.25L17.25 12l-4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </span>
           <span class="page-arrow-text">
             <strong>Page Two</strong>
             <span>Advanced</span>
+          </span>
+        </button>
+        <button id="levelSelectThirdPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open speedrun levels">
+          <span class="page-arrow-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M4 12h12.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M12.5 7.25L17.25 12l-4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="page-arrow-text">
+            <strong>Page Three</strong>
+            <span>Speedrun</span>
+          </span>
+        </button>
+        <button id="levelSelectBackFromSpeedrunButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to advanced levels">
+          <span class="page-arrow-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M20 12H7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M11.5 7.25L6.75 12l4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="page-arrow-text">
+            <strong>Previous</strong>
+            <span>Page Two</span>
           </span>
         </button>
       </div>
@@ -301,8 +347,25 @@
             </ul>
           </section>
 
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Stats</p>
+                <h3>Local progress</h3>
+              </div>
+            </div>
+            <div class="stat-grid settings-stats-grid">
+              <div class="stat-card"><span>Main Cleared</span><strong id="settingsMainClearsText">0 / 20</strong></div>
+              <div class="stat-card"><span>Advanced Cleared</span><strong id="settingsAdvancedClearsText">0 / 20</strong></div>
+              <div class="stat-card"><span>Total Views</span><strong id="settingsTotalViewsText">0</strong></div>
+              <div class="stat-card"><span>Best Clear</span><strong id="settingsFastestClearText">0.0s</strong></div>
+              <div class="stat-card"><span>Speedrun Avg</span><strong id="settingsSpeedrunAverageText">0.0s</strong></div>
+              <div class="stat-card"><span>Speedrun Best</span><strong id="settingsSpeedrunBestText">0.0s</strong></div>
+            </div>
+          </section>
+
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.0.5</p>
+            <p id="versionTapTarget" class="version-label">Version 0.0.0.1.0.6</p>
             <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">

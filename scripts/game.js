@@ -1,5 +1,5 @@
 import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
-import { loadSave, recordLevelResult, saveSettings, saveMeta } from "./storage.js";
+import { loadSave, recordLevelResult, recordLevelView, recordSpeedrunResult, saveSettings, saveMeta } from "./storage.js";
 import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
 
@@ -24,6 +24,7 @@ const PARTY_SEQUENCE = ["p", "a", "r", "t", "y"];
 
 const ADVANCED_MAIN_LEVELS = ADVANCED_LEVELS.filter((level) => !level.isAdvancedBonus);
 const ADVANCED_BONUS_LEVELS = ADVANCED_LEVELS.filter((level) => level.isAdvancedBonus);
+const AUTHORED_ADVANCED_MAIN_LEVELS = ADVANCED_MAIN_LEVELS.filter((level) => level.targets.some((target) => Boolean(target.preview)));
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -35,6 +36,10 @@ function formatScore(value) {
 
 function formatTime(ms) {
   return `${(ms / 1000).toFixed(1)}s`;
+}
+
+function averageOrZero(total, count) {
+  return count > 0 ? total / count : 0;
 }
 
 function getTotalStars(bucket) {
@@ -87,10 +92,12 @@ export class HiddenObjectGame {
     this.homeIntroPlayed = false;
     this.homeAssetsReady = false;
     this.homeBootStarted = false;
+    this.speedrunRecentIds = [];
     this.state = {
       levelIndex: 0,
       levelSelectPage: 1,
       totalScore: 0,
+      runMode: "standard",
       elapsedMs: 0,
       elapsedTimerId: null,
       runActive: false,
@@ -168,13 +175,23 @@ export class HiddenObjectGame {
       bonusLevelGrid: document.getElementById("bonusLevelGrid"),
       advancedLevelGrid: document.getElementById("advancedLevelGrid"),
       advancedBonusLevelGrid: document.getElementById("advancedBonusLevelGrid"),
+      speedrunRouteSection: document.getElementById("speedrunRouteSection"),
+      startSpeedrunButton: document.getElementById("startSpeedrunButton"),
+      speedrunRoundsText: document.getElementById("speedrunRoundsText"),
+      speedrunAverageScoreText: document.getElementById("speedrunAverageScoreText"),
+      speedrunAverageTimeText: document.getElementById("speedrunAverageTimeText"),
+      speedrunFastestText: document.getElementById("speedrunFastestText"),
+      speedrunLastPickText: document.getElementById("speedrunLastPickText"),
       levelSelectPageLabel: document.getElementById("levelSelectPageLabel"),
       levelSelectPrevPageButton: document.getElementById("levelSelectPrevPageButton"),
       levelSelectNextPageButton: document.getElementById("levelSelectNextPageButton"),
+      levelSelectThirdPageButton: document.getElementById("levelSelectThirdPageButton"),
+      levelSelectBackFromSpeedrunButton: document.getElementById("levelSelectBackFromSpeedrunButton"),
       mainRouteSection: document.getElementById("mainRouteSection"),
       bonusRouteSection: document.getElementById("bonusRouteSection"),
       advancedRouteSection: document.getElementById("advancedRouteSection"),
       advancedBonusSection: document.getElementById("advancedBonusSection"),
+      progressRouteSection: document.getElementById("progressRouteSection"),
       themeSelect: document.getElementById("themeSelect"),
       densitySelect: document.getElementById("densitySelect"),
       motionSelect: document.getElementById("motionSelect"),
@@ -187,6 +204,12 @@ export class HiddenObjectGame {
       settingsMoreGamesButton: document.getElementById("settingsMoreGamesButton"),
       settingsLevelSelectButton: document.getElementById("settingsLevelSelectButton"),
       settingsLinkHint: document.getElementById("settingsLinkHint"),
+      settingsMainClearsText: document.getElementById("settingsMainClearsText"),
+      settingsAdvancedClearsText: document.getElementById("settingsAdvancedClearsText"),
+      settingsTotalViewsText: document.getElementById("settingsTotalViewsText"),
+      settingsFastestClearText: document.getElementById("settingsFastestClearText"),
+      settingsSpeedrunAverageText: document.getElementById("settingsSpeedrunAverageText"),
+      settingsSpeedrunBestText: document.getElementById("settingsSpeedrunBestText"),
       versionTapTarget: document.getElementById("versionTapTarget"),
       diagnosticUnlock: document.getElementById("diagnosticUnlock"),
       diagnosticCodeInput: document.getElementById("diagnosticCodeInput"),
@@ -275,6 +298,9 @@ export class HiddenObjectGame {
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.levelSelectPrevPageButton.addEventListener("click", () => this.changeLevelSelectPage(-1));
     this.elements.levelSelectNextPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
+    this.elements.levelSelectThirdPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
+    this.elements.levelSelectBackFromSpeedrunButton.addEventListener("click", () => this.changeLevelSelectPage(-1));
+    this.elements.startSpeedrunButton.addEventListener("click", () => this.startRandomSpeedrun());
     this.elements.versionTapTarget.addEventListener("click", () => this.handleVersionTap());
     this.elements.unlockDiagnosticButton.addEventListener("click", () => this.unlockDiagnostics());
     this.elements.levelImage.addEventListener("load", () => this.onLevelImageLoaded());
@@ -389,6 +415,10 @@ export class HiddenObjectGame {
     if (name === "home" || name === "levelSelect") {
       this.renderLevelSelect();
     }
+    if (name === "settings") {
+      this.save = loadSave();
+      this.renderHomeStats();
+    }
     this.layoutHomeButtons();
     if (name === "home" && this.homeAssetsReady && this.elements.startScreenImage.naturalWidth > 0) {
       this.playHomeButtonIntro();
@@ -492,6 +522,12 @@ export class HiddenObjectGame {
     const unlockedMain = Math.min(this.save.legit.highestLevelCleared, MAIN_LEVELS.length);
     const starCount = getTotalStars(this.save.legit);
     const mainCleared = MAIN_LEVELS.filter((level) => this.save.legit.levelResults[level.id]?.completed).length;
+    const advancedCleared = AUTHORED_ADVANCED_MAIN_LEVELS.filter((level) => this.save.legit.levelResults[level.id]?.completed).length;
+    const totalViews = Object.values(this.save.legit.levelResults ?? {}).reduce((sum, result) => sum + (result.viewCount ?? 0), 0);
+    const fastestMain = Object.values(this.save.legit.levelResults ?? {})
+      .map((result) => result.bestTimeMs ?? 0)
+      .filter((value) => value > 0);
+    const speedrun = this.save.legit.speedrun;
     this.elements.homeLevelCount.textContent = String(MAIN_LEVELS.length);
     this.elements.homeUnlockedText.textContent = `${unlockedMain} / ${MAIN_LEVELS.length}`;
     this.elements.homeBestScore.textContent = formatScore(this.save.legit.bestScore);
@@ -500,6 +536,19 @@ export class HiddenObjectGame {
     this.elements.bonusUnlockText.textContent = this.isBonusUnlocked() ? "Unlocked" : "Locked";
     this.elements.bonusRuleText.textContent = `Bonuses unlock after normal level 5 or 10 total stars. Current stars: ${starCount}.`;
     this.elements.advancedRevealText.textContent = this.getAdvancedUnlockText();
+    this.elements.speedrunRoundsText.textContent = String(speedrun.roundsPlayed ?? 0);
+    this.elements.speedrunAverageScoreText.textContent = formatScore(averageOrZero(speedrun.totalScore ?? 0, speedrun.roundsPlayed ?? 0));
+    this.elements.speedrunAverageTimeText.textContent = formatTime(averageOrZero(speedrun.totalTimeMs ?? 0, speedrun.roundsPlayed ?? 0));
+    this.elements.speedrunFastestText.textContent = speedrun.fastestTimeMs ? formatTime(speedrun.fastestTimeMs) : "0.0s";
+    this.elements.speedrunLastPickText.textContent = speedrun.lastLevelId
+      ? `Last random pick: ${this.getDisplayLabelForLevelId(speedrun.lastLevelId)}`
+      : "Last random pick: none yet.";
+    this.elements.settingsMainClearsText.textContent = `${mainCleared} / ${MAIN_LEVELS.length}`;
+    this.elements.settingsAdvancedClearsText.textContent = `${advancedCleared} / ${AUTHORED_ADVANCED_MAIN_LEVELS.length}`;
+    this.elements.settingsTotalViewsText.textContent = String(totalViews);
+    this.elements.settingsFastestClearText.textContent = fastestMain.length ? formatTime(Math.min(...fastestMain)) : "0.0s";
+    this.elements.settingsSpeedrunAverageText.textContent = formatTime(averageOrZero(speedrun.totalTimeMs ?? 0, speedrun.roundsPlayed ?? 0));
+    this.elements.settingsSpeedrunBestText.textContent = speedrun.fastestTimeMs ? formatTime(speedrun.fastestTimeMs) : "0.0s";
   }
 
   showMenuToast(message, isBad = false) {
@@ -507,6 +556,7 @@ export class HiddenObjectGame {
   }
 
   renderLevelSelect() {
+    this.save = loadSave();
     this.renderLevelGrid(this.elements.mainLevelGrid, MAIN_LEVELS, { kind: "main" });
     this.renderLevelGrid(this.elements.bonusLevelGrid, BONUS_LEVELS, { kind: "bonus" });
     this.renderLevelGrid(this.elements.advancedLevelGrid, ADVANCED_MAIN_LEVELS, { kind: "advanced" });
@@ -586,6 +636,15 @@ export class HiddenObjectGame {
     return mainCleared && getTotalStars(this.save.legit) >= 50;
   }
 
+  isSpeedrunUnlocked() {
+    if (this.sessionTestingUnlocked) {
+      return true;
+    }
+    const mainCleared = MAIN_LEVELS.every((level) => this.save.legit.levelResults[level.id]?.completed);
+    const advancedCleared = AUTHORED_ADVANCED_MAIN_LEVELS.every((level) => this.save.legit.levelResults[level.id]?.completed);
+    return mainCleared && advancedCleared;
+  }
+
   isAdvancedLevelUnlocked(level) {
     if (this.sessionTestingUnlocked) {
       return true;
@@ -613,10 +672,22 @@ export class HiddenObjectGame {
     return `Surprise unlocks at ${totalStars}/50 stars. ${remainingStars} more stars to reveal Advanced Levels.`;
   }
 
+  getSpeedrunUnlockText() {
+    if (this.isSpeedrunUnlocked()) {
+      return "Speedrun Levels unlocked.";
+    }
+    const advancedDone = AUTHORED_ADVANCED_MAIN_LEVELS.filter((level) => this.save.legit.levelResults[level.id]?.completed).length;
+    return `Page 3 unlocks after all authored advanced levels are cleared. Advanced clears: ${advancedDone}/${AUTHORED_ADVANCED_MAIN_LEVELS.length}.`;
+  }
+
   changeLevelSelectPage(direction) {
-    const nextPage = clamp(this.state.levelSelectPage + direction, 1, 2);
+    const nextPage = clamp(this.state.levelSelectPage + direction, 1, 3);
     if (nextPage === 2 && !this.isAdvancedUnlocked()) {
       this.showMenuToast(this.getAdvancedUnlockText(), true);
+      return;
+    }
+    if (nextPage === 3 && !this.isSpeedrunUnlocked()) {
+      this.showMenuToast(this.getSpeedrunUnlockText(), true);
       return;
     }
     this.state.levelSelectPage = nextPage;
@@ -624,26 +695,73 @@ export class HiddenObjectGame {
   }
 
   syncLevelSelectPage() {
-    const onAdvancedPage = this.state.levelSelectPage === 2 && this.isAdvancedUnlocked();
-    this.elements.levelSelectPageLabel.textContent = onAdvancedPage ? "Advanced Levels" : "Main Levels";
-    this.elements.mainRouteSection.classList.toggle("hidden", onAdvancedPage);
-    this.elements.bonusRouteSection.classList.toggle("hidden", onAdvancedPage);
+    const page = this.state.levelSelectPage;
+    const onAdvancedPage = page === 2 && this.isAdvancedUnlocked();
+    const onSpeedrunPage = page === 3 && this.isSpeedrunUnlocked();
+    this.elements.levelSelectPageLabel.textContent = onSpeedrunPage
+      ? "Level Select: Speedrun Levels"
+      : onAdvancedPage
+        ? "Advanced Levels"
+        : "Main Levels";
+    this.elements.mainRouteSection.classList.toggle("hidden", page !== 1);
+    this.elements.bonusRouteSection.classList.toggle("hidden", page !== 1);
+    this.elements.progressRouteSection.classList.toggle("hidden", page !== 1);
     this.elements.advancedRouteSection.classList.toggle("hidden", !onAdvancedPage);
     this.elements.advancedBonusSection.classList.toggle("hidden", !onAdvancedPage);
+    this.elements.speedrunRouteSection.classList.toggle("hidden", !onSpeedrunPage);
     this.elements.levelSelectPrevPageButton.classList.toggle("hidden", !onAdvancedPage);
-    this.elements.levelSelectNextPageButton.classList.toggle("hidden", !this.isAdvancedUnlocked() || onAdvancedPage);
+    this.elements.levelSelectNextPageButton.classList.toggle("hidden", !this.isAdvancedUnlocked() || page !== 1);
+    this.elements.levelSelectThirdPageButton.classList.toggle("hidden", !this.isSpeedrunUnlocked() || !onAdvancedPage);
+    this.elements.levelSelectBackFromSpeedrunButton.classList.toggle("hidden", !onSpeedrunPage);
   }
 
   startNextLevel() {
     const nextIndex = Math.max(0, Math.min(this.save.legit.highestLevelCleared - 1, MAIN_LEVELS.length - 1));
+    this.state.runMode = "standard";
     this.startCampaignFromLevel(nextIndex);
   }
 
   startSelectedLevel(levelId) {
     const index = LEVELS.findIndex((level) => level.id === levelId);
     if (index >= 0 && (this.sessionTestingUnlocked || this.isLevelUnlocked(LEVELS[index], LEVELS[index].isAdvancedBonus ? "advancedBonus" : LEVELS[index].isAdvanced ? "advanced" : LEVELS[index].isBonus ? "bonus" : "main"))) {
+      this.state.runMode = "standard";
       this.startCampaignFromLevel(index);
     }
+  }
+
+  startRandomSpeedrun() {
+    const level = this.pickRandomSpeedrunLevel();
+    if (!level) {
+      this.showMenuToast("No speedrun level could be selected.", true);
+      return;
+    }
+    const index = LEVELS.findIndex((item) => item.id === level.id);
+    if (index < 0) {
+      this.showMenuToast("Speedrun level is missing from the current data.", true);
+      return;
+    }
+    this.state.runMode = "speedrun";
+    this.startCampaignFromLevel(index);
+  }
+
+  pickRandomSpeedrunLevel() {
+    const available = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_MAIN_LEVELS, ...ADVANCED_BONUS_LEVELS];
+    if (!available.length) {
+      return null;
+    }
+    let pick = available[Math.floor(Math.random() * available.length)];
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const recentPenalty = this.speedrunRecentIds.includes(pick.id);
+      if (!recentPenalty || Math.random() > 0.82) {
+        break;
+      }
+      pick = available[Math.floor(Math.random() * available.length)];
+    }
+    this.speedrunRecentIds.push(pick.id);
+    if (this.speedrunRecentIds.length > 3) {
+      this.speedrunRecentIds.shift();
+    }
+    return pick;
   }
 
   retryCurrentLevel() {
@@ -707,9 +825,28 @@ export class HiddenObjectGame {
     return `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
   }
 
+  getDisplayLabelForLevelId(levelId) {
+    const level = LEVELS.find((item) => item.id === levelId);
+    if (!level) {
+      return "Unknown level";
+    }
+    if (level.isAdvancedBonus) {
+      return `Page 2, AB ${ADVANCED_BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
+    }
+    if (level.isAdvanced) {
+      return `Page 2, AL ${ADVANCED_MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
+    }
+    if (level.isBonus) {
+      return `Page 1, Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
+    }
+    return `Page 1, Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
+  }
+
   openLevelIntro() {
     const level = this.getCurrentLevel();
-    this.elements.introLevelLabel.textContent = this.getCurrentLevelLabel(level);
+    this.elements.introLevelLabel.textContent = this.state.runMode === "speedrun"
+      ? `Speedrun Pick • ${this.getDisplayLabelForLevelId(level.id)}`
+      : this.getCurrentLevelLabel(level);
     this.elements.introLevelName.textContent = level.name;
     this.clearIntroPreviewError();
     this.renderPreviewList(this.elements.introPreviewList, this.elements.introPreviewErrorText, level.targets);
@@ -734,7 +871,13 @@ export class HiddenObjectGame {
     this.state.foundTargetIds = new Set();
     this.state.runActive = false;
     this.stopElapsedTimer();
-    this.elements.hudLevelText.textContent = this.getCurrentLevelLabel(level);
+    this.save = recordLevelView({
+      cheated: this.sessionTestingUnlocked,
+      levelId: level.id,
+    });
+    this.elements.hudLevelText.textContent = this.state.runMode === "speedrun"
+      ? this.getDisplayLabelForLevelId(level.id)
+      : this.getCurrentLevelLabel(level);
     this.elements.hudLevelName.textContent = level.name;
     this.elements.targetPreviewLabel.textContent = level.targets.length > 1 ? "Find These People" : "Find This Person";
     this.elements.sceneFallback.classList.add("hidden");
@@ -777,7 +920,9 @@ export class HiddenObjectGame {
     this.state.startTimestamp = performance.now();
     this.state.runActive = true;
     this.startElapsedTimer();
-    this.preloadLevelAssets(this.getNextLevelIndex());
+    if (this.state.runMode !== "speedrun") {
+      this.preloadLevelAssets(this.getNextLevelIndex());
+    }
   }
 
   onLevelImageError() {
@@ -1299,9 +1444,11 @@ export class HiddenObjectGame {
     const levelScore = this.getCurrentLevelScore();
     const stars = getStars(this.state.elapsedMs);
     this.state.totalScore += levelScore;
+    const wasSpeedrun = this.state.runMode === "speedrun";
 
     const mainIndex = MAIN_LEVELS.findIndex((item) => item.id === level.id);
     const advancedIndex = ADVANCED_MAIN_LEVELS.findIndex((item) => item.id === level.id);
+    const authoredAdvancedIndex = AUTHORED_ADVANCED_MAIN_LEVELS.findIndex((item) => item.id === level.id);
     let nextUnlock = this.save.legit.highestLevelCleared;
     if (!level.isBonus && !this.sessionTestingUnlocked && mainIndex >= 0) {
       nextUnlock = Math.max(this.save.legit.highestLevelCleared, Math.min(MAIN_LEVELS.length + 1, mainIndex + 2));
@@ -1317,9 +1464,18 @@ export class HiddenObjectGame {
       campaignWon: !level.isBonus && !level.isAdvanced && mainIndex === MAIN_LEVELS.length - 1,
     });
 
+    if (wasSpeedrun) {
+      this.save = recordSpeedrunResult({
+        cheated: this.sessionTestingUnlocked,
+        levelId: level.id,
+        score: levelScore,
+        clearMs: this.state.elapsedMs,
+      });
+    }
+
     this.renderLevelSelect();
 
-    if (!level.isBonus && !level.isAdvanced && mainIndex === MAIN_LEVELS.length - 1 && !this.sessionTestingUnlocked) {
+    if (!wasSpeedrun && !level.isBonus && !level.isAdvanced && mainIndex === MAIN_LEVELS.length - 1 && !this.sessionTestingUnlocked) {
       this.elements.completionBody.textContent = this.isAdvancedUnlocked()
         ? "You cleared the main route and unlocked Advanced Levels."
         : this.getAdvancedUnlockText();
@@ -1329,25 +1485,45 @@ export class HiddenObjectGame {
       return;
     }
 
-    if (advancedIndex === ADVANCED_MAIN_LEVELS.length - 1 && !this.sessionTestingUnlocked) {
-      this.elements.completionBody.textContent = "You cleared the Advanced route. Advanced bonus levels stay open on page two.";
+    if (!wasSpeedrun && authoredAdvancedIndex === AUTHORED_ADVANCED_MAIN_LEVELS.length - 1 && !this.sessionTestingUnlocked) {
+      this.elements.completionBody.textContent = this.isSpeedrunUnlocked()
+        ? "You cleared the Advanced route and unlocked Speedrun Levels on page three."
+        : "You cleared the Advanced route.";
       this.elements.completionScore.textContent = formatScore(this.save.legit.bestScore);
       this.elements.completionStars.textContent = String(getTotalStars(this.save.legit));
       this.elements.completionOverlay.classList.remove("hidden");
       return;
     }
 
-    this.elements.resultEyebrow.textContent = level.isAdvancedBonus ? "Advanced Bonus Cleared" : level.isAdvanced ? "Advanced Cleared" : level.isBonus ? "Bonus Cleared" : "Level Cleared";
+    this.elements.resultEyebrow.textContent = wasSpeedrun
+      ? "Speedrun Clear"
+      : level.isAdvancedBonus
+        ? "Advanced Bonus Cleared"
+        : level.isAdvanced
+          ? "Advanced Cleared"
+          : level.isBonus
+            ? "Bonus Cleared"
+            : "Level Cleared";
     this.elements.resultTitle.textContent = level.name;
     this.elements.resultStarsText.textContent = starText(stars);
-    this.elements.resultBody.textContent = `You found ${this.getCurrentLevelTargets().length} target${this.getCurrentLevelTargets().length === 1 ? "" : "s"} in ${formatTime(this.state.elapsedMs)}. Faster clears earn more stars and more score.`;
+    this.elements.resultBody.textContent = wasSpeedrun
+      ? `${this.getDisplayLabelForLevelId(level.id)} completed in ${formatTime(this.state.elapsedMs)}. Next will roll a new random level.`
+      : `You found ${this.getCurrentLevelTargets().length} target${this.getCurrentLevelTargets().length === 1 ? "" : "s"} in ${formatTime(this.state.elapsedMs)}. Faster clears earn more stars and more score.`;
     this.elements.resultScore.textContent = formatScore(levelScore);
     this.elements.resultTimeText.textContent = formatTime(this.state.elapsedMs);
-    this.elements.resultPrimaryButton.textContent = this.getNextLevelIndex() !== null ? "Next Level" : "Level Select";
+    this.elements.resultPrimaryButton.textContent = wasSpeedrun
+      ? "Next Random Level"
+      : this.getNextLevelIndex() !== null
+        ? "Next Level"
+        : "Level Select";
     this.elements.resultOverlay.classList.remove("hidden");
   }
 
   getNextLevelIndex() {
+    if (this.state.runMode === "speedrun") {
+      const next = this.pickRandomSpeedrunLevel();
+      return next ? LEVELS.findIndex((item) => item.id === next.id) : null;
+    }
     const current = this.getCurrentLevel();
     const currentMainIndex = MAIN_LEVELS.findIndex((item) => item.id === current.id);
     if (currentMainIndex >= 0 && currentMainIndex < MAIN_LEVELS.length - 1) {

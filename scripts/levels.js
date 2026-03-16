@@ -218,6 +218,18 @@ const ADVANCED_LEVELS_RAW = [
   ], {
     name: "Final Double Take",
   }),
+  makeAdvancedLevel(9, [
+    makeTarget("advanced-09-a", "di1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-09-b", "tru9", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Crowd Pressure",
+  }),
+  makeAdvancedLevel(10, [
+    makeTarget("advanced-10-a", "ep12", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Twin Watch",
+  }),
   makeAdvancedBonusLevel(1, [
     makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-bonus-01-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
@@ -232,7 +244,7 @@ const ADVANCED_LEVELS_RAW = [
   }),
 ];
 
-for (let number = 9; number <= 20; number += 1) {
+for (let number = 11; number <= 20; number += 1) {
   ADVANCED_LEVELS_RAW.push(
     makeAdvancedLevel(number, [
       makePlaceholderTarget(`advanced-${String(number).padStart(2, "0")}-a`),
@@ -243,7 +255,7 @@ for (let number = 9; number <= 20; number += 1) {
   );
 }
 
-for (let number = 3; number <= 20; number += 1) {
+for (let number = 3; number <= 5; number += 1) {
   ADVANCED_LEVELS_RAW.push(
     makeAdvancedBonusLevel(number, [
       makePlaceholderTarget(`advanced-bonus-${String(number).padStart(2, "0")}-a`),

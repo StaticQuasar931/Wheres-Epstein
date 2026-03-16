@@ -86,7 +86,18 @@ Missing art behavior
 
 - If a preview image path is missing or wrong, the preview panel shows the exact path it tried to load.
 - If a background image is missing, the scene fallback shows the exact background path it tried to load.
-- Placeholder advanced entries currently exist up to advanced level 20 and advanced bonus 20 so expansion does not need another structural pass.
+- Placeholder advanced entries currently exist up to advanced level 20 and advanced bonus 5 so expansion does not need another structural pass.
+
+Speedrun route
+
+- Page 3 is the random speedrun route.
+- Unlock logic lives in `game.js` with `isSpeedrunUnlocked()`.
+- The current unlock uses:
+  - all main levels completed
+  - all authored advanced levels completed
+- Random picking happens in `pickRandomSpeedrunLevel()`.
+- It can repeat levels, but recent picks are softly avoided with rerolls.
+- Speedrun stats are saved in `storage.js` under `bucket.speedrun`.
 
 Safe places to change visuals later
 

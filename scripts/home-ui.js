@@ -34,11 +34,11 @@ export function layoutHomeButtons(game, config) {
   placeHomeButton(game.elements.openSettingsButton, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
   placeHomeButton(game.elements.moreGamesButton, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
   placeHomeArt(game, game.elements.startButtonArt, config.start, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeSheen(game, game.elements.startButtonSheen, game.elements.startButtonArt);
+  placeHomeSheen(game, game.elements.startButtonSheen, game.elements.startButtonArt, config.alphaThreshold);
   placeHomeArt(game, game.elements.settingsButtonArt, config.settings, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeSheen(game, game.elements.settingsButtonSheen, game.elements.settingsButtonArt);
+  placeHomeSheen(game, game.elements.settingsButtonSheen, game.elements.settingsButtonArt, config.alphaThreshold);
   placeHomeArt(game, game.elements.moreGamesButtonArt, config.moreGames, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
-  placeHomeSheen(game, game.elements.moreGamesButtonSheen, game.elements.moreGamesButtonArt);
+  placeHomeSheen(game, game.elements.moreGamesButtonSheen, game.elements.moreGamesButtonArt, config.alphaThreshold);
   renderHomeDebugOverlay(game, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
 }
 
@@ -243,14 +243,23 @@ function placeHomeArt(game, imageElement, zone, drawWidth, drawHeight, naturalWi
   imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
 }
 
-function placeHomeSheen(game, sheenElement, imageElement) {
+function placeHomeSheen(game, sheenElement, imageElement, alphaThreshold) {
   if (!sheenElement || !imageElement.style.width) {
     return;
   }
-  sheenElement.style.left = imageElement.style.left;
-  sheenElement.style.top = imageElement.style.top;
-  sheenElement.style.width = imageElement.style.width;
-  sheenElement.style.height = imageElement.style.height;
+  const bounds = getHomeArtBounds(game, imageElement, alphaThreshold);
+  const renderedWidth = Number.parseFloat(imageElement.style.width);
+  const renderedHeight = Number.parseFloat(imageElement.style.height);
+  if (!bounds || !renderedWidth || !renderedHeight) {
+    return;
+  }
+  const scale = renderedWidth / imageElement.naturalWidth;
+  const imageLeft = Number.parseFloat(imageElement.style.left);
+  const imageTop = Number.parseFloat(imageElement.style.top);
+  sheenElement.style.left = `${imageLeft + (bounds.left * scale)}px`;
+  sheenElement.style.top = `${imageTop + (bounds.top * scale)}px`;
+  sheenElement.style.width = `${bounds.width * scale}px`;
+  sheenElement.style.height = `${bounds.height * scale}px`;
   sheenElement.style.setProperty("--home-enter-offset", imageElement.style.getPropertyValue("--home-enter-offset"));
 }
 

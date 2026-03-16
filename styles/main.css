@@ -530,19 +530,8 @@ p {
 }
 
 #levelSelectScreen .level-select-groups {
-  grid-template-columns: minmax(0, 2.5fr) minmax(280px, 1fr);
+  grid-template-columns: 1fr;
   align-items: start;
-}
-
-#mainRouteSection,
-#advancedRouteSection {
-  grid-column: 1;
-}
-
-#bonusRouteSection,
-#advancedBonusSection,
-#progressRouteSection {
-  grid-column: 2;
 }
 
 #settingsScreen .level-select-groups {
@@ -575,6 +564,15 @@ p {
 }
 
 #mainLevelGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+#advancedLevelGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+#bonusLevelGrid,
+#advancedBonusLevelGrid {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
@@ -648,6 +646,19 @@ p {
   justify-items: center;
   font-size: 0.8rem;
   font-weight: 800;
+}
+
+.speedrun-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.speedrun-button {
+  justify-self: start;
+}
+
+.speedrun-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .level-stars {
@@ -1026,16 +1037,6 @@ body[data-preview="large"] .target-card {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  #levelSelectScreen .level-select-groups {
-    grid-template-columns: 1fr;
-  }
-
-  #bonusRouteSection,
-  #advancedBonusSection,
-  #progressRouteSection {
-    grid-column: 1;
-  }
-
   #settingsScreen .level-select-groups {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -1043,6 +1044,16 @@ body[data-preview="large"] .target-card {
 
   #mainLevelGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  #advancedLevelGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  #bonusLevelGrid,
+  #advancedBonusLevelGrid,
+  .speedrun-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
 }
@@ -1081,11 +1092,18 @@ body[data-preview="large"] .target-card {
 
   .settings-grid,
   #levelSelectScreen .level-select-groups,
-  #settingsScreen .level-select-groups {
+  #settingsScreen .level-select-groups,
+  .speedrun-stats {
     grid-template-columns: 1fr;
   }
 
   #mainLevelGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #advancedLevelGrid,
+  #bonusLevelGrid,
+  #advancedBonusLevelGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
