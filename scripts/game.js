@@ -14,6 +14,7 @@ const DIAGNOSTIC_CODE = "5278";
 const HOME_BUTTON_STAGGER_MS = 260;
 const HOME_BUTTON_ANIMATION_MS = 980;
 const HOME_BUTTON_Y_OFFSET = -300;
+const HOME_BUTTON_ALPHA_THRESHOLD = 96;
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 
 const MAIN_LEVELS = LEVELS.filter((level) => !level.isBonus);
@@ -751,7 +752,7 @@ export class HiddenObjectGame {
     let maxY = -1;
 
     for (let index = 3; index < data.length; index += 4) {
-      if (data[index] <= 8) {
+      if (data[index] < HOME_BUTTON_ALPHA_THRESHOLD) {
         continue;
       }
       const pixelIndex = (index - 3) / 4;
@@ -786,16 +787,19 @@ export class HiddenObjectGame {
     const targetTop = top * (drawHeight / naturalHeight);
     const targetWidth = (right - left) * (drawWidth / naturalWidth);
     const targetHeight = (bottom - top) * (drawHeight / naturalHeight);
-    const scaleX = targetWidth / bounds.width;
-    const scaleY = targetHeight / bounds.height;
-    const finalLeft = targetLeft - (bounds.left * scaleX);
-    const finalTop = targetTop - (bounds.top * scaleY);
+    const scale = Math.min(targetWidth / bounds.width, targetHeight / bounds.height);
+    const targetCenterX = targetLeft + (targetWidth / 2);
+    const targetCenterY = targetTop + (targetHeight / 2);
+    const artCenterX = (bounds.left + (bounds.width / 2)) * scale;
+    const artCenterY = (bounds.top + (bounds.height / 2)) * scale;
+    const finalLeft = targetCenterX - artCenterX;
+    const finalTop = targetCenterY - artCenterY;
     const startOffset = Math.max(drawHeight - targetTop + targetHeight + 48, 120);
 
     imageElement.style.left = `${finalLeft}px`;
     imageElement.style.top = `${finalTop}px`;
-    imageElement.style.width = `${imageElement.naturalWidth * scaleX}px`;
-    imageElement.style.height = `${imageElement.naturalHeight * scaleY}px`;
+    imageElement.style.width = `${imageElement.naturalWidth * scale}px`;
+    imageElement.style.height = `${imageElement.naturalHeight * scale}px`;
     imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
   }
 
