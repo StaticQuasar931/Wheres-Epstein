@@ -37,7 +37,11 @@ function getHit(point, hitbox) {
     return Math.sqrt((dx * dx) + (dy * dy)) <= hitbox.radius;
   }
 
-  return point.x >= hitbox.x1 && point.x <= hitbox.x2 && point.y >= hitbox.y1 && point.y <= hitbox.y2;
+  const left = Math.min(hitbox.x1, hitbox.x2);
+  const right = Math.max(hitbox.x1, hitbox.x2);
+  const top = Math.min(hitbox.y1, hitbox.y2);
+  const bottom = Math.max(hitbox.y1, hitbox.y2);
+  return point.x >= left && point.x <= right && point.y >= top && point.y <= bottom;
 }
 
 function getStars(elapsedMs) {
@@ -162,6 +166,7 @@ export class HiddenObjectGame {
       zoomInButton: document.getElementById("zoomInButton"),
       fitZoomButton: document.getElementById("fitZoomButton"),
       resetZoomButton: document.getElementById("resetZoomButton"),
+      skipLevelButton: document.getElementById("skipLevelButton"),
       pauseButton: document.getElementById("pauseButton"),
       returnHomeButton: document.getElementById("returnHomeButton"),
       togglePreviewButton: document.getElementById("togglePreviewButton"),
@@ -235,6 +240,7 @@ export class HiddenObjectGame {
     this.elements.zoomInButton.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
     this.elements.fitZoomButton.addEventListener("click", () => this.fitLevelToViewport());
     this.elements.resetZoomButton.addEventListener("click", () => this.fitLevelToViewport());
+    this.elements.skipLevelButton.addEventListener("click", () => this.skipLevel());
     this.elements.pauseButton.addEventListener("click", () => this.pauseGame());
     this.elements.returnHomeButton.addEventListener("click", () => this.quitRun());
     this.elements.togglePreviewButton.addEventListener("click", () => this.togglePreviewCard());
@@ -247,6 +253,7 @@ export class HiddenObjectGame {
     this.elements.playAgainButton.addEventListener("click", () => this.startCampaignFromLevel(0));
     this.elements.completionLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.hudLevelText.addEventListener("dblclick", () => this.showScreen("levelSelect"));
+    this.elements.hudLevelText.addEventListener("click", () => this.showScreen("levelSelect"));
 
     this.elements.sceneViewport.addEventListener("wheel", (event) => {
       event.preventDefault();
@@ -285,6 +292,7 @@ export class HiddenObjectGame {
     this.elements.body.dataset.motion = this.save.settings.motion;
     this.elements.body.dataset.preview = this.save.settings.previewSize;
     this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
+    this.elements.skipLevelButton.classList.toggle("hidden", !this.sessionTestingUnlocked);
   }
 
   persistSettings() {
@@ -367,11 +375,14 @@ export class HiddenObjectGame {
     levels.forEach((level) => {
       const result = this.save.legit.levelResults[level.id];
       const unlocked = isBonus ? this.isBonusUnlocked() : this.isMainLevelUnlocked(level);
+      const bestStars = result ? starText(result.bestStars ?? 0) : starText(0);
       const button = document.createElement("button");
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
-      button.innerHTML = `<h4>${level.name}</h4><p class="level-meta">${unlocked ? "Ready" : "Locked"}</p><p class="level-meta level-stars">${result ? starText(result.bestStars ?? 0) : starText(0)}</p>`;
+      button.innerHTML = unlocked
+        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${level.isBonus ? "Bonus" : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`}</span></div><p class="level-meta level-stars">${bestStars}</p>`
+        : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${level.isBonus ? "Bonus" : `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p><p class="level-meta level-stars">${bestStars}</p>`;
       button.addEventListener("click", () => this.startSelectedLevel(level.id));
       container.appendChild(button);
     });
@@ -400,6 +411,23 @@ export class HiddenObjectGame {
 
   retryCurrentLevel() {
     this.elements.resultOverlay.classList.add("hidden");
+    if (this.save.settings.showLevelIntro === "on") {
+      this.openLevelIntro();
+      return;
+    }
+    this.beginLevel();
+  }
+
+  skipLevel() {
+    if (!this.sessionTestingUnlocked) {
+      return;
+    }
+    const nextIndex = this.getNextLevelIndex();
+    if (nextIndex === null) {
+      this.showScreen("levelSelect");
+      return;
+    }
+    this.state.levelIndex = nextIndex;
     if (this.save.settings.showLevelIntro === "on") {
       this.openLevelIntro();
       return;
@@ -571,6 +599,10 @@ export class HiddenObjectGame {
     element.style.height = `${(zone.y2 - zone.y1) * scaleY}px`;
   }
 
+  isUiEventTarget(target) {
+    return Boolean(target?.closest?.("button, select, input, .play-topbar, .target-card, .play-stats, .modal-card"));
+  }
+
   renderHomeDebugOverlay(drawWidth, drawHeight, naturalWidth, naturalHeight) {
     const debug = this.elements.homeDebugOverlay;
     debug.innerHTML = "";
@@ -639,10 +671,14 @@ export class HiddenObjectGame {
       node.style.height = `${hitbox.radius * 2}px`;
       node.style.borderRadius = "50%";
     } else {
-      node.style.left = `${hitbox.x1}px`;
-      node.style.top = `${hitbox.y1}px`;
-      node.style.width = `${hitbox.x2 - hitbox.x1}px`;
-      node.style.height = `${hitbox.y2 - hitbox.y1}px`;
+      const left = Math.min(hitbox.x1, hitbox.x2);
+      const right = Math.max(hitbox.x1, hitbox.x2);
+      const top = Math.min(hitbox.y1, hitbox.y2);
+      const bottom = Math.max(hitbox.y1, hitbox.y2);
+      node.style.left = `${left}px`;
+      node.style.top = `${top}px`;
+      node.style.width = `${right - left}px`;
+      node.style.height = `${bottom - top}px`;
       node.style.borderRadius = "12px";
     }
     this.elements.hitboxOverlay.appendChild(node);
@@ -745,6 +781,7 @@ export class HiddenObjectGame {
       this.elements.diagnosticMessage.textContent = "Opened.";
       this.elements.hitboxOverlay.classList.remove("hidden");
       this.elements.debugReadout.classList.remove("hidden");
+      this.elements.skipLevelButton.classList.remove("hidden");
       this.layoutHomeButtons();
       return;
     }
@@ -752,6 +789,9 @@ export class HiddenObjectGame {
   }
 
   onPointerDown(event) {
+    if (this.isUiEventTarget(event.target)) {
+      return;
+    }
     if (!this.state.runActive || this.state.paused) {
       return;
     }
@@ -765,6 +805,9 @@ export class HiddenObjectGame {
   }
 
   onPointerMove(event) {
+    if (this.isUiEventTarget(event.target)) {
+      return;
+    }
     this.state.pointerImage = this.clientToImage(event.clientX, event.clientY);
     this.updateDebugReadout();
     if (this.state.drag.pointerId !== event.pointerId) {
@@ -784,6 +827,10 @@ export class HiddenObjectGame {
   }
 
   onPointerUp(event) {
+    if (this.isUiEventTarget(event.target)) {
+      this.clearDragState(event.pointerId);
+      return;
+    }
     if (this.state.drag.pointerId !== event.pointerId) {
       return;
     }

@@ -55,12 +55,12 @@ export const LEVELS = [
     hitbox: { type: "rect", x1: 531, y1: 204, x2: 554, y2: 225 },
   }),
   makeLevel(8, "eps4", {
-    name: "Waldo's Briefcase",
-    hitbox: { type: "rect", x1: 531, y1: 204, x2: 554, y2: 225 },
+    name: "Popcorn Park",
+    hitbox: { type: "rect", x1: 1375, y1: 271, x2: 1352, y2: 237 },
   }),
   makeLevel(9, "eps2", {
     name: "Harbor Chaos",
-    hitbox: { type: "rect", x1: 1655, y1: 905, x2: 1781, y2: 1095 },
+    hitbox: { type: "rect", x1: 425, y1: 697, x2: 394, y2: 650 },
   }),
   makeLevel(10, "eps5", {
     name: "Final Crowd Sweep",
@@ -92,6 +92,18 @@ export const LEVELS = [
   }),
   makeLevel(17, "trum4", {
     name: "Level 17",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+  }),
+  makeLevel(18, "trum3", {
+    name: "Level 18",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+  }),
+  makeLevel(19, "eps4", {
+    name: "Level 19",
+    hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
+  }),
+  makeLevel(20, "eps2", {
+    name: "Level 20",
     hitbox: { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 },
   }),
   {
