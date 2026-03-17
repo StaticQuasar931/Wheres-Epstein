@@ -1,34 +1,28 @@
 /* ============================================================
-   WHERE'S EPSTEIN? — styles/effects.css  (Polish Pass 2)
+   WHERE'S EPSTEIN? — styles/effects.css  (Polish Pass 3)
    Home button animations, page arrows, preview items, easter eggs.
-   All existing class names preserved — JS depends on them.
+   All JS-toggled class names preserved exactly.
    ============================================================ */
 
 /* ============================================================
-   IMAGE BUTTONS (home screen overlays)
+   IMAGE BUTTONS (invisible hit targets on home screen)
    ============================================================ */
 .image-button {
-  /* 98asdf798asdf7as9d8f7as9df87as9d8f7 */
   transition: box-shadow 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 
-.image-button:not(.image-button-hidden-link):hover {
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow: 0 0 22px rgba(255, 216, 78, 0.18);
+.image-button:hover {
+  background: rgba(255, 255, 255, 0.018);
+  box-shadow: 0 0 30px rgba(255, 216, 78, 0.24);
 }
 
-.image-button:not(.image-button-hidden-link):active {
-  transform: scale(0.982);
-}
-
-.image-button-hidden-link {
-  background: transparent;
-  border-radius: 10px;
+.image-button:active {
+  transform: scale(0.980);
 }
 
 /* ============================================================
-   HOME BUTTON ART — hover, enter, settle, press
-   JS adds/removes: is-prepping, is-entering, is-settled, is-hovered, is-pressed
+   HOME BUTTON ART
+   JS toggles: is-prepping / is-entering / is-settled / is-hovered / is-pressed
    ============================================================ */
 .home-button-art {
   position: absolute;
@@ -38,7 +32,6 @@
   pointer-events: none;
   filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.30));
   z-index: 1;
-  /* Default: offscreen below */
   transform: translateY(var(--home-enter-offset, 140%));
   will-change: transform, filter;
   transform-origin: center center;
@@ -50,22 +43,20 @@
 .home-button-art.is-hovered,
 .image-button:focus-visible + .home-button-art {
   filter:
-    drop-shadow(0 30px 46px rgba(0, 0, 0, 0.42))
-    drop-shadow(0 0 36px rgba(255, 216, 78, 0.36))
-    brightness(1.08)
-    saturate(1.12);
-  transform: translateY(-2px) scale(1.078);
+    drop-shadow(0 30px 46px rgba(0, 0, 0, 0.44))
+    drop-shadow(0 0 38px rgba(255, 216, 78, 0.38))
+    brightness(1.10)
+    saturate(1.15);
+  transform: translateY(-7px) scale(1.06);
   transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1.05), filter 220ms ease;
 }
 
-/* Prepping — held offscreen, invisible */
 .home-button-art.is-prepping {
   opacity: 1;
   transform: translateY(var(--home-enter-offset, 140%));
   animation-play-state: paused;
 }
 
-/* Entering — slide up */
 .home-button-art.is-entering {
   opacity: 1;
   transform: translateY(0);
@@ -73,22 +64,20 @@
   animation-play-state: paused;
 }
 
-/* Settled — idle glow runs */
 .home-button-art.is-settled {
   opacity: 1;
   transform: translateY(0);
   animation-play-state: running;
 }
 
-/* Pressed — squash down */
 .home-button-art.is-pressed {
-  transform: translateY(3px) scale(0.983);
-  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.32));
+  transform: translateY(3px) scale(0.982);
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.34));
 }
 
 /* ============================================================
    HOME BUTTON SHEEN
-   JS adds/removes: is-settled, is-hovered, is-pressed
+   JS toggles: is-settled / is-hovered / is-pressed
    ============================================================ */
 .home-button-sheen {
   position: absolute;
@@ -118,85 +107,13 @@
   transform: translateY(0);
 }
 
-/* Shimmer sweep — runs passively while settled */
 .home-button-sheen.is-hovered::before,
 .home-button-art.is-settled + .home-button-sheen::before {
-  animation: home-shimmer 7.2s ease-in-out infinite;
+  animation: home-shimmer 7s ease-in-out infinite;
 }
 
 .home-button-sheen.is-pressed {
-  transform: translateY(3px) scale(0.983);
-}
-
-/* ============================================================
-   PAGE NAVIGATION ARROWS
-   ============================================================ */
-.page-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 8;
-  width: 8.8rem;
-  min-height: 7.1rem;
-  padding: 0.9rem 0.85rem;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(255, 216, 78, 0.20);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 100%),
-    rgba(6, 14, 24, 0.92);
-  color: var(--text);
-  box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.36),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  display: grid;
-  gap: 0.2rem;
-  justify-items: center;
-  align-content: center;
-  text-align: center;
-  transition:
-    transform     180ms cubic-bezier(0.2, 0.8, 0.2, 1.06),
-    border-color  160ms ease,
-    box-shadow    200ms ease,
-    background    160ms ease;
-}
-
-.page-arrow-left  { left: -3.3rem; }
-.page-arrow-right { right: -4.2rem; }
-
-.page-arrow-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.55rem;
-  height: 2.55rem;
-  border-radius: 999px;
-  background: rgba(255, 216, 78, 0.14);
-  color: var(--accent);
-  transition: background 180ms ease, transform 180ms ease;
-}
-
-.page-arrow svg { width: 1.95rem; height: 1.95rem; }
-
-.page-arrow-text      { display: grid; gap: 0.04rem; }
-.page-arrow-text strong { font-size: 1.1rem; font-weight: 800; }
-.page-arrow-text span   { font-size: 0.76rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
-
-.page-arrow:hover {
-  transform: translateY(-50%) scale(1.05);
-  border-color: rgba(255, 216, 78, 0.46);
-  box-shadow:
-    0 22px 54px rgba(0, 0, 0, 0.32),
-    0 0 32px rgba(255, 216, 78, 0.16);
-}
-.page-arrow:hover .page-arrow-icon {
-  background: rgba(255, 216, 78, 0.22);
-  transform: scale(1.08);
-}
-.page-arrow:active {
-  transform: translateY(-50%) scale(0.97);
-  transition-duration: 60ms;
+  transform: translateY(3px) scale(0.982);
 }
 
 /* ============================================================
@@ -204,12 +121,15 @@
    ============================================================ */
 .target-preview-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   gap: 0.65rem;
-  margin: 0.75rem 0;
+  margin: 0.7rem 0;
 }
 
-.intro-preview-list { max-width: 320px; margin-inline: auto; }
+.intro-preview-list {
+  max-width: 320px;
+  margin-inline: auto;
+}
 
 .preview-item {
   position: relative;
@@ -217,20 +137,19 @@
   gap: 0.35rem;
 }
 
-/* Found state — dim + red X */
-.preview-item.is-found { opacity: 0.62; }
+/* Found state — red X bars */
+.preview-item.is-found { opacity: 0.60; }
 
 .preview-item.is-found::before,
 .preview-item.is-found::after {
   content: "";
   position: absolute;
-  left: 8%;
-  right: 8%;
+  left: 8%; right: 8%;
   top: 34%;
   height: 4px;
   border-radius: 999px;
-  background: rgba(255, 107, 98, 0.96);
-  box-shadow: 0 0 18px rgba(255, 107, 98, 0.60);
+  background: rgba(255, 104, 96, 0.96);
+  box-shadow: 0 0 18px rgba(255, 104, 96, 0.60);
   animation: found-cross-pulse 1.4s ease-in-out infinite;
 }
 .preview-item.is-found::before { transform: rotate(26deg); }
@@ -260,17 +179,17 @@
 
 .preview-item.is-found .preview-badge {
   color: #ffe2de;
-  background: rgba(255, 107, 98, 0.20);
-  border-color: rgba(255, 107, 98, 0.44);
+  background: rgba(255, 104, 96, 0.20);
+  border-color: rgba(255, 104, 96, 0.44);
 }
 
-/* Found hitbox (game-renderer.js adds this class) */
+/* Found hitbox on scene — class added by game-renderer.js */
 .hitbox-shape-found {
-  border-color: rgba(111, 227, 168, 0.95);
-  background: rgba(111, 227, 168, 0.18);
+  border-color: rgba(82, 212, 148, 0.95);
+  background: rgba(82, 212, 148, 0.18);
   box-shadow:
-    0 0 0 3px rgba(111, 227, 168, 0.28),
-    0 0 22px rgba(111, 227, 168, 0.68);
+    0 0 0 3px rgba(82, 212, 148, 0.28),
+    0 0 22px rgba(82, 212, 148, 0.68);
   animation: found-hitbox-pulse 1.3s ease-in-out infinite;
 }
 
@@ -287,85 +206,52 @@ body.easter-arcade .menu-shell,
 body.easter-arcade .home-viewport {
   background:
     radial-gradient(circle at 10% 10%, rgba(122,255,215,0.15), transparent 22%),
-    radial-gradient(circle at 90% 18%, rgba(78,163,255,0.15), transparent 20%),
-    linear-gradient(160deg, #07101b, #10243e 70%, #08111d);
+    radial-gradient(circle at 90% 18%, rgba(78,163,255,0.15),  transparent 20%),
+    linear-gradient(160deg, #060f1a, #0f2340 70%, #07101c);
 }
 
 body.easter-arcade .level-stars,
-body.easter-arcade .result-stars {
-  text-shadow: 0 0 18px rgba(122, 255, 215, 0.50);
+body.easter-arcade .result-stars,
+body.easter-arcade .result-star--filled {
+  color: var(--accent);
+  text-shadow: 0 0 18px rgba(122, 255, 215, 0.52);
 }
-
-body.easter-cheese .menu-shell,
-body.easter-cheese .home-viewport {
-  background:
-    radial-gradient(circle at 15% 18%, rgba(255, 223, 118, 0.16), transparent 18%),
-    radial-gradient(circle at 82% 20%, rgba(255, 177, 63, 0.12), transparent 22%),
-    linear-gradient(160deg, #10161f, #30240f 68%, #151c26);
-}
-
-body.easter-static .scene-viewport::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 5px);
-  mix-blend-mode: screen;
-  opacity: 0.3;
-}
-
-/* Note: easter-stripes and easter-party ::after rules live in main.css
-   (home-viewport already uses ::before for the grain).
-   Duplicate z-index rules would conflict, so kept in one place. */
 
 /* ============================================================
-   KEYFRAMES
+   KEYFRAMES (kept for backward compat — home-spin still used by name)
    ============================================================ */
 
-/* Home button idle glow pulse */
 @keyframes home-idle-glow {
   0%, 100% { filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.30)); }
-  50%  {
+  50% {
     filter:
-      drop-shadow(0 22px 40px rgba(0, 0, 0, 0.34))
-      drop-shadow(0 0 20px rgba(255, 216, 78, 0.18));
+      drop-shadow(0 22px 40px rgba(0, 0, 0, 0.36))
+      drop-shadow(0 0 22px rgba(255, 216, 78, 0.20));
   }
 }
 
-/* Home button sheen sweep */
 @keyframes home-shimmer {
-  0%, 68% {
-    transform: translateX(-180%) skewX(-24deg);
-    opacity: 0;
-  }
-  72% { opacity: 0.88; }
-  84% {
-    transform: translateX(350%) skewX(-24deg);
-    opacity: 0.88;
-  }
-  100% {
-    transform: translateX(370%) skewX(-24deg);
-    opacity: 0;
-  }
+  0%, 68% { transform: translateX(-180%) skewX(-24deg); opacity: 0; }
+  72%      { opacity: 0.88; }
+  84%      { transform: translateX(350%) skewX(-24deg); opacity: 0.88; }
+  100%     { transform: translateX(370%) skewX(-24deg); opacity: 0; }
 }
 
-/* Found target X on preview */
 @keyframes found-cross-pulse {
-  0%, 100% { opacity: 0.88; box-shadow: 0 0 18px rgba(255, 107, 98, 0.44); }
-  50%       { opacity: 1;    box-shadow: 0 0 28px rgba(255, 107, 98, 0.80); }
+  0%, 100% { opacity: 0.88; box-shadow: 0 0 18px rgba(255, 104, 96, 0.44); }
+  50%       { opacity: 1;    box-shadow: 0 0 28px rgba(255, 104, 96, 0.80); }
 }
 
-/* Found hitbox pulse on scene */
 @keyframes found-hitbox-pulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 3px rgba(111,227,168,0.28), 0 0 22px rgba(111,227,168,0.50);
+    box-shadow: 0 0 0 3px rgba(82,212,148,0.28), 0 0 22px rgba(82,212,148,0.50);
   }
   50% {
     transform: scale(1.022);
-    box-shadow: 0 0 0 4px rgba(111,227,168,0.36), 0 0 30px rgba(111,227,168,0.78);
+    box-shadow: 0 0 0 4px rgba(82,212,148,0.36), 0 0 30px rgba(82,212,148,0.78);
   }
 }
 
-/* Boot spinner — kept for backward compat if anything still refs home-spin */
+/* Backward compat name — kept in case anything references it */
 @keyframes home-spin { to { transform: rotate(360deg); } }
