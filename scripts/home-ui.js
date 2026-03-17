@@ -329,8 +329,7 @@ function getHomeArtBounds(game, imageElement, alphaThreshold) {
 }
 
 function placeHomeArt(game, imageElement, zone, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
-  const bounds = getHomeArtBounds(game, imageElement, config.alphaThreshold);
-  if (!bounds) {
+  if (!imageElement || !zone) {
     return;
   }
 
@@ -343,38 +342,18 @@ function placeHomeArt(game, imageElement, zone, drawWidth, drawHeight, naturalWi
   const targetTop = top * (drawHeight / naturalHeight);
   const targetWidth = (right - left) * (drawWidth / naturalWidth);
   const targetHeight = (bottom - top) * (drawHeight / naturalHeight);
-  const scale = Math.min(targetWidth / bounds.width, targetHeight / bounds.height);
-  const targetCenterX = targetLeft + (targetWidth / 2);
-  const targetCenterY = targetTop + (targetHeight / 2);
-  const artCenterX = (bounds.left + (bounds.width / 2)) * scale;
-  const artCenterY = (bounds.top + (bounds.height / 2)) * scale;
-  const finalLeft = targetCenterX - artCenterX;
-  const finalTop = targetCenterY - artCenterY;
   const startOffset = Math.max(drawHeight - targetTop + targetHeight + 48, 120);
-  const visibleLeft = finalLeft + (bounds.left * scale);
-  const visibleTop = finalTop + (bounds.top * scale);
-  const visibleWidth = bounds.width * scale;
-  const visibleHeight = bounds.height * scale;
-  const sourceScaleX = naturalWidth / drawWidth;
-  const sourceScaleY = naturalHeight / drawHeight;
-
-  imageElement.style.left = `${finalLeft}px`;
-  imageElement.style.top = `${finalTop}px`;
-  imageElement.style.width = `${imageElement.naturalWidth * scale}px`;
-  imageElement.style.height = `${imageElement.naturalHeight * scale}px`;
+  imageElement.style.left = `${targetLeft}px`;
+  imageElement.style.top = `${targetTop}px`;
+  imageElement.style.width = `${targetWidth}px`;
+  imageElement.style.height = `${targetHeight}px`;
   imageElement.style.setProperty("--home-enter-offset", `${startOffset}px`);
   return {
     rendered: {
-      left: visibleLeft,
-      top: visibleTop,
-      width: visibleWidth,
-      height: visibleHeight,
-    },
-    source: {
-      x1: visibleLeft * sourceScaleX,
-      y1: visibleTop * sourceScaleY,
-      x2: (visibleLeft + visibleWidth) * sourceScaleX,
-      y2: (visibleTop + visibleHeight) * sourceScaleY,
+      left: targetLeft,
+      top: targetTop,
+      width: targetWidth,
+      height: targetHeight,
     },
   };
 }
