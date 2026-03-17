@@ -13,10 +13,6 @@
 </head>
 <body data-theme="dark" data-density="comfortable" data-motion="full" data-preview="normal">
 
-  <header class="site-topbar">
-    <button id="topMenuButton" class="ghost-button" type="button">Levels</button>
-  </header>
-
   <main class="screen-shell">
 
     <!-- =====================================================
@@ -31,7 +27,7 @@
         <div id="homeBootOverlay" class="home-boot-overlay">
           <div class="home-boot-card">
             <div class="home-boot-logo" aria-hidden="true">
-              <span class="boot-logo-text">W?</span>
+              <img src="https://cdn.jsdelivr.net/gh/StaticQuasar931/Images@main/squarestaticquasar931logo.jpg" alt="" loading="eager" decoding="async">
             </div>
             <div class="home-boot-spinner-wrap">
               <div class="home-boot-spinner" aria-hidden="true"></div>
@@ -88,7 +84,7 @@
             <h2 id="levelSelectPageLabel">Main Levels</h2>
           </div>
           <div class="button-row">
-            <button id="closeLevelSelectButton" class="ghost-button" type="button">← Back</button>
+            <button id="closeLevelSelectButton" class="ghost-button" type="button">Back</button>
           </div>
         </div>
 
@@ -194,7 +190,7 @@
             <p class="eyebrow">Settings</p>
             <h2>Look, Feel &amp; Quality of Life</h2>
           </div>
-          <button id="closeSettingsButton" class="ghost-button" type="button">← Back</button>
+          <button id="closeSettingsButton" class="ghost-button" type="button">Back</button>
         </div>
 
         <div class="settings-grid">
@@ -285,7 +281,7 @@
               <div><p class="eyebrow">Controls</p><h3>Play Shortcuts</h3></div>
             </div>
             <ul class="control-list">
-              <li>Mouse wheel or <kbd>+</kbd> / <kbd>−</kbd> buttons to zoom</li>
+              <li>Mouse wheel or <kbd>+</kbd> / <kbd>-</kbd> buttons to zoom</li>
               <li>Drag, <kbd>WASD</kbd>, or arrow keys to pan</li>
               <li><kbd>Space</kbd> pauses and resumes</li>
               <li><kbd>N</kbd> starts the level intro or next level</li>
@@ -301,7 +297,7 @@
               <div><p class="eyebrow">Scoring</p><h3>Fast is Better</h3></div>
             </div>
             <ul class="control-list">
-              <li>No fail timer — search as long as you need.</li>
+              <li>No fail timer. Search as long as you need.</li>
               <li>Faster clears earn more score and stars.</li>
               <li>Wrong clicks reduce score but don't reveal the target.</li>
               <li>Bonuses open after level 5 or 10 total stars.</li>
@@ -333,18 +329,6 @@
 
           <section class="menu-card">
             <div class="menu-card-header">
-              <div><p class="eyebrow">Dev Info</p><h3>File Reference</h3></div>
-            </div>
-            <ul class="control-list compact-list">
-              <li>Level hitboxes are in <code>scripts/levels.js</code></li>
-              <li>Button zones use <code>x1, y1 → x2, y2</code> format</li>
-              <li>Testing mode shows live coordinates and hitboxes</li>
-              <li>Advanced levels support two targets with separate hitboxes</li>
-            </ul>
-          </section>
-
-          <section class="menu-card">
-            <div class="menu-card-header">
               <div><p class="eyebrow">Stats</p><h3>Local Progress</h3></div>
             </div>
             <div class="stat-grid settings-stats-grid">
@@ -357,8 +341,8 @@
             </div>
           </section>
 
-          <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.9.32</p>
+          <div class="version-line">
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.9.4</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -389,29 +373,18 @@
         </div>
         <div id="magnifierLens" class="magnifier-lens hidden" aria-hidden="true"></div>
 
-        <!-- HUD: 2-row layout
-             Row 1 (top): info pills + action buttons
-             Row 2 (below right): zoom buttons, same width as action group -->
         <div class="play-topbar">
           <div class="play-hud-row">
-            <!-- Left: pan tip -->
             <div class="play-hud-info">
-              <span id="panTipText" class="overlay-pill">Pan: drag or WASD</span>
               <span id="hudLevelText" class="overlay-pill hud-level-badge" title="Click to open level select">Level 1</span>
               <span id="hudLevelName" class="overlay-pill">Welcome Party</span>
+              <span id="panTipText" class="overlay-pill">Pan: drag or WASD</span>
             </div>
-            <!-- Right column: top = action buttons, bottom = zoom buttons -->
             <div class="play-hud-right-col">
               <div class="play-top-actions">
                 <button id="skipLevelButton"  class="overlay-button hidden"        type="button">Skip</button>
                 <button id="pauseButton"      class="overlay-button"               type="button">Pause</button>
                 <button id="returnHomeButton" class="overlay-button danger-button"  type="button">Quit</button>
-              </div>
-              <div class="play-top-zoom">
-                <button id="zoomOutButton"  class="overlay-button zoom-btn" type="button">−</button>
-                <button id="zoomInButton"   class="overlay-button zoom-btn" type="button">+</button>
-                <button id="fitZoomButton"  class="overlay-button zoom-btn" type="button">Fit</button>
-                <button id="resetZoomButton" class="overlay-button zoom-btn" type="button">Reset</button>
               </div>
             </div>
           </div>
@@ -443,6 +416,15 @@
           </div>
         </div>
 
+        <div class="play-controls-stack">
+          <div class="play-controls-grid">
+            <button id="zoomOutButtonBottom" class="overlay-button zoom-btn" type="button">-</button>
+            <button id="zoomInButtonBottom" class="overlay-button zoom-btn" type="button">+</button>
+            <button id="fitZoomButtonBottom" class="overlay-button zoom-btn" type="button">Fit</button>
+            <button id="resetZoomButtonBottom" class="overlay-button zoom-btn" type="button">Reset</button>
+          </div>
+        </div>
+
         <div id="sceneFeedback" class="scene-feedback" aria-live="polite"></div>
         <div id="debugReadout"  class="debug-readout hidden" aria-live="polite"></div>
       </div>
@@ -463,7 +445,7 @@
       </svg>
     </span>
     <span class="page-arrow-text">
-      <strong>Back</strong>
+      <strong>Previous</strong>
       <span>Page One</span>
     </span>
   </button>
@@ -476,8 +458,8 @@
       </svg>
     </span>
     <span class="page-arrow-text">
-      <strong>Advanced</strong>
-      <span>Page Two</span>
+      <strong>Page Two</strong>
+      <span>Advanced</span>
     </span>
   </button>
 
@@ -489,8 +471,8 @@
       </svg>
     </span>
     <span class="page-arrow-text">
-      <strong>Speedrun</strong>
-      <span>Page Three</span>
+      <strong>Page Three</strong>
+      <span>Speedrun</span>
     </span>
   </button>
 
@@ -502,7 +484,7 @@
       </svg>
     </span>
     <span class="page-arrow-text">
-      <strong>Back</strong>
+      <strong>Previous</strong>
       <span>Page Two</span>
     </span>
   </button>
@@ -537,7 +519,7 @@
   <div id="pauseOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card">
       <p class="eyebrow">Paused</p>
-      <h2>Take your time — the clock is frozen.</h2>
+      <h2>Take your time. The clock is frozen.</h2>
       <div class="button-row">
         <button id="resumeButton"    class="primary-button" type="button">Resume</button>
         <button id="pauseQuitButton" class="ghost-button"   type="button">Quit Run</button>

@@ -181,7 +181,7 @@ code {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 30;
-  display: none;
+  display: none !important;
   justify-content: space-between;
   align-items: center;
   padding: 0.9rem 1rem 0;
@@ -345,6 +345,17 @@ body.mode-game .site-topbar { display: flex; }
   gap: 0.6rem;
   margin-top: 1rem;
 }
+
+#settingsScreen .button-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: 0.55rem;
+}
+
+#settingsScreen .button-row > * {
+  width: 100%;
+}
 .menu-header      .button-row,
 .menu-card-header .button-row { margin-top: 0; }
 
@@ -417,6 +428,16 @@ body.mode-game .site-topbar { display: flex; }
   animation: kb-breathe 26s ease-in-out infinite alternate;
 }
 
+.home-viewport:not(.home-ready) .hero-background,
+.home-viewport:not(.home-ready) .home-button-overlay,
+.home-viewport:not(.home-ready) .home-debug-overlay,
+.home-viewport:not(.home-ready) .home-debug-readout,
+.home-viewport:not(.home-ready) .home-name-button,
+.home-viewport:not(.home-ready) .home-ambient {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* ============================================================
    BOOT OVERLAY — much improved loading screen
    ============================================================ */
@@ -456,21 +477,20 @@ body.mode-game .site-topbar { display: flex; }
 
 /* Game logo mark inside loading */
 .home-boot-logo {
-  width: 4.2rem;
-  height: 4.2rem;
+  width: 4.6rem;
+  height: 4.6rem;
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, rgba(255,216,78,0.15), rgba(255,115,24,0.10));
   border: 1px solid rgba(255, 216, 78, 0.25);
   display: grid;
   place-items: center;
   margin-bottom: 0.2rem;
+  overflow: hidden;
 }
-.boot-logo-text {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  color: var(--accent);
-  letter-spacing: 0.04em;
-  text-shadow: 0 0 20px rgba(255, 216, 78, 0.50);
+.home-boot-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .home-boot-spinner-wrap {
@@ -795,10 +815,10 @@ body.mode-game .site-topbar { display: flex; }
    ============================================================ */
 .menu-shell {
   min-height: 100vh;
-  padding: 4.6rem 0.9rem 1rem;
-  width: min(100%, 1460px);
+  padding: 2rem 1.15rem 1rem;
+  width: 100%;
+  max-width: 1580px;
   margin: 0 auto;
-  /* Full width — no artificial max-width restriction that creates dead space */
   position: relative;
 }
 
@@ -850,15 +870,20 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 #settingsScreen .level-select-groups {
-  grid-template-columns: 1.1fr 1.1fr 0.95fr;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: start;
 }
 
-#settingsScreen .version-card   { margin-top: 0; grid-column: 1 / -1; }
+#settingsScreen .settings-grid { grid-column: 1 / -1; }
+#settingsScreen .level-select-groups > .menu-card:nth-of-type(1) { grid-column: span 4; }
+#settingsScreen .level-select-groups > .menu-card:nth-of-type(2) { grid-column: span 4; }
+#settingsScreen .level-select-groups > .menu-card:nth-of-type(3) { grid-column: span 4; }
+#settingsScreen .level-select-groups > .menu-card:nth-of-type(4) { grid-column: span 5; }
+#settingsScreen .level-select-groups > .menu-card:nth-of-type(5) { grid-column: span 7; }
 #settingsScreen .menu-card,
 #settingsScreen .setting-card   { height: 100%; }
-#settingsScreen .menu-card      { padding: 1rem 1.1rem; }
-#settingsScreen .setting-card   { padding: 0.82rem 0.92rem; }
+#settingsScreen .menu-card      { padding: 0.95rem 1rem; }
+#settingsScreen .setting-card   { padding: 0.72rem 0.8rem; }
 #settingsScreen .menu-header,
 #settingsScreen .menu-card-header { gap: 0.5rem; }
 
@@ -887,9 +912,9 @@ body.mode-game .site-topbar { display: flex; }
     rgba(255, 255, 255, 0.022) 100%
   );
   /* More padding, bigger feel */
-  padding: 0.8rem 0.72rem;
+  padding: 0.72rem 0.68rem;
   text-align: center;
-  min-height: 112px;
+  min-height: 102px;
   cursor: pointer;
   display: grid;
   align-content: space-between;
@@ -944,7 +969,7 @@ body.mode-game .site-topbar { display: flex; }
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(circle at 50% 0%, rgba(255,216,78,0.08), transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(255,216,78,0.09), transparent 70%);
   opacity: 0;
   transition: opacity 200ms ease;
   pointer-events: none;
@@ -954,13 +979,13 @@ body.mode-game .site-topbar { display: flex; }
 .level-card:hover:not(.locked)::after  { opacity: 1; }
 
 .level-card:hover:not(.locked) {
-  transform: translateY(-3px);
+  transform: translateY(-2px) scale(1.01);
   border-color: rgba(255, 216, 78, 0.44);
   background: rgba(255, 255, 255, 0.11);
   box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.26),
+    0 8px 18px rgba(0, 0, 0, 0.22),
     0 0 0 1px rgba(255,216,78,0.08),
-    0 0 12px rgba(255, 216, 78, 0.06);
+    0 0 10px rgba(255, 216, 78, 0.06);
 }
 
 .level-card:active:not(.locked) {
@@ -978,7 +1003,7 @@ body.mode-game .site-topbar { display: flex; }
 
 .level-card h4 {
   font-family: var(--font-body);
-  font-size: 1rem;   /* bigger — was 0.93rem */
+  font-size: 1.03rem;
   font-weight: 700;
   line-height: 1.22;
   color: var(--text-bright);
@@ -1013,15 +1038,15 @@ body.mode-game .site-topbar { display: flex; }
   display: grid;
   gap: 0.12rem;
   justify-items: center;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: var(--muted-hi);
 }
 
 .level-stars {
   color: var(--accent);
-  letter-spacing: 0.22rem;
-  font-size: 1.4rem;
+  letter-spacing: 0.16rem;
+  font-size: 1.68rem;
   font-weight: 900;
   justify-self: center;
   text-shadow: 0 0 16px rgba(255, 216, 78, 0.30), 0 0 32px rgba(255,216,78,0.12);
@@ -1052,7 +1077,8 @@ body.mode-game .site-topbar { display: flex; }
    ============================================================ */
 .settings-grid {
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  margin-top: 0.7rem;
+  margin-top: 0.45rem;
+  gap: 0.65rem;
 }
 
 .setting-card {
@@ -1113,8 +1139,18 @@ body.mode-game .site-topbar { display: flex; }
 }
 .compact-list { line-height: 1.56; font-size: 0.82rem; }
 
+#settingsScreen .control-list {
+  margin-top: 0.35rem;
+}
+
 .diagnostic-row { display: flex; gap: 0.72rem; margin-top: 0.85rem; }
-.version-card { margin-top: 0; text-align: center; }
+.version-line {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0 0;
+}
 
 /* ============================================================
    THEME OVERRIDES
@@ -1207,66 +1243,44 @@ body.easter-party .home-viewport::after {
    ============================================================ */
 .play-topbar {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: var(--shell-padding);
+  right: var(--shell-padding);
+  left: auto;
   z-index: 5;
-  padding: var(--shell-padding);
-  padding-bottom: calc(var(--shell-padding) * 2.2);
-  background: linear-gradient(180deg,
-    rgba(2, 8, 16, 0.90) 0%,
-    rgba(2, 8, 16, 0.54) 60%,
-    transparent 100%
-  );
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   pointer-events: none;
 }
 .play-topbar > * { pointer-events: auto; }
 
-/* Single flex row: info on left, right-col on right */
 .play-hud-row {
   display: flex;
   align-items: flex-start;
   gap: 0.6rem;
+  justify-content: flex-end;
 }
 
-/* Info pills — level name / pan tip — grow to fill left */
 .play-hud-info {
-  flex: 1;
+  flex: 0 1 auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.34rem;
+  align-items: flex-end;
   min-width: 0;
 }
 
-/* Right column: action buttons on top, zoom buttons below */
 .play-hud-right-col {
   display: flex;
-  flex-direction: column;
-  gap: 0.38rem;
+  align-items: flex-end;
   flex-shrink: 0;
 }
 
-/* Action group: Skip / Pause / Quit */
 .play-top-actions {
   display: flex;
   gap: 0.4rem;
   justify-content: flex-end;
-}
-
-/* Zoom group: − + Fit Reset — same total width as actions */
-.play-top-zoom {
-  display: flex;
-  gap: 0.4rem;
-}
-
-/* Zoom buttons stretch to fill their container width (= actions width) */
-.play-top-zoom .overlay-button.zoom-btn {
-  flex: 1;
-  justify-content: center;
-  padding-left: 0.42rem;
-  padding-right: 0.42rem;
-  min-width: 0;
 }
 
 .magnifier-lens {
@@ -1343,13 +1357,32 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   right: var(--shell-padding);
   bottom: var(--shell-padding);
   z-index: 5;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  display: grid;
+  width: min(360px, 40vw);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.42rem;
 }
 
-.stat-pill { text-align: center; }
+.stat-pill { text-align: center; width: 100%; }
+
+.play-controls-stack {
+  position: absolute;
+  right: var(--shell-padding);
+  bottom: calc(var(--shell-padding) + 5rem);
+  z-index: 5;
+  width: min(360px, 40vw);
+}
+
+.play-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.42rem;
+}
+
+.play-controls-grid .overlay-button {
+  width: 100%;
+  justify-content: center;
+}
 
 .stat-pill span {
   display: block;
@@ -1399,7 +1432,8 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   white-space: pre-line;
   border-radius: var(--radius-md);
   font-family: 'Courier New', 'Consolas', monospace;
-  font-size: 0.78rem;
+  font-size: 1rem;
+  padding: 0.8rem 1rem;
 }
 
 .asset-error { color: var(--danger); font-size: 0.84rem; }
@@ -1413,9 +1447,9 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   top: 50%;
   transform: translateY(-50%);
   z-index: 20; /* above content, below modals (z:40) */
-  width: 4.4rem;
-  min-height: 6.5rem;
-  padding: 0.76rem 0.5rem;
+  width: 6rem;
+  min-height: 8rem;
+  padding: 0.92rem 0.6rem;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 216, 78, 0.20);
   background:
@@ -1439,8 +1473,8 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
     background    160ms ease;
 }
 
-.page-arrow-left  { left:  0.4rem; }
-.page-arrow-right { right: 0.4rem; }
+.page-arrow-left  { left:  0.16rem; }
+.page-arrow-right { right: 0.16rem; }
 
 .page-arrow:hover {
   transform: translateY(-50%) scale(1.06);
@@ -1458,8 +1492,8 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
   background: rgba(255, 216, 78, 0.14);
   color: var(--accent);
@@ -1471,7 +1505,7 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   transform: scale(1.10);
 }
 
-.page-arrow svg { width: 1.25rem; height: 1.25rem; }
+.page-arrow svg { width: 1.55rem; height: 1.55rem; }
 
 .page-arrow-text {
   display: flex;
@@ -1479,12 +1513,12 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   gap: 0.06rem;
 }
 .page-arrow-text strong {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-weight: 800;
   line-height: 1.1;
 }
 .page-arrow-text span {
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   color: var(--muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1652,9 +1686,7 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
 
   .stat-grid, .result-stats { grid-template-columns: 1fr; }
 
-  .play-stats,
   .play-top-actions,
-  .play-top-zoom,
   .play-hud-info,
   .diagnostic-row,
   .button-row {
@@ -1662,12 +1694,19 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
     align-items: stretch;
   }
 
-  .play-hud-row { flex-direction: column; }
+  .play-topbar {
+    top: 0.85rem;
+    right: 0.85rem;
+  }
+  .play-hud-row { flex-direction: column; align-items: flex-end; }
   .play-hud-right-col { width: 100%; }
-  .play-top-zoom .overlay-button.zoom-btn { flex: 1; }
   .play-top-actions { flex-direction: row; flex-wrap: wrap; }
 
-  .target-card { width: calc(100% - 1.7rem); bottom: 5.2rem; }
+  .target-card { width: calc(100% - 1.7rem); bottom: 10.3rem; }
+  .play-stats,
+  .play-controls-stack {
+    width: calc(100% - 1.7rem);
+  }
 
   .home-debug-readout { left: 0.75rem; right: 0.75rem; min-width: 0; max-width: none; }
 

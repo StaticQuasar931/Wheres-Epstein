@@ -325,7 +325,7 @@ export class HiddenObjectGame {
     this.elements.openSettingsButton.addEventListener("click", () => this.showScreen("settings"));
     this.elements.closeSettingsButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.moreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
-    this.elements.topMenuButton.addEventListener("click", () => this.handleTopMenu());
+    bind(this.elements.topMenuButton, "click", () => this.handleTopMenu());
     bind(this.elements.themeSelect, "change", () => this.persistSettings());
     bind(this.elements.densitySelect, "change", () => this.persistSettings());
     bind(this.elements.motionSelect, "change", () => this.persistSettings());
@@ -472,7 +472,9 @@ export class HiddenObjectGame {
       element.setAttribute("aria-hidden", String(!active));
     });
     this.elements.body.classList.toggle("mode-game", name === "game");
-    this.elements.topMenuButton.textContent = name === "home" ? "Levels" : "Menu";
+    if (this.elements.topMenuButton) {
+      this.elements.topMenuButton.textContent = name === "home" ? "Levels" : "Menu";
+    }
     if (name !== "game") {
       this.stopElapsedTimer();
       this.clearKeys();
@@ -1007,6 +1009,7 @@ export class HiddenObjectGame {
     this.elements.levelImage.style.visibility = "hidden";
     this.elements.levelImage.removeAttribute("src");
     this.elements.levelImage.setAttribute("src", "");
+    this.elements.levelImage.src = "";
     this.elements.sceneContent.style.width = "1px";
     this.elements.sceneContent.style.height = "1px";
     this.elements.hitboxOverlay.style.width = "1px";
@@ -1959,10 +1962,23 @@ export class HiddenObjectGame {
     return { x: Math.round(imageX), y: Math.round(imageY) };
   }
 
+  clientToImagePrecise(clientX, clientY) {
+    const rect = this.elements.sceneViewport.getBoundingClientRect();
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    const imageX = (localX - this.state.transform.x) / this.state.transform.scale;
+    const imageY = (localY - this.state.transform.y) / this.state.transform.scale;
+    if (imageX < 0 || imageY < 0 || imageX > this.state.naturalWidth || imageY > this.state.naturalHeight) {
+      return null;
+    }
+    return { x: imageX, y: imageY, localX, localY };
+  }
+
   showMagnifier(clientX, clientY, persistent) {
     this.state.magnifier.active = true;
     this.state.magnifier.persistent = persistent;
     this.elements.magnifierLens.classList.remove("hidden");
+    this.elements.magnifierLens.style.visibility = "visible";
     this.updateMagnifier(clientX, clientY);
   }
 
@@ -1970,22 +1986,31 @@ export class HiddenObjectGame {
     this.state.magnifier.active = false;
     this.state.magnifier.persistent = false;
     this.elements.magnifierLens.classList.add("hidden");
+    this.elements.magnifierLens.style.visibility = "hidden";
   }
 
   updateMagnifier(clientX, clientY) {
     if (!this.state.magnifier.active) {
       return;
     }
-    const rect = this.elements.sceneViewport.getBoundingClientRect();
-    const localX = clientX - rect.left;
-    const localY = clientY - rect.top;
+    const precisePoint = this.clientToImagePrecise(clientX, clientY);
+    if (!precisePoint) {
+      this.elements.magnifierLens.style.visibility = "hidden";
+      return;
+    }
+    const { localX, localY } = precisePoint;
+    const lensWidth = this.elements.magnifierLens.offsetWidth || 240;
+    const lensHeight = this.elements.magnifierLens.offsetHeight || 240;
+    const zoom = this.state.magnifier.zoom;
+    const bgScale = this.state.transform.scale * zoom;
     this.state.magnifier.pointerX = clientX;
     this.state.magnifier.pointerY = clientY;
+    this.elements.magnifierLens.style.visibility = "visible";
     this.elements.magnifierLens.style.left = `${localX}px`;
     this.elements.magnifierLens.style.top = `${localY}px`;
     this.elements.magnifierLens.style.backgroundImage = `url("${this.elements.levelImage.currentSrc || this.elements.levelImage.src}")`;
-    this.elements.magnifierLens.style.backgroundSize = `${this.state.naturalWidth * this.state.transform.scale * this.state.magnifier.zoom}px ${this.state.naturalHeight * this.state.transform.scale * this.state.magnifier.zoom}px`;
-    this.elements.magnifierLens.style.backgroundPosition = `${-(this.state.transform.x * this.state.magnifier.zoom) - (localX * (this.state.magnifier.zoom - 1))}px ${-(this.state.transform.y * this.state.magnifier.zoom) - (localY * (this.state.magnifier.zoom - 1))}px`;
+    this.elements.magnifierLens.style.backgroundSize = `${this.state.naturalWidth * bgScale}px ${this.state.naturalHeight * bgScale}px`;
+    this.elements.magnifierLens.style.backgroundPosition = `${(lensWidth / 2) - (localX * zoom)}px ${(lensHeight / 2) - (localY * zoom)}px`;
   }
 
   updateDebugReadout() {

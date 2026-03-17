@@ -212,7 +212,7 @@ function placeHomeButton(game, key, element, placement) {
   if (!placement) {
     return;
   }
-  const expand = 16;
+  const expand = 24;
   const clickLeft = placement.rendered.left - expand;
   const clickTop = placement.rendered.top - expand;
   const clickWidth = placement.rendered.width + (expand * 2);

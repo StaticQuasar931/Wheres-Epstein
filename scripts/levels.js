@@ -303,6 +303,20 @@ const ADVANCED_LEVELS_RAW = [
     name: "Celebrity Overmash",
     needsSetup: true,
   }),
+  makeAdvancedBonusLevel(4, [
+    makePlaceholderTarget("advanced-bonus-04-a"),
+    makePlaceholderTarget("advanced-bonus-04-b"),
+  ], {
+    name: "Advanced Bonus 4",
+    needsSetup: true,
+  }),
+  makeAdvancedBonusLevel(5, [
+    makeTarget("advanced-bonus-05-a", "di6", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-05-b", "tru4", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Boardwalk Clash",
+    needsSetup: true,
+  }),
 ];
 
 for (let number = 18; number <= 20; number += 1) {
@@ -312,18 +326,6 @@ for (let number = 18; number <= 20; number += 1) {
       makePlaceholderTarget(`advanced-${String(number).padStart(2, "0")}-b`),
     ], {
       name: `Advanced Level ${number}`,
-      needsSetup: true,
-    }),
-  );
-}
-
-for (let number = 4; number <= 5; number += 1) {
-  ADVANCED_LEVELS_RAW.push(
-    makeAdvancedBonusLevel(number, [
-      makePlaceholderTarget(`advanced-bonus-${String(number).padStart(2, "0")}-a`),
-      makePlaceholderTarget(`advanced-bonus-${String(number).padStart(2, "0")}-b`),
-    ], {
-      name: `Advanced Bonus ${number}`,
       needsSetup: true,
     }),
   );
