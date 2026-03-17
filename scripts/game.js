@@ -1853,10 +1853,13 @@ export class HiddenObjectGame {
     const aspect = (element?.naturalWidth && element?.naturalHeight)
       ? (element.naturalWidth / element.naturalHeight)
       : (Math.abs(zone.x2 - zone.x1) / Math.max(1, Math.abs(zone.y2 - zone.y1)));
-    const nextWidth = Math.max(8, Math.abs(zone.x2 - zone.x1) + ((key === "arrowleft" || key === "arrowright") ? amount : amount * aspect));
-    const nextHeight = Math.max(8, nextWidth / Math.max(0.01, aspect));
     const left = Math.min(zone.x1, zone.x2);
     const top = Math.min(zone.y1, zone.y2);
+    const width = Math.max(8, Math.abs(zone.x2 - zone.x1));
+    const height = Math.max(8, Math.abs(zone.y2 - zone.y1));
+    const delta = (key === "arrowleft" || key === "arrowup") ? -amount : amount;
+    const nextWidth = Math.max(8, width + delta);
+    const nextHeight = Math.max(8, nextWidth / Math.max(0.01, aspect));
     zone.x1 = left;
     zone.y1 = top;
     zone.x2 = left + nextWidth;
@@ -1920,12 +1923,18 @@ export class HiddenObjectGame {
         const aspect = (element?.naturalWidth && element?.naturalHeight)
           ? (element.naturalWidth / element.naturalHeight)
           : (Math.abs(zone.x2 - zone.x1) / Math.max(1, Math.abs(zone.y2 - zone.y1)));
-        const widthFromX = Math.max(8, Math.abs(zone.x2 - zone.x1) + deltaX);
-        const widthFromY = Math.max(8, (Math.abs(zone.y2 - zone.y1) + deltaY) * aspect);
+        const left = Math.min(zone.x1, zone.x2);
+        const top = Math.min(zone.y1, zone.y2);
+        const width = Math.max(8, Math.abs(zone.x2 - zone.x1));
+        const height = Math.max(8, Math.abs(zone.y2 - zone.y1));
+        const widthFromX = Math.max(8, width + deltaX);
+        const widthFromY = Math.max(8, (height + deltaY) * aspect);
         const nextWidth = Math.abs(deltaX) >= Math.abs(deltaY) ? widthFromX : widthFromY;
         const nextHeight = Math.max(8, nextWidth / Math.max(0.01, aspect));
-        zone.x2 = zone.x1 + nextWidth;
-        zone.y2 = zone.y1 + nextHeight;
+        zone.x1 = left;
+        zone.y1 = top;
+        zone.x2 = left + nextWidth;
+        zone.y2 = top + nextHeight;
       } else {
         zone.x2 += deltaX;
         zone.y2 += deltaY;

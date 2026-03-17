@@ -440,13 +440,6 @@ function placeHomeLayer(game, key, element, zone, drawWidth, drawHeight, natural
   if (!element || !zone) {
     return;
   }
-  if (element.naturalWidth && element.naturalHeight) {
-    const fit = fitZoneToAspect(zone, element.naturalWidth / element.naturalHeight);
-    zone.x1 = fit.x1;
-    zone.y1 = fit.y1;
-    zone.x2 = fit.x2;
-    zone.y2 = fit.y2;
-  }
   const adjusted = getAdjustedHomeZone(zone, config);
   const left = Math.min(adjusted.x1, adjusted.x2) * (drawWidth / naturalWidth);
   const top = Math.min(adjusted.y1, adjusted.y2) * (drawHeight / naturalHeight);
@@ -475,30 +468,6 @@ function getHomeElement(game, key) {
     magnifierDecor: game.elements.magnifierDecorLayer,
   };
   return map[key] ?? null;
-}
-
-function fitZoneToAspect(zone, aspect) {
-  const left = Math.min(zone.x1, zone.x2);
-  const right = Math.max(zone.x1, zone.x2);
-  const top = Math.min(zone.y1, zone.y2);
-  const bottom = Math.max(zone.y1, zone.y2);
-  const width = Math.max(1, right - left);
-  const height = Math.max(1, bottom - top);
-  const currentAspect = width / height;
-
-  if (Math.abs(currentAspect - aspect) < 0.002) {
-    return { x1: left, y1: top, x2: right, y2: bottom };
-  }
-
-  if (currentAspect > aspect) {
-    const fittedWidth = height * aspect;
-    const marginX = (width - fittedWidth) / 2;
-    return { x1: left + marginX, y1: top, x2: right - marginX, y2: bottom };
-  }
-
-  const fittedHeight = width / aspect;
-  const marginY = (height - fittedHeight) / 2;
-  return { x1: left, y1: top + marginY, x2: right, y2: bottom - marginY };
 }
 
 function getDebugColor(label, config) {

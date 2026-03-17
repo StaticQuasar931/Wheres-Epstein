@@ -593,11 +593,12 @@ body.mode-game .site-topbar { display: flex; }
    ============================================================ */
 .home-button-overlay,
 .home-debug-overlay,
-.home-layer-overlay { position: absolute; z-index: 5; }
+.home-layer-overlay { position: absolute; }
 
 .home-layer-overlay {
   pointer-events: none;
   overflow: visible;
+  z-index: auto;
 }
 
 .home-decor-layer {
@@ -607,6 +608,22 @@ body.mode-game .site-topbar { display: flex; }
   height: auto;
   pointer-events: none;
   user-select: none;
+}
+
+#cloud1Layer,
+#cloud2Layer,
+#cloud3Layer {
+  z-index: 1;
+}
+
+#wheelStandLayer,
+#wheelLayer {
+  z-index: 3;
+}
+
+#titleBannerLayer,
+#magnifierDecorLayer {
+  z-index: 6;
 }
 
 .home-button-overlay {
@@ -639,7 +656,7 @@ body.mode-game .site-topbar { display: flex; }
 /* ============================================================
    DEBUG OVERLAYS
    ============================================================ */
-.home-debug-overlay { pointer-events: none; }
+.home-debug-overlay { pointer-events: none; z-index: 7; }
 .home-debug-overlay.editor-active { pointer-events: auto; }
 
 .home-debug-box {
