@@ -592,13 +592,29 @@ body.mode-game .site-topbar { display: flex; }
    HOME BUTTON OVERLAY
    ============================================================ */
 .home-button-overlay,
-.home-debug-overlay { position: absolute; z-index: 5; }
+.home-debug-overlay,
+.home-layer-overlay { position: absolute; z-index: 5; }
+
+.home-layer-overlay {
+  pointer-events: none;
+  overflow: visible;
+}
+
+.home-decor-layer {
+  position: absolute;
+  display: block;
+  width: auto;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
 
 .home-button-overlay {
   pointer-events: none;
   overflow: visible;
   opacity: 0;
   transition: opacity 340ms ease;
+  z-index: 6;
 }
 .home-viewport.home-ready .home-button-overlay { opacity: 1; }
 
@@ -652,6 +668,28 @@ body.mode-game .site-topbar { display: flex; }
 .color-green  { color: #4df7a6; }
 .color-blue   { color: #56b7ff; }
 .color-orange { color: #ffac57; }
+.color-gold   { color: #ffd84e; }
+.color-cyan   { color: #6fe8ff; }
+.color-pink   { color: #ff85cb; }
+.color-purple { color: #b58cff; }
+.color-white  { color: #f6fbff; }
+.color-red    { color: #ff7568; }
+
+.home-debug-box.is-selected {
+  box-shadow: 0 0 0 3px rgba(255, 216, 78, 0.32), 0 0 28px rgba(255, 216, 78, 0.18);
+}
+
+.home-debug-handle {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  background: rgba(3, 8, 16, 0.94);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
+}
 
 .home-debug-readout {
   position: absolute;

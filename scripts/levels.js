@@ -58,17 +58,6 @@ function makeAdvancedBonusLevel(number, targets, overrides = {}) {
   };
 }
 
-function makeDailyLevel(day, previewFile, overrides = {}) {
-  return {
-    id: `daily-${String(day).padStart(2, "0")}`,
-    name: `Daily Game ${day}`,
-    background: `Assets/Bakgrounds/daily/day${day}.png`,
-    targets: [makeTarget(`daily-${String(day).padStart(2, "0")}-a`, previewFile, { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/daily")],
-    isDaily: true,
-    ...overrides,
-  };
-}
-
 function makePlaceholderTarget(id) {
   return makeTarget(id, "", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced");
 }
@@ -91,6 +80,18 @@ export const START_SCREEN_BUTTONS = {
   settings: { x1: 557, y1: 814, x2: 935, y2: 922, color: "blue" },
   moreGames: { x1: 961, y1: 814, x2: 1365, y2: 918, color: "orange" },
   nameLink: { x1: 566, y1: 166, x2: 765, y2: 204, color: "gold" },
+};
+
+export const START_SCREEN_LAYERS = {
+  startscreen: { x1: 0, y1: 0, x2: 1500, y2: 1000, color: "cyan", src: "Assets/ui/startscreen.png" },
+  titleCard: { x1: 470, y1: 52, x2: 1030, y2: 260, color: "pink", src: "Assets/ui/titlecard.png" },
+  titleBanner: { x1: 420, y1: 34, x2: 1080, y2: 190, color: "purple", src: "Assets/ui/titlebanner.png" },
+  cloud1: { x1: 70, y1: 86, x2: 350, y2: 210, color: "white", src: "Assets/ui/cloud1.png" },
+  cloud2: { x1: 1080, y1: 58, x2: 1380, y2: 194, color: "white", src: "Assets/ui/cloud2.png" },
+  cloud3: { x1: 640, y1: 116, x2: 960, y2: 250, color: "white", src: "Assets/ui/cloud3.png" },
+  wheelStand: { x1: 1030, y1: 302, x2: 1380, y2: 760, color: "orange", src: "Assets/ui/WheelStand.png" },
+  wheel: { x1: 990, y1: 84, x2: 1450, y2: 660, color: "blue", src: "Assets/ui/Wheel.png" },
+  magnifierDecor: { x1: 1090, y1: 258, x2: 1450, y2: 620, color: "red", src: "Assets/ui/mglassempty.png" },
 };
 // uh783kjs9tya8tji3chq8ugajskaere9h3v198jk
 
@@ -173,13 +174,6 @@ const BONUS_LEVELS_RAW = [
     targets: [makeTarget("bonus-05-a", "trum3", { type: "rect", x1: 352, y1: 261, x2: 364, y2: 278 })],
     isBonus: true,
   },
-];
-
-const DAILY_LEVELS_RAW = [
-  makeDailyLevel(1, "day1", {
-    name: "Daily Game 1",
-    needsSetup: true,
-  }),
 ];
 
 const ADVANCED_LEVELS_RAW = [
@@ -353,10 +347,9 @@ for (let number = 18; number <= 20; number += 1) {
 
 export const MAIN_LEVELS = MAIN_LEVELS_RAW.map(normalizeLevel);
 export const BONUS_LEVELS = BONUS_LEVELS_RAW.map(normalizeLevel);
-export const DAILY_LEVELS = DAILY_LEVELS_RAW.map(normalizeLevel);
 export const ADVANCED_LEVELS = ADVANCED_LEVELS_RAW.map(normalizeLevel);
 
-export const LEVELS = [...MAIN_LEVELS, ...BONUS_LEVELS, ...DAILY_LEVELS, ...ADVANCED_LEVELS];
+export const LEVELS = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_LEVELS];
 
 export const DEFAULT_SETTINGS = {
   correctClickPoints: 1200,

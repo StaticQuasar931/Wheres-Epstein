@@ -1,4 +1,4 @@
-import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, DAILY_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
+import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS, START_SCREEN_LAYERS } from "./levels.js";
 import { loadSave, recordLevelResult, recordLevelView, recordSpeedrunResult, saveSettings, saveMeta } from "./storage.js";
 import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
@@ -178,8 +178,18 @@ export class HiddenObjectGame {
       homeBootOverlay: document.getElementById("homeBootOverlay"),
       homeBootStatus: document.getElementById("homeBootStatus"),
       homeButtonOverlay: document.getElementById("homeButtonOverlay"),
+      homeLayerOverlay: document.getElementById("homeLayerOverlay"),
       homeDebugOverlay: document.getElementById("homeDebugOverlay"),
       homeDebugReadout: document.getElementById("homeDebugReadout"),
+      startscreenLayer: document.getElementById("startscreenLayer"),
+      titleCardLayer: document.getElementById("titleCardLayer"),
+      titleBannerLayer: document.getElementById("titleBannerLayer"),
+      cloud1Layer: document.getElementById("cloud1Layer"),
+      cloud2Layer: document.getElementById("cloud2Layer"),
+      cloud3Layer: document.getElementById("cloud3Layer"),
+      wheelStandLayer: document.getElementById("wheelStandLayer"),
+      wheelLayer: document.getElementById("wheelLayer"),
+      magnifierDecorLayer: document.getElementById("magnifierDecorLayer"),
       startButtonArt: document.getElementById("startButtonArt"),
       startButtonSheen: document.getElementById("startButtonSheen"),
       settingsButtonArt: document.getElementById("settingsButtonArt"),
@@ -195,12 +205,10 @@ export class HiddenObjectGame {
       homeStarCount: document.getElementById("homeStarCount"),
       mainProgressText: document.getElementById("mainProgressText"),
       bonusUnlockText: document.getElementById("bonusUnlockText"),
-      dailyCountText: document.getElementById("dailyCountText"),
       bonusRuleText: document.getElementById("bonusRuleText"),
       advancedRevealText: document.getElementById("advancedRevealText"),
       mainLevelGrid: document.getElementById("mainLevelGrid"),
       bonusLevelGrid: document.getElementById("bonusLevelGrid"),
-      dailyLevelGrid: document.getElementById("dailyLevelGrid"),
       advancedLevelGrid: document.getElementById("advancedLevelGrid"),
       advancedBonusLevelGrid: document.getElementById("advancedBonusLevelGrid"),
       speedrunRouteSection: document.getElementById("speedrunRouteSection"),
@@ -218,7 +226,6 @@ export class HiddenObjectGame {
       levelSelectBackFromSpeedrunButton: document.getElementById("levelSelectBackFromSpeedrunButton"),
       mainRouteSection: document.getElementById("mainRouteSection"),
       bonusRouteSection: document.getElementById("bonusRouteSection"),
-      dailyRouteSection: document.getElementById("dailyRouteSection"),
       advancedRouteSection: document.getElementById("advancedRouteSection"),
       advancedBonusSection: document.getElementById("advancedBonusSection"),
       progressRouteSection: document.getElementById("progressRouteSection"),
@@ -496,7 +503,14 @@ export class HiddenObjectGame {
     }
     this.homeBootStarted = true;
     const assets = [
-      ["background", this.elements.startScreenImage, "Assets/ui/nobuttonloadingscreen.jpg"],
+      ["background", this.elements.startScreenImage, "Assets/ui/backgroundplain.png"],
+      ["startscreen", this.elements.startscreenLayer, START_SCREEN_LAYERS.startscreen.src],
+      ["titleCard", this.elements.titleCardLayer, START_SCREEN_LAYERS.titleCard.src],
+      ["titleBanner", this.elements.titleBannerLayer, START_SCREEN_LAYERS.titleBanner.src],
+      ["cloud1", this.elements.cloud1Layer, START_SCREEN_LAYERS.cloud1.src],
+      ["cloud2", this.elements.cloud2Layer, START_SCREEN_LAYERS.cloud2.src],
+      ["cloud3", this.elements.cloud3Layer, START_SCREEN_LAYERS.cloud3.src],
+      ["magnifierDecor", this.elements.magnifierDecorLayer, START_SCREEN_LAYERS.magnifierDecor.src],
       ["start", this.elements.startButtonArt, "Assets/ui/startbutton.png"],
       ["settings", this.elements.settingsButtonArt, "Assets/ui/settingsbutton.png"],
       ["moreGames", this.elements.moreGamesButtonArt, "Assets/ui/moregbutton.png"],
@@ -510,7 +524,7 @@ export class HiddenObjectGame {
         .map((result) => result.value.src);
       this.homeAssetsReady = true;
       this.layoutHomeButtons();
-      if (failures.includes("Assets/ui/nobuttonloadingscreen.jpg")) {
+      if (failures.includes("Assets/ui/backgroundplain.png")) {
         this.showStartImageError();
       }
       this.elements.homeBootStatus.textContent = failures.length
@@ -597,9 +611,6 @@ export class HiddenObjectGame {
     this.elements.homeUnlockedText.textContent = `${unlockedMain} / ${MAIN_LEVELS.length}`;
     this.elements.homeBestScore.textContent = formatScore(this.save.legit.bestScore);
     this.elements.homeStarCount.textContent = String(starCount);
-    if (this.elements.dailyCountText) {
-      this.elements.dailyCountText.textContent = `${DAILY_LEVELS.length} day${DAILY_LEVELS.length === 1 ? "" : "s"}`;
-    }
     this.elements.mainProgressText.textContent = `${mainCleared} / ${MAIN_LEVELS.length} cleared`;
     this.elements.bonusUnlockText.textContent = this.isBonusUnlocked() ? "Unlocked" : "Locked";
     this.elements.bonusRuleText.textContent = `Bonuses unlock after normal level 5 or 10 total stars. Current stars: ${starCount}.`;
@@ -650,7 +661,6 @@ export class HiddenObjectGame {
     this.save = loadSave();
     this.renderLevelGrid(this.elements.mainLevelGrid, MAIN_LEVELS, { kind: "main" });
     this.renderLevelGrid(this.elements.bonusLevelGrid, BONUS_LEVELS, { kind: "bonus" });
-    this.renderLevelGrid(this.elements.dailyLevelGrid, [...DAILY_LEVELS].reverse(), { kind: "daily" });
     this.renderLevelGrid(this.elements.advancedLevelGrid, ADVANCED_MAIN_LEVELS, { kind: "advanced" });
     this.renderLevelGrid(this.elements.advancedBonusLevelGrid, ADVANCED_BONUS_LEVELS, { kind: "advancedBonus" });
     this.syncLevelSelectPage();
@@ -696,9 +706,6 @@ export class HiddenObjectGame {
     if (kind === "advancedBonus") {
       return `AB ${ADVANCED_BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     }
-    if (kind === "daily") {
-      return `Day ${DAILY_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
-    }
     return `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
   }
 
@@ -711,9 +718,6 @@ export class HiddenObjectGame {
     }
     if (kind === "advanced") {
       return this.isAdvancedLevelUnlocked(level);
-    }
-    if (kind === "daily") {
-      return true;
     }
     return this.isMainLevelUnlocked(level);
   }
@@ -811,7 +815,6 @@ export class HiddenObjectGame {
         : "Main Levels";
     this.elements.mainRouteSection.classList.toggle("hidden", page !== 1);
     this.elements.bonusRouteSection.classList.toggle("hidden", page !== 1);
-    this.elements.dailyRouteSection.classList.toggle("hidden", page !== 1);
     this.elements.progressRouteSection.classList.toggle("hidden", page !== 1);
     this.elements.advancedRouteSection.classList.toggle("hidden", !onAdvancedPage);
     this.elements.advancedBonusSection.classList.toggle("hidden", !onAdvancedPage);
@@ -830,7 +833,7 @@ export class HiddenObjectGame {
 
   startSelectedLevel(levelId) {
     const index = LEVELS.findIndex((level) => level.id === levelId);
-    if (index >= 0 && (this.sessionTestingUnlocked || this.isLevelUnlocked(LEVELS[index], LEVELS[index].isAdvancedBonus ? "advancedBonus" : LEVELS[index].isAdvanced ? "advanced" : LEVELS[index].isBonus ? "bonus" : LEVELS[index].isDaily ? "daily" : "main"))) {
+    if (index >= 0 && (this.sessionTestingUnlocked || this.isLevelUnlocked(LEVELS[index], LEVELS[index].isAdvancedBonus ? "advancedBonus" : LEVELS[index].isAdvanced ? "advanced" : LEVELS[index].isBonus ? "bonus" : "main"))) {
       this.state.runMode = "standard";
       this.startCampaignFromLevel(index);
     }
@@ -929,9 +932,6 @@ export class HiddenObjectGame {
     if (level.isBonus) {
       return `Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     }
-    if (level.isDaily) {
-      return `Day ${DAILY_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
-    }
     return `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
   }
 
@@ -948,9 +948,6 @@ export class HiddenObjectGame {
     }
     if (level.isBonus) {
       return `Page 1, Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
-    }
-    if (level.isDaily) {
-      return `Page 1, Day ${DAILY_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
     }
     return `Page 1, Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
   }
@@ -1136,6 +1133,7 @@ export class HiddenObjectGame {
 
   layoutHomeButtons() {
     layoutHomeButtonsUi(this, {
+      layers: START_SCREEN_LAYERS,
       start: START_SCREEN_BUTTONS.start,
       settings: START_SCREEN_BUTTONS.settings,
       moreGames: START_SCREEN_BUTTONS.moreGames,
@@ -1191,6 +1189,7 @@ export class HiddenObjectGame {
 
   updateHomeDebug(event) {
     updateHomeDebugUi(this, event, {
+      layers: START_SCREEN_LAYERS,
       start: START_SCREEN_BUTTONS.start,
       settings: START_SCREEN_BUTTONS.settings,
       moreGames: START_SCREEN_BUTTONS.moreGames,
@@ -1463,9 +1462,18 @@ export class HiddenObjectGame {
         this.layoutHomeButtons();
         return;
       }
+      if (key === "[" || key === "]") {
+        event.preventDefault();
+        this.cycleHomeEditorSelection(key === "]" ? 1 : -1);
+        return;
+      }
       if (["arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
         event.preventDefault();
-        this.nudgeHomeEditorZone(key, event.shiftKey ? 1 : HOME_EDITOR_NUDGE_STEP);
+        if (event.shiftKey) {
+          this.resizeHomeEditorZone(key, HOME_EDITOR_NUDGE_STEP);
+        } else {
+          this.nudgeHomeEditorZone(key, HOME_EDITOR_NUDGE_STEP);
+        }
         return;
       }
     }
@@ -1597,12 +1605,38 @@ export class HiddenObjectGame {
     this.homeButtonEditorEnabled = !this.homeButtonEditorEnabled;
     this.layoutHomeButtons();
     this.showMenuToast(this.homeButtonEditorEnabled
-      ? "Home button editor on. Drag boxes or use 1, 2, 3 with arrow keys."
+      ? "Home editor on. Drag boxes to move, drag the corner to resize, use [ ] to cycle, arrows to move, Shift plus arrows to resize."
       : "Home button editor off.");
   }
 
+  getHomeEditorItems() {
+    return [
+      { key: "start", zone: START_SCREEN_BUTTONS.start },
+      { key: "settings", zone: START_SCREEN_BUTTONS.settings },
+      { key: "more", zone: START_SCREEN_BUTTONS.moreGames },
+      { key: "nameLink", zone: START_SCREEN_BUTTONS.nameLink },
+      ...Object.entries(START_SCREEN_LAYERS).map(([key, zone]) => ({ key, zone })),
+    ];
+  }
+
+  getHomeEditorZone(key) {
+    if (key === "start") return START_SCREEN_BUTTONS.start;
+    if (key === "settings") return START_SCREEN_BUTTONS.settings;
+    if (key === "more") return START_SCREEN_BUTTONS.moreGames;
+    if (key === "nameLink") return START_SCREEN_BUTTONS.nameLink;
+    return START_SCREEN_LAYERS[key];
+  }
+
+  cycleHomeEditorSelection(direction) {
+    const items = this.getHomeEditorItems();
+    const currentIndex = Math.max(0, items.findIndex((item) => item.key === this.homeButtonEditorSelection));
+    const nextIndex = (currentIndex + direction + items.length) % items.length;
+    this.homeButtonEditorSelection = items[nextIndex].key;
+    this.layoutHomeButtons();
+  }
+
   nudgeHomeEditorZone(key, amount) {
-    const zone = START_SCREEN_BUTTONS[this.homeButtonEditorSelection === "more" ? "moreGames" : this.homeButtonEditorSelection];
+    const zone = this.getHomeEditorZone(this.homeButtonEditorSelection);
     if (!zone) {
       return;
     }
@@ -1622,6 +1656,23 @@ export class HiddenObjectGame {
     this.layoutHomeButtons();
   }
 
+  resizeHomeEditorZone(key, amount) {
+    const zone = this.getHomeEditorZone(this.homeButtonEditorSelection);
+    if (!zone) {
+      return;
+    }
+    if (key === "arrowup") {
+      zone.y2 -= amount;
+    } else if (key === "arrowdown") {
+      zone.y2 += amount;
+    } else if (key === "arrowleft") {
+      zone.x2 -= amount;
+    } else if (key === "arrowright") {
+      zone.x2 += amount;
+    }
+    this.layoutHomeButtons();
+  }
+
   onHomeEditorPointerDown(event) {
     if (!this.sessionTestingUnlocked || !this.homeButtonEditorEnabled) {
       return;
@@ -1631,8 +1682,10 @@ export class HiddenObjectGame {
       return;
     }
     this.homeButtonEditorSelection = box.dataset.editorKey;
+    const mode = event.target.closest(".home-debug-handle") ? "resize" : "move";
     this.homeEditorDrag = {
       key: box.dataset.editorKey,
+      mode,
       startX: event.clientX,
       startY: event.clientY,
     };
@@ -1646,16 +1699,21 @@ export class HiddenObjectGame {
     const overlayRect = this.elements.homeButtonOverlay.getBoundingClientRect();
     const imageWidth = this.elements.startScreenImage.naturalWidth || 1;
     const imageHeight = this.elements.startScreenImage.naturalHeight || 1;
-    const zone = START_SCREEN_BUTTONS[this.homeEditorDrag.key === "more" ? "moreGames" : this.homeEditorDrag.key];
+    const zone = this.getHomeEditorZone(this.homeEditorDrag.key);
     if (!zone) {
       return;
     }
     const deltaX = ((event.clientX - this.homeEditorDrag.startX) / overlayRect.width) * imageWidth;
     const deltaY = ((event.clientY - this.homeEditorDrag.startY) / overlayRect.height) * imageHeight;
-    zone.x1 += deltaX;
-    zone.x2 += deltaX;
-    zone.y1 += deltaY;
-    zone.y2 += deltaY;
+    if (this.homeEditorDrag.mode === "resize") {
+      zone.x2 += deltaX;
+      zone.y2 += deltaY;
+    } else {
+      zone.x1 += deltaX;
+      zone.x2 += deltaX;
+      zone.y1 += deltaY;
+      zone.y2 += deltaY;
+    }
     this.homeEditorDrag.startX = event.clientX;
     this.homeEditorDrag.startY = event.clientY;
     this.layoutHomeButtons();
@@ -1848,8 +1906,6 @@ export class HiddenObjectGame {
         ? "Advanced Bonus Cleared"
         : level.isAdvanced
           ? "Advanced Cleared"
-          : level.isDaily
-            ? "Daily Cleared"
           : level.isBonus
             ? "Bonus Cleared"
             : "Level Cleared";
@@ -1881,10 +1937,6 @@ export class HiddenObjectGame {
     const currentBonusIndex = BONUS_LEVELS.findIndex((item) => item.id === current.id);
     if (currentBonusIndex >= 0 && currentBonusIndex < BONUS_LEVELS.length - 1) {
       return LEVELS.findIndex((item) => item.id === BONUS_LEVELS[currentBonusIndex + 1].id);
-    }
-    const currentDailyIndex = DAILY_LEVELS.findIndex((item) => item.id === current.id);
-    if (currentDailyIndex >= 0 && currentDailyIndex < DAILY_LEVELS.length - 1) {
-      return LEVELS.findIndex((item) => item.id === DAILY_LEVELS[currentDailyIndex + 1].id);
     }
     const currentAdvancedIndex = ADVANCED_MAIN_LEVELS.findIndex((item) => item.id === current.id);
     if (currentAdvancedIndex >= 0 && currentAdvancedIndex < ADVANCED_MAIN_LEVELS.length - 1) {
