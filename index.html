@@ -112,6 +112,17 @@
             <div id="bonusLevelGrid" class="level-grid"></div>
           </section>
 
+          <section id="dailyRouteSection" class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Daily Games</p>
+                <h3>Newest First</h3>
+              </div>
+              <span id="dailyCountText" class="chip-label">1 day</span>
+            </div>
+            <div id="dailyLevelGrid" class="level-grid"></div>
+          </section>
+
           <section id="advancedRouteSection" class="menu-card hidden">
             <div class="menu-card-header">
               <div>
@@ -317,18 +328,6 @@
 
           <section class="menu-card">
             <div class="menu-card-header">
-              <div><p class="eyebrow">Links</p><h3>Community</h3></div>
-            </div>
-            <div class="button-row">
-              <button id="settingsDiscordButton"     class="secondary-button" type="button">Join Discord</button>
-              <button id="settingsMoreGamesButton"   class="ghost-button"     type="button">More Games</button>
-              <button id="settingsLevelSelectButton" class="ghost-button"     type="button">Level Select</button>
-            </div>
-            <p id="settingsLinkHint" class="subtle-text">Community links open in a new tab when configured.</p>
-          </section>
-
-          <section class="menu-card">
-            <div class="menu-card-header">
               <div><p class="eyebrow">Stats</p><h3>Local Progress</h3></div>
             </div>
             <div class="stat-grid settings-stats-grid">
@@ -342,7 +341,13 @@
           </section>
 
           <div class="version-line">
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.9.4</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.94.1</p>
+            <div class="button-row settings-links-row">
+              <button id="settingsDiscordButton" class="secondary-button" type="button">Join Discord</button>
+              <button id="settingsMoreGamesButton" class="ghost-button" type="button">More Games</button>
+              <button id="settingsLevelSelectButton" class="ghost-button" type="button">Level Select</button>
+            </div>
+            <p id="settingsLinkHint" class="subtle-text">Community links open in a new tab when configured.</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -398,6 +403,7 @@
           </div>
           <div id="targetPreviewList" class="target-preview-list"></div>
           <p id="previewErrorText" class="asset-error hidden"></p>
+          <p id="panTipText" class="target-pan-tip">Pan: drag or WASD</p>
         </aside>
 
         <!-- Stats HUD -->
@@ -413,15 +419,6 @@
           <div class="overlay-pill stat-pill">
             <span>Time</span>
             <strong id="hudTimeText">0.0s</strong>
-          </div>
-        </div>
-
-        <div class="play-controls-stack">
-          <div class="play-controls-grid">
-            <button id="zoomOutButtonBottom" class="overlay-button zoom-btn" type="button">-</button>
-            <button id="zoomInButtonBottom" class="overlay-button zoom-btn" type="button">+</button>
-            <button id="fitZoomButtonBottom" class="overlay-button zoom-btn" type="button">Fit</button>
-            <button id="resetZoomButtonBottom" class="overlay-button zoom-btn" type="button">Reset</button>
           </div>
         </div>
 

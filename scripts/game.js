@@ -1,4 +1,4 @@
-import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
+import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, DAILY_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS } from "./levels.js";
 import { loadSave, recordLevelResult, recordLevelView, recordSpeedrunResult, saveSettings, saveMeta } from "./storage.js";
 import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
@@ -195,10 +195,12 @@ export class HiddenObjectGame {
       homeStarCount: document.getElementById("homeStarCount"),
       mainProgressText: document.getElementById("mainProgressText"),
       bonusUnlockText: document.getElementById("bonusUnlockText"),
+      dailyCountText: document.getElementById("dailyCountText"),
       bonusRuleText: document.getElementById("bonusRuleText"),
       advancedRevealText: document.getElementById("advancedRevealText"),
       mainLevelGrid: document.getElementById("mainLevelGrid"),
       bonusLevelGrid: document.getElementById("bonusLevelGrid"),
+      dailyLevelGrid: document.getElementById("dailyLevelGrid"),
       advancedLevelGrid: document.getElementById("advancedLevelGrid"),
       advancedBonusLevelGrid: document.getElementById("advancedBonusLevelGrid"),
       speedrunRouteSection: document.getElementById("speedrunRouteSection"),
@@ -216,6 +218,7 @@ export class HiddenObjectGame {
       levelSelectBackFromSpeedrunButton: document.getElementById("levelSelectBackFromSpeedrunButton"),
       mainRouteSection: document.getElementById("mainRouteSection"),
       bonusRouteSection: document.getElementById("bonusRouteSection"),
+      dailyRouteSection: document.getElementById("dailyRouteSection"),
       advancedRouteSection: document.getElementById("advancedRouteSection"),
       advancedBonusSection: document.getElementById("advancedBonusSection"),
       progressRouteSection: document.getElementById("progressRouteSection"),
@@ -257,10 +260,6 @@ export class HiddenObjectGame {
       zoomInButton: document.getElementById("zoomInButton"),
       fitZoomButton: document.getElementById("fitZoomButton"),
       resetZoomButton: document.getElementById("resetZoomButton"),
-      zoomOutButtonBottom: document.getElementById("zoomOutButtonBottom"),
-      zoomInButtonBottom: document.getElementById("zoomInButtonBottom"),
-      fitZoomButtonBottom: document.getElementById("fitZoomButtonBottom"),
-      resetZoomButtonBottom: document.getElementById("resetZoomButtonBottom"),
       skipLevelButton: document.getElementById("skipLevelButton"),
       pauseButton: document.getElementById("pauseButton"),
       returnHomeButton: document.getElementById("returnHomeButton"),
@@ -366,10 +365,6 @@ export class HiddenObjectGame {
     bind(this.elements.zoomInButton, "click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
     bind(this.elements.fitZoomButton, "click", () => this.fitLevelToViewport());
     bind(this.elements.resetZoomButton, "click", () => this.fitLevelToViewport());
-    bind(this.elements.zoomOutButtonBottom, "click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
-    bind(this.elements.zoomInButtonBottom, "click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
-    bind(this.elements.fitZoomButtonBottom, "click", () => this.fitLevelToViewport());
-    bind(this.elements.resetZoomButtonBottom, "click", () => this.fitLevelToViewport());
     this.elements.skipLevelButton.addEventListener("click", () => this.skipLevel());
     this.elements.pauseButton.addEventListener("click", () => this.pauseGame());
     this.elements.returnHomeButton.addEventListener("click", () => this.quitRun());
@@ -602,6 +597,9 @@ export class HiddenObjectGame {
     this.elements.homeUnlockedText.textContent = `${unlockedMain} / ${MAIN_LEVELS.length}`;
     this.elements.homeBestScore.textContent = formatScore(this.save.legit.bestScore);
     this.elements.homeStarCount.textContent = String(starCount);
+    if (this.elements.dailyCountText) {
+      this.elements.dailyCountText.textContent = `${DAILY_LEVELS.length} day${DAILY_LEVELS.length === 1 ? "" : "s"}`;
+    }
     this.elements.mainProgressText.textContent = `${mainCleared} / ${MAIN_LEVELS.length} cleared`;
     this.elements.bonusUnlockText.textContent = this.isBonusUnlocked() ? "Unlocked" : "Locked";
     this.elements.bonusRuleText.textContent = `Bonuses unlock after normal level 5 or 10 total stars. Current stars: ${starCount}.`;
@@ -652,6 +650,7 @@ export class HiddenObjectGame {
     this.save = loadSave();
     this.renderLevelGrid(this.elements.mainLevelGrid, MAIN_LEVELS, { kind: "main" });
     this.renderLevelGrid(this.elements.bonusLevelGrid, BONUS_LEVELS, { kind: "bonus" });
+    this.renderLevelGrid(this.elements.dailyLevelGrid, [...DAILY_LEVELS].reverse(), { kind: "daily" });
     this.renderLevelGrid(this.elements.advancedLevelGrid, ADVANCED_MAIN_LEVELS, { kind: "advanced" });
     this.renderLevelGrid(this.elements.advancedBonusLevelGrid, ADVANCED_BONUS_LEVELS, { kind: "advancedBonus" });
     this.syncLevelSelectPage();
@@ -697,6 +696,9 @@ export class HiddenObjectGame {
     if (kind === "advancedBonus") {
       return `AB ${ADVANCED_BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     }
+    if (kind === "daily") {
+      return `Day ${DAILY_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+    }
     return `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
   }
 
@@ -709,6 +711,9 @@ export class HiddenObjectGame {
     }
     if (kind === "advanced") {
       return this.isAdvancedLevelUnlocked(level);
+    }
+    if (kind === "daily") {
+      return true;
     }
     return this.isMainLevelUnlocked(level);
   }
@@ -806,6 +811,7 @@ export class HiddenObjectGame {
         : "Main Levels";
     this.elements.mainRouteSection.classList.toggle("hidden", page !== 1);
     this.elements.bonusRouteSection.classList.toggle("hidden", page !== 1);
+    this.elements.dailyRouteSection.classList.toggle("hidden", page !== 1);
     this.elements.progressRouteSection.classList.toggle("hidden", page !== 1);
     this.elements.advancedRouteSection.classList.toggle("hidden", !onAdvancedPage);
     this.elements.advancedBonusSection.classList.toggle("hidden", !onAdvancedPage);
@@ -824,7 +830,7 @@ export class HiddenObjectGame {
 
   startSelectedLevel(levelId) {
     const index = LEVELS.findIndex((level) => level.id === levelId);
-    if (index >= 0 && (this.sessionTestingUnlocked || this.isLevelUnlocked(LEVELS[index], LEVELS[index].isAdvancedBonus ? "advancedBonus" : LEVELS[index].isAdvanced ? "advanced" : LEVELS[index].isBonus ? "bonus" : "main"))) {
+    if (index >= 0 && (this.sessionTestingUnlocked || this.isLevelUnlocked(LEVELS[index], LEVELS[index].isAdvancedBonus ? "advancedBonus" : LEVELS[index].isAdvanced ? "advanced" : LEVELS[index].isBonus ? "bonus" : LEVELS[index].isDaily ? "daily" : "main"))) {
       this.state.runMode = "standard";
       this.startCampaignFromLevel(index);
     }
@@ -923,6 +929,9 @@ export class HiddenObjectGame {
     if (level.isBonus) {
       return `Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     }
+    if (level.isDaily) {
+      return `Day ${DAILY_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+    }
     return `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
   }
 
@@ -939,6 +948,9 @@ export class HiddenObjectGame {
     }
     if (level.isBonus) {
       return `Page 1, Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
+    }
+    if (level.isDaily) {
+      return `Page 1, Day ${DAILY_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
     }
     return `Page 1, Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}, ${level.name}`;
   }
@@ -980,10 +992,11 @@ export class HiddenObjectGame {
       cheated: this.sessionTestingUnlocked,
       levelId: level.id,
     });
-    this.elements.hudLevelText.textContent = this.state.runMode === "speedrun"
+    const levelLabel = this.state.runMode === "speedrun"
       ? this.getDisplayLabelForLevelId(level.id)
       : this.getCurrentLevelLabel(level);
-    this.elements.hudLevelName.textContent = level.name;
+    this.elements.hudLevelText.textContent = `${level.name} • ${levelLabel}`;
+    this.elements.hudLevelName.textContent = "";
     this.elements.targetPreviewLabel.textContent = level.targets.length > 1 ? "Find These People" : "Find This Person";
     this.elements.sceneFallback.classList.add("hidden");
     this.preloadLevelAssets(this.state.levelIndex);
@@ -1835,6 +1848,8 @@ export class HiddenObjectGame {
         ? "Advanced Bonus Cleared"
         : level.isAdvanced
           ? "Advanced Cleared"
+          : level.isDaily
+            ? "Daily Cleared"
           : level.isBonus
             ? "Bonus Cleared"
             : "Level Cleared";
@@ -1866,6 +1881,10 @@ export class HiddenObjectGame {
     const currentBonusIndex = BONUS_LEVELS.findIndex((item) => item.id === current.id);
     if (currentBonusIndex >= 0 && currentBonusIndex < BONUS_LEVELS.length - 1) {
       return LEVELS.findIndex((item) => item.id === BONUS_LEVELS[currentBonusIndex + 1].id);
+    }
+    const currentDailyIndex = DAILY_LEVELS.findIndex((item) => item.id === current.id);
+    if (currentDailyIndex >= 0 && currentDailyIndex < DAILY_LEVELS.length - 1) {
+      return LEVELS.findIndex((item) => item.id === DAILY_LEVELS[currentDailyIndex + 1].id);
     }
     const currentAdvancedIndex = ADVANCED_MAIN_LEVELS.findIndex((item) => item.id === current.id);
     if (currentAdvancedIndex >= 0 && currentAdvancedIndex < ADVANCED_MAIN_LEVELS.length - 1) {

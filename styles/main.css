@@ -867,6 +867,7 @@ body.mode-game .site-topbar { display: flex; }
 #levelSelectScreen .level-select-groups {
   grid-template-columns: 1fr;
   align-items: start;
+  gap: 0.8rem;
 }
 
 #settingsScreen .level-select-groups {
@@ -878,8 +879,7 @@ body.mode-game .site-topbar { display: flex; }
 #settingsScreen .level-select-groups > .menu-card:nth-of-type(1) { grid-column: span 4; }
 #settingsScreen .level-select-groups > .menu-card:nth-of-type(2) { grid-column: span 4; }
 #settingsScreen .level-select-groups > .menu-card:nth-of-type(3) { grid-column: span 4; }
-#settingsScreen .level-select-groups > .menu-card:nth-of-type(4) { grid-column: span 5; }
-#settingsScreen .level-select-groups > .menu-card:nth-of-type(5) { grid-column: span 7; }
+#settingsScreen .level-select-groups > .menu-card:nth-of-type(4) { grid-column: 1 / -1; }
 #settingsScreen .menu-card,
 #settingsScreen .setting-card   { height: 100%; }
 #settingsScreen .menu-card      { padding: 0.95rem 1rem; }
@@ -901,6 +901,7 @@ body.mode-game .site-topbar { display: flex; }
 #advancedLevelGrid      { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 #bonusLevelGrid,
 #advancedBonusLevelGrid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#dailyLevelGrid         { grid-template-columns: repeat(1, minmax(0, 1fr)); max-width: 320px; }
 
 .level-card {
   position: relative;
@@ -1152,6 +1153,10 @@ body.mode-game .site-topbar { display: flex; }
   padding: 0.35rem 0 0;
 }
 
+.settings-links-row {
+  width: min(720px, 100%);
+}
+
 /* ============================================================
    THEME OVERRIDES
    ============================================================ */
@@ -1265,10 +1270,14 @@ body.easter-party .home-viewport::after {
 .play-hud-info {
   flex: 0 1 auto;
   display: flex;
-  flex-direction: column;
-  gap: 0.34rem;
-  align-items: flex-end;
+  flex-direction: row;
+  gap: 0.4rem;
+  align-items: center;
   min-width: 0;
+}
+
+#hudLevelName {
+  display: none;
 }
 
 .play-hud-right-col {
@@ -1349,6 +1358,13 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
 .target-card.hidden-preview .target-preview-list,
 .target-card.hidden-preview .asset-error { display: none; }
 
+.target-pan-tip {
+  margin-top: 0.45rem;
+  font-size: 0.82rem;
+  color: var(--muted-hi);
+  line-height: 1.35;
+}
+
 /* ============================================================
    PLAY STATS (HUD — bottom right)
    ============================================================ */
@@ -1364,25 +1380,6 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
 }
 
 .stat-pill { text-align: center; width: 100%; }
-
-.play-controls-stack {
-  position: absolute;
-  right: var(--shell-padding);
-  bottom: calc(var(--shell-padding) + 5rem);
-  z-index: 5;
-  width: min(360px, 40vw);
-}
-
-.play-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.42rem;
-}
-
-.play-controls-grid .overlay-button {
-  width: 100%;
-  justify-content: center;
-}
 
 .stat-pill span {
   display: block;
@@ -1702,11 +1699,8 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   .play-hud-right-col { width: 100%; }
   .play-top-actions { flex-direction: row; flex-wrap: wrap; }
 
-  .target-card { width: calc(100% - 1.7rem); bottom: 10.3rem; }
-  .play-stats,
-  .play-controls-stack {
-    width: calc(100% - 1.7rem);
-  }
+  .target-card { width: calc(100% - 1.7rem); bottom: 5.9rem; }
+  .play-stats { width: calc(100% - 1.7rem); }
 
   .home-debug-readout { left: 0.75rem; right: 0.75rem; min-width: 0; max-width: none; }
 

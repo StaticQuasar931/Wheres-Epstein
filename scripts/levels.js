@@ -58,6 +58,17 @@ function makeAdvancedBonusLevel(number, targets, overrides = {}) {
   };
 }
 
+function makeDailyLevel(day, previewFile, overrides = {}) {
+  return {
+    id: `daily-${String(day).padStart(2, "0")}`,
+    name: `Daily Game ${day}`,
+    background: `Assets/Bakgrounds/daily/day${day}.png`,
+    targets: [makeTarget(`daily-${String(day).padStart(2, "0")}-a`, previewFile, { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/daily")],
+    isDaily: true,
+    ...overrides,
+  };
+}
+
 function makePlaceholderTarget(id) {
   return makeTarget(id, "", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced");
 }
@@ -164,6 +175,13 @@ const BONUS_LEVELS_RAW = [
   },
 ];
 
+const DAILY_LEVELS_RAW = [
+  makeDailyLevel(1, "day1", {
+    name: "Daily Game 1",
+    needsSetup: true,
+  }),
+];
+
 const ADVANCED_LEVELS_RAW = [
   // Advanced Level 1: Advanced Arrival
   makeAdvancedLevel(1, [
@@ -246,14 +264,14 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-12-a", "tru10", { type: "rect", x1: 1112, y1: 364, x2: 1072, y2: 317 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Split Signal",
+    name: "LEGO Party",
   }),
-  // Advanced Level 13: Crossed Paths               
+  // Advanced Level 13: Crossed Paths                         
   makeAdvancedLevel(13, [
-    makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 16, y1: 255, x2: 0, y2: 221 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 399, y1: 273, x2: 421, y2: 314 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 894, y1: 258, x2: 869, y2: 230 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Crossed Paths",
+    name: "Bookoff",
   }),
   // Advanced Level 14: Crimson Route              
   makeAdvancedLevel(14, [
@@ -263,45 +281,47 @@ const ADVANCED_LEVELS_RAW = [
     name: "Horse Party",
     needsSetup: false,
   }),
-  makeAdvancedLevel(15, [
-    makeTarget("advanced-15-a", "di1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-15-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  makeAdvancedLevel(15, [            
+    makeTarget("advanced-15-a", "di1", { type: "rect", x1: 1518, y1: 267, x2: 1508, y2: 254 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-15-b", "ep12", { type: "rect", x1: 313, y1: 318, x2: 348, y2: 361 }, "Assets/Waldos/advanced"),
   ], {
     name: "July 1st",
-    needsSetup: true,
+    needsSetup: false,
   }),
-  makeAdvancedLevel(16, [
-    makeTarget("advanced-16-a", "di6", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-16-b", "tru2", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  makeAdvancedLevel(16, [                
+    makeTarget("advanced-16-a", "di6", { type: "rect", x1: 501, y1: 401, x2: 518, y2: 423 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-16-b", "tru2", { type: "rect", x1: 1122, y1: 424, x2: 1102, y2: 402 }, "Assets/Waldos/advanced"),
   ], {
     name: "Swimoff",
-    needsSetup: true,
+    needsSetup: false,
   }),
-  makeAdvancedLevel(17, [
-    makeTarget("advanced-17-a", "sh1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-17-b", "ep3", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  makeAdvancedLevel(17, [            
+    makeTarget("advanced-17-a", "sh1", { type: "rect", x1: 705, y1: 212, x2: 693, y2: 197 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-17-b", "ep3", { type: "rect", x1: 1266, y1: 211, x2: 1246, y2: 188 }, "Assets/Waldos/advanced"),
   ], {
     name: "Chessoff",
-    needsSetup: true,
+    needsSetup: false,
   }),
-  makeAdvancedBonusLevel(1, [
-    makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-01-b", "ep12", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  makeAdvancedBonusLevel(1, [                  
+    makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 1281, y1: 198, x2: 1265, y2: 189 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-01-b", "ep12", { type: "rect", x1: 282, y1: 716, x2: 304, y2: 743 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Hidden VIPs",
+    name: "Dragon V Dragon",
+    needsSetup: false,
   }),
-  makeAdvancedBonusLevel(2, [
-    makeTarget("advanced-bonus-02-a", "tru1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-02-b", "sh1", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  makeAdvancedBonusLevel(2, [                       
+    makeTarget("advanced-bonus-02-a", "tru1", { type: "rect", x1: 1086, y1: 224, x2: 1075, y2: 210 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-02-b", "sh1", { type: "rect", x1: 813, y1: 338, x2: 788, y2: 307 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Secret Guests",
+    name: "Déjà Vu",
+    needsSetup: false,
   }),
-  makeAdvancedBonusLevel(3, [
-    makeTarget("advanced-bonus-03-a", "tru8", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+  makeAdvancedBonusLevel(3, [             
+    makeTarget("advanced-bonus-03-a", "tru8", { type: "rect", x1: 792, y1: 117, x2: 785, y2: 109 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 782, y1: 511, x2: 846, y2: 496 }, "Assets/Waldos/advanced"),
   ], {
     name: "Celebrity Overmash",
-    needsSetup: true,
+    needsSetup: false,
   }),
   makeAdvancedBonusLevel(4, [
     makePlaceholderTarget("advanced-bonus-04-a"),
@@ -333,9 +353,10 @@ for (let number = 18; number <= 20; number += 1) {
 
 export const MAIN_LEVELS = MAIN_LEVELS_RAW.map(normalizeLevel);
 export const BONUS_LEVELS = BONUS_LEVELS_RAW.map(normalizeLevel);
+export const DAILY_LEVELS = DAILY_LEVELS_RAW.map(normalizeLevel);
 export const ADVANCED_LEVELS = ADVANCED_LEVELS_RAW.map(normalizeLevel);
 
-export const LEVELS = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_LEVELS];
+export const LEVELS = [...MAIN_LEVELS, ...BONUS_LEVELS, ...DAILY_LEVELS, ...ADVANCED_LEVELS];
 
 export const DEFAULT_SETTINGS = {
   correctClickPoints: 1200,
