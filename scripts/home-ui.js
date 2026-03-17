@@ -43,6 +43,7 @@ export function layoutHomeButtons(game, config) {
   overlay.style.top = `${offsetY}px`;
   overlay.style.width = `${drawWidth}px`;
   overlay.style.height = `${drawHeight}px`;
+  game.homeRenderedRects.clear();
   if (game.elements.homeLayerOverlay) {
     game.elements.homeLayerOverlay.style.left = `${offsetX}px`;
     game.elements.homeLayerOverlay.style.top = `${offsetY}px`;
@@ -251,6 +252,12 @@ function placeHomeButton(game, key, element, zone, drawWidth, drawHeight, natura
   element.style.top = `${clickTop}px`;
   element.style.width = `${clickWidth}px`;
   element.style.height = `${clickHeight}px`;
+  game.homeRenderedRects.set(key, {
+    left: clickLeft,
+    top: clickTop,
+    width: clickWidth,
+    height: clickHeight,
+  });
   game.homeButtonZones.set(key, {
     x1: Math.round(Math.min(adjusted.x1, adjusted.x2)),
     y1: Math.round(Math.min(adjusted.y1, adjusted.y2)),
@@ -277,6 +284,12 @@ function placeHomeZoneButton(game, key, element, zone, drawWidth, drawHeight, na
   element.style.top = `${top}px`;
   element.style.width = `${width}px`;
   element.style.height = `${height}px`;
+  game.homeRenderedRects.set(key, {
+    left,
+    top,
+    width,
+    height,
+  });
 
   game.homeButtonZones.set(key, {
     x1: Math.round((left / drawWidth) * naturalWidth),
@@ -398,12 +411,20 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
     node.classList.toggle("is-locked", game.homeEditorLockedKeys?.has(label));
     const tag = document.createElement("span");
     tag.className = "home-debug-label";
-    const overlayRect = game.elements.homeButtonOverlay.getBoundingClientRect();
-    const buttonRect = buttonElement.getBoundingClientRect();
-    node.style.left = `${buttonRect.left - overlayRect.left}px`;
-    node.style.top = `${buttonRect.top - overlayRect.top}px`;
-    node.style.width = `${buttonRect.width}px`;
-    node.style.height = `${buttonRect.height}px`;
+    const rendered = game.homeRenderedRects.get(label);
+    if (rendered) {
+      node.style.left = `${rendered.left}px`;
+      node.style.top = `${rendered.top}px`;
+      node.style.width = `${rendered.width}px`;
+      node.style.height = `${rendered.height}px`;
+    } else {
+      const overlayRect = game.elements.homeButtonOverlay.getBoundingClientRect();
+      const buttonRect = buttonElement.getBoundingClientRect();
+      node.style.left = `${buttonRect.left - overlayRect.left}px`;
+      node.style.top = `${buttonRect.top - overlayRect.top}px`;
+      node.style.width = `${buttonRect.width}px`;
+      node.style.height = `${buttonRect.height}px`;
+    }
     tag.textContent = actual
       ? `${label}${game.homeEditorLockedKeys?.has(label) ? " [locked]" : ""}: ${Math.min(actual.x1, actual.x2)},${Math.min(actual.y1, actual.y2)} -> ${Math.max(actual.x1, actual.x2)},${Math.max(actual.y1, actual.y2)}`
       : `${label}: unavailable`;
@@ -419,15 +440,50 @@ function placeHomeLayer(game, key, element, zone, drawWidth, drawHeight, natural
   if (!element || !zone) {
     return;
   }
+  const bounds = getHomeArtBounds(game, element, config.alphaThreshold);
   const adjusted = getAdjustedHomeZone(zone, config);
-  const left = Math.min(adjusted.x1, adjusted.x2) * (drawWidth / naturalWidth);
-  const top = Math.min(adjusted.y1, adjusted.y2) * (drawHeight / naturalHeight);
-  const width = Math.abs(adjusted.x2 - adjusted.x1) * (drawWidth / naturalWidth);
-  const height = Math.abs(adjusted.y2 - adjusted.y1) * (drawHeight / naturalHeight);
-  element.style.left = `${left}px`;
-  element.style.top = `${top}px`;
-  element.style.width = `${width}px`;
-  element.style.height = `${height}px`;
+  const left = Math.min(adjusted.x1, adjusted.x2);
+  const right = Math.max(adjusted.x1, adjusted.x2);
+  const top = Math.min(adjusted.y1, adjusted.y2);
+  const bottom = Math.max(adjusted.y1, adjusted.y2);
+  const targetLeft = left * (drawWidth / naturalWidth);
+  const targetTop = top * (drawHeight / naturalHeight);
+  const targetWidth = (right - left) * (drawWidth / naturalWidth);
+  const targetHeight = (bottom - top) * (drawHeight / naturalHeight);
+  if (!bounds) {
+    element.style.left = `${targetLeft}px`;
+    element.style.top = `${targetTop}px`;
+    element.style.width = `${targetWidth}px`;
+    element.style.height = `${targetHeight}px`;
+    game.homeRenderedRects.set(key, {
+      left: targetLeft,
+      top: targetTop,
+      width: targetWidth,
+      height: targetHeight,
+    });
+  } else {
+    const scale = Math.min(targetWidth / bounds.width, targetHeight / bounds.height);
+    const targetCenterX = targetLeft + (targetWidth / 2);
+    const targetCenterY = targetTop + (targetHeight / 2);
+    const artCenterX = (bounds.left + (bounds.width / 2)) * scale;
+    const artCenterY = (bounds.top + (bounds.height / 2)) * scale;
+    const finalLeft = targetCenterX - artCenterX;
+    const finalTop = targetCenterY - artCenterY;
+    const visibleLeft = finalLeft + (bounds.left * scale);
+    const visibleTop = finalTop + (bounds.top * scale);
+    const visibleWidth = bounds.width * scale;
+    const visibleHeight = bounds.height * scale;
+    element.style.left = `${finalLeft}px`;
+    element.style.top = `${finalTop}px`;
+    element.style.width = `${element.naturalWidth * scale}px`;
+    element.style.height = `${element.naturalHeight * scale}px`;
+    game.homeRenderedRects.set(key, {
+      left: visibleLeft,
+      top: visibleTop,
+      width: visibleWidth,
+      height: visibleHeight,
+    });
+  }
   game.homeButtonZones.set(key, {
     x1: Math.round(Math.min(adjusted.x1, adjusted.x2)),
     y1: Math.round(Math.min(adjusted.y1, adjusted.y2)),

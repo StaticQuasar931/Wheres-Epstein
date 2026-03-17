@@ -99,6 +99,7 @@ export class HiddenObjectGame {
     this.homeAnimationTimers = [];
     this.homeArtBounds = new Map();
     this.homeButtonZones = new Map();
+    this.homeRenderedRects = new Map();
     this.preloadedAssets = new Map();
     this.homeIntroPlayed = false;
     this.homeAssetsReady = false;

@@ -76,20 +76,20 @@ function normalizeLevel(level) {
 }
 
 export const START_SCREEN_BUTTONS = {
-  start: { x1: 143, y1: 815, x2: 530, y2: 922, color: "green" },
-  settings: { x1: 557, y1: 814, x2: 935, y2: 922, color: "blue" },
-  moreGames: { x1: 961, y1: 814, x2: 1365, y2: 918, color: "orange" },
-  nameLink: { x1: 566, y1: 166, x2: 765, y2: 204, color: "gold" },
+  start: { x1: 107, y1: 827, x2: 494, y2: 934, color: "green" },
+  settings: { x1: 593, y1: 826, x2: 971, y2: 934, color: "blue" },
+  moreGames: { x1: 1097, y1: 830, x2: 1501, y2: 934, color: "orange" },
+  nameLink: { x1: 1166, y1: 182, x2: 1425, y2: 260, color: "gold" },
 };
 
 export const START_SCREEN_LAYERS = {
-  titleBanner: { x1: 420, y1: 34, x2: 1080, y2: 190, color: "purple", src: "Assets/ui/titlebanner.png" },
-  cloud1: { x1: 70, y1: 86, x2: 350, y2: 210, color: "white", src: "Assets/ui/cloud1.png" },
-  cloud2: { x1: 1080, y1: 58, x2: 1380, y2: 194, color: "white", src: "Assets/ui/cloud2.png" },
-  cloud3: { x1: 640, y1: 116, x2: 960, y2: 250, color: "white", src: "Assets/ui/cloud3.png" },
-  wheelStand: { x1: 1030, y1: 302, x2: 1380, y2: 760, color: "orange", src: "Assets/ui/WheelStand.png" },
-  wheel: { x1: 990, y1: 84, x2: 1450, y2: 660, color: "blue", src: "Assets/ui/Wheel.png" },
-  magnifierDecor: { x1: 1090, y1: 258, x2: 1450, y2: 620, color: "red", src: "Assets/ui/mglassempty.png" },
+  titleBanner: { x1: 260, y1: 38, x2: 1156, y2: 293, color: "purple", src: "Assets/ui/titlebanner.png" },
+  cloud1: { x1: 70, y1: 18, x2: 350, y2: 142, color: "white", src: "Assets/ui/cloud1.png" },
+  cloud2: { x1: 580, y1: -6, x2: 880, y2: 130, color: "white", src: "Assets/ui/cloud2.png" },
+  cloud3: { x1: 1108, y1: -8, x2: 1428, y2: 126, color: "white", src: "Assets/ui/cloud3.png" },
+  wheelStand: { x1: 1058, y1: 178, x2: 1192, y2: 278, color: "orange", src: "Assets/ui/WheelStand.png" },
+  wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
+  magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, color: "red", src: "Assets/ui/mglassempty.png" },
 };
 // uh783kjs9tya8tji3chq8ugajskaere9h3v198jk
 
