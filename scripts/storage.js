@@ -12,6 +12,7 @@ const DEFAULT_SAVE = {
     confirmQuit: "on",
     previewDefault: "shown",
     foundFx: "strong",
+    magnifierShape: "circle",
   },
   meta: {
     advancedMultiSeen: false,
@@ -46,6 +47,7 @@ const DEFAULT_SAVE = {
     levelResults: {},
   },
 };
+// iuewgt87BFE7y4t39ikjbf087t309848ufjT_ujnkg8yg88ujBF8g4998ib
 
 function mergeSave(parsed) {
   return {

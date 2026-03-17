@@ -8,16 +8,22 @@
    IMAGE BUTTONS (home screen overlays)
    ============================================================ */
 .image-button {
+  /* 98asdf798asdf7as9d8f7as9df87as9d8f7 */
   transition: box-shadow 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 
-.image-button:hover {
+.image-button:not(.image-button-hidden-link):hover {
   background: rgba(255, 255, 255, 0.02);
-  box-shadow: 0 0 28px rgba(255, 216, 78, 0.22);
+  box-shadow: 0 0 22px rgba(255, 216, 78, 0.18);
 }
 
-.image-button:active {
+.image-button:not(.image-button-hidden-link):active {
   transform: scale(0.982);
+}
+
+.image-button-hidden-link {
+  background: transparent;
+  border-radius: 10px;
 }
 
 /* ============================================================
@@ -48,7 +54,7 @@
     drop-shadow(0 0 36px rgba(255, 216, 78, 0.36))
     brightness(1.08)
     saturate(1.12);
-  transform: translateY(-6px) scale(1.058);
+  transform: translateY(-2px) scale(1.078);
   transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1.05), filter 220ms ease;
 }
 
@@ -130,9 +136,9 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 8;
-  width: 7.8rem;
-  min-height: 6.5rem;
-  padding: 0.8rem 0.7rem;
+  width: 8.8rem;
+  min-height: 7.1rem;
+  padding: 0.9rem 0.85rem;
   border-radius: 1.5rem;
   border: 1px solid rgba(255, 216, 78, 0.20);
   background:
@@ -156,8 +162,8 @@
     background    160ms ease;
 }
 
-.page-arrow-left  { left: -1.15rem; }
-.page-arrow-right { right: -2.2rem; }
+.page-arrow-left  { left: -3.3rem; }
+.page-arrow-right { right: -4.2rem; }
 
 .page-arrow-icon {
   display: inline-flex;
@@ -171,11 +177,11 @@
   transition: background 180ms ease, transform 180ms ease;
 }
 
-.page-arrow svg { width: 1.62rem; height: 1.62rem; }
+.page-arrow svg { width: 1.95rem; height: 1.95rem; }
 
 .page-arrow-text      { display: grid; gap: 0.04rem; }
-.page-arrow-text strong { font-size: 1.02rem; font-weight: 800; }
-.page-arrow-text span   { font-size: 0.70rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.page-arrow-text strong { font-size: 1.1rem; font-weight: 800; }
+.page-arrow-text span   { font-size: 0.76rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
 
 .page-arrow:hover {
   transform: translateY(-50%) scale(1.05);
@@ -288,6 +294,24 @@ body.easter-arcade .home-viewport {
 body.easter-arcade .level-stars,
 body.easter-arcade .result-stars {
   text-shadow: 0 0 18px rgba(122, 255, 215, 0.50);
+}
+
+body.easter-cheese .menu-shell,
+body.easter-cheese .home-viewport {
+  background:
+    radial-gradient(circle at 15% 18%, rgba(255, 223, 118, 0.16), transparent 18%),
+    radial-gradient(circle at 82% 20%, rgba(255, 177, 63, 0.12), transparent 22%),
+    linear-gradient(160deg, #10161f, #30240f 68%, #151c26);
+}
+
+body.easter-static .scene-viewport::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 5px);
+  mix-blend-mode: screen;
+  opacity: 0.3;
 }
 
 /* Note: easter-stripes and easter-party ::after rules live in main.css

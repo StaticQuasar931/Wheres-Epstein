@@ -1,4 +1,5 @@
 export function layoutHomeButtons(game, config) {
+  // ajsd98f7as9d8f7as9df87as9df87a9sdf
   const image = game.elements.startScreenImage;
   const overlay = game.elements.homeButtonOverlay;
   if (!image.naturalWidth || !overlay || !game.elements.homeViewport) {
@@ -141,10 +142,11 @@ export function updateHomeDebug(game, event, config) {
   const start = game.homeButtonZones.get("start");
   const settings = game.homeButtonZones.get("settings");
   const more = game.homeButtonZones.get("more");
+  const nameLink = game.homeButtonZones.get("nameLink");
   const editor = game.homeButtonEditorEnabled
     ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box or use 1, 2, 3 with arrow keys.`
     : "Editor: off (press H in testing mode)";
-  game.elements.homeDebugReadout.textContent = `${pointer}\n${editor}\nstart: ${formatZone(start)}\nsettings: ${formatZone(settings)}\nmore: ${formatZone(more)}`;
+  game.elements.homeDebugReadout.textContent = `${pointer}\n${editor}\nstart: ${formatZone(start)}\nsettings: ${formatZone(settings)}\nmore: ${formatZone(more)}\nname: ${formatZone(nameLink)}`;
 }
 
 function clearHomeAnimationTimers(game) {
@@ -210,7 +212,7 @@ function placeHomeButton(game, key, element, placement) {
   if (!placement) {
     return;
   }
-  const expand = 6;
+  const expand = 16;
   const clickLeft = placement.rendered.left - expand;
   const clickTop = placement.rendered.top - expand;
   const clickWidth = placement.rendered.width + (expand * 2);
@@ -380,10 +382,11 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
     ["start", game.elements.startGameButton],
     ["settings", game.elements.openSettingsButton],
     ["more", game.elements.moreGamesButton],
+    ["nameLink", game.elements.homeNameButton],
   ].forEach(([label, buttonElement]) => {
     const actual = game.homeButtonZones.get(label);
     const node = document.createElement("div");
-    node.className = `home-debug-box color-${label === "start" ? "green" : label === "settings" ? "blue" : "orange"}`;
+    node.className = `home-debug-box color-${label === "start" ? "green" : label === "settings" ? "blue" : label === "more" ? "orange" : "gold"}`;
     node.dataset.editorKey = label;
     node.classList.toggle("is-selected", game.homeButtonEditorEnabled && game.homeButtonEditorSelection === label);
     const tag = document.createElement("span");

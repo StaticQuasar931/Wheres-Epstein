@@ -1,4 +1,5 @@
 export function showMenuToast(game, message, isBad = false) {
+  // 9sdf98as7df98a7sdf987as98d7f98as7df
   const node = game.elements.menuToast;
   node.textContent = message;
   node.classList.remove("hidden", "bad");

@@ -2,6 +2,7 @@ import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, S
 import { loadSave, recordLevelResult, recordLevelView, recordSpeedrunResult, saveSettings, saveMeta } from "./storage.js";
 import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
+// 7hgasd87f6gas8d76f8g7as6d8f7g6asd8f7g
 
 const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
 const DISCORD_URL = "https://discord.gg/jW2az4AQUH";
@@ -21,9 +22,15 @@ const HOME_BUTTON_X_OFFSET = -90;
 const HOME_BUTTON_Y_OFFSET = -180;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
 const HOME_EDITOR_NUDGE_STEP = 4;
+const MAGNIFIER_HOLD_MS = 240;
+const MAGNIFIER_MIN_ZOOM = 1.4;
+const MAGNIFIER_MAX_ZOOM = 6;
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 const WALDO_SEQUENCE = ["w", "a", "l", "d", "o"];
 const PARTY_SEQUENCE = ["p", "a", "r", "t", "y"];
+const CHEESE_SEQUENCE = ["c", "h", "e", "e", "s", "e"];
+const STATIC_SEQUENCE = ["s", "t", "a", "t", "i", "c"];
+// y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const ADVANCED_MAIN_LEVELS = ADVANCED_LEVELS.filter((level) => !level.isAdvancedBonus);
 const ADVANCED_BONUS_LEVELS = ADVANCED_LEVELS.filter((level) => level.isAdvancedBonus);
@@ -101,6 +108,7 @@ export class HiddenObjectGame {
     this.homeButtonEditorSelection = "start";
     this.homeEditorDrag = null;
     this.sceneNudgeTimerId = null;
+    this.magnifierHoldTimerId = null;
     this.state = {
       levelIndex: 0,
       levelSelectPage: 1,
@@ -130,6 +138,15 @@ export class HiddenObjectGame {
         moved: false,
       },
       quitPromptResumeTarget: false,
+      magnifier: {
+        active: false,
+        persistent: false,
+        pointerId: null,
+        pointerX: 0,
+        pointerY: 0,
+        zoom: 2.2,
+        downAt: 0,
+      },
     };
 
     this.elements = this.getElements();
@@ -211,6 +228,7 @@ export class HiddenObjectGame {
       confirmQuitSelect: document.getElementById("confirmQuitSelect"),
       previewDefaultSelect: document.getElementById("previewDefaultSelect"),
       foundFxSelect: document.getElementById("foundFxSelect"),
+      magnifierShapeSelect: document.getElementById("magnifierShapeSelect"),
       settingsDiscordButton: document.getElementById("settingsDiscordButton"),
       settingsMoreGamesButton: document.getElementById("settingsMoreGamesButton"),
       settingsLevelSelectButton: document.getElementById("settingsLevelSelectButton"),
@@ -233,10 +251,15 @@ export class HiddenObjectGame {
       sceneFallback: document.getElementById("sceneFallback"),
       sceneFallbackTitle: document.getElementById("sceneFallbackTitle"),
       sceneFallbackText: document.getElementById("sceneFallbackText"),
+      magnifierLens: document.getElementById("magnifierLens"),
       zoomOutButton: document.getElementById("zoomOutButton"),
       zoomInButton: document.getElementById("zoomInButton"),
       fitZoomButton: document.getElementById("fitZoomButton"),
       resetZoomButton: document.getElementById("resetZoomButton"),
+      zoomOutButtonBottom: document.getElementById("zoomOutButtonBottom"),
+      zoomInButtonBottom: document.getElementById("zoomInButtonBottom"),
+      fitZoomButtonBottom: document.getElementById("fitZoomButtonBottom"),
+      resetZoomButtonBottom: document.getElementById("resetZoomButtonBottom"),
       skipLevelButton: document.getElementById("skipLevelButton"),
       pauseButton: document.getElementById("pauseButton"),
       returnHomeButton: document.getElementById("returnHomeButton"),
@@ -306,6 +329,7 @@ export class HiddenObjectGame {
     this.elements.confirmQuitSelect.addEventListener("change", () => this.persistSettings());
     this.elements.previewDefaultSelect.addEventListener("change", () => this.persistSettings());
     this.elements.foundFxSelect.addEventListener("change", () => this.persistSettings());
+    this.elements.magnifierShapeSelect.addEventListener("change", () => this.persistSettings());
     this.elements.settingsDiscordButton.addEventListener("click", () => this.openExternalLink(DISCORD_URL, "Add your Discord invite URL in scripts/game.js to enable this button."));
     this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
@@ -335,6 +359,10 @@ export class HiddenObjectGame {
     this.elements.zoomInButton.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
     this.elements.fitZoomButton.addEventListener("click", () => this.fitLevelToViewport());
     this.elements.resetZoomButton.addEventListener("click", () => this.fitLevelToViewport());
+    this.elements.zoomOutButtonBottom.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
+    this.elements.zoomInButtonBottom.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
+    this.elements.fitZoomButtonBottom.addEventListener("click", () => this.fitLevelToViewport());
+    this.elements.resetZoomButtonBottom.addEventListener("click", () => this.fitLevelToViewport());
     this.elements.skipLevelButton.addEventListener("click", () => this.skipLevel());
     this.elements.pauseButton.addEventListener("click", () => this.pauseGame());
     this.elements.returnHomeButton.addEventListener("click", () => this.quitRun());
@@ -355,6 +383,12 @@ export class HiddenObjectGame {
 
     this.elements.sceneViewport.addEventListener("wheel", (event) => {
       event.preventDefault();
+      if (this.state.magnifier.active) {
+        const delta = event.deltaY < 0 ? 0.2 : -0.2;
+        this.state.magnifier.zoom = clamp(this.state.magnifier.zoom + delta, MAGNIFIER_MIN_ZOOM, MAGNIFIER_MAX_ZOOM);
+        this.updateMagnifier(event.clientX, event.clientY);
+        return;
+      }
       const factor = event.deltaY < 0 ? 1 + WHEEL_ZOOM_STEP : 1 - WHEEL_ZOOM_STEP;
       this.zoomAtClientPoint(event.clientX, event.clientY, factor);
     }, { passive: false });
@@ -363,6 +397,7 @@ export class HiddenObjectGame {
     this.elements.sceneViewport.addEventListener("pointermove", (event) => this.onPointerMove(event));
     this.elements.sceneViewport.addEventListener("pointerup", (event) => this.onPointerUp(event));
     this.elements.sceneViewport.addEventListener("pointercancel", (event) => this.onPointerCancel(event));
+    this.elements.sceneViewport.addEventListener("contextmenu", (event) => this.onSceneContextMenu(event));
     this.elements.homeViewport.addEventListener("pointermove", (event) => this.updateHomeDebug(event));
     this.elements.homeDebugOverlay.addEventListener("pointerdown", (event) => this.onHomeEditorPointerDown(event));
     window.addEventListener("pointermove", (event) => this.onHomeEditorPointerMove(event));
@@ -389,11 +424,13 @@ export class HiddenObjectGame {
     this.elements.confirmQuitSelect.value = this.save.settings.confirmQuit;
     this.elements.previewDefaultSelect.value = this.save.settings.previewDefault;
     this.elements.foundFxSelect.value = this.save.settings.foundFx;
+    this.elements.magnifierShapeSelect.value = this.save.settings.magnifierShape ?? "circle";
     this.elements.body.dataset.theme = this.save.settings.theme;
     this.elements.body.dataset.density = this.save.settings.density;
     this.elements.body.dataset.motion = this.save.settings.motion;
     this.elements.body.dataset.preview = this.save.settings.previewSize;
     this.elements.body.dataset.foundfx = this.save.settings.foundFx;
+    this.elements.body.dataset.magnifier = this.save.settings.magnifierShape ?? "circle";
     this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
     this.elements.skipLevelButton.classList.toggle("hidden", !this.sessionTestingUnlocked);
     this.elements.settingsDiscordButton.disabled = !DISCORD_URL;
@@ -413,6 +450,7 @@ export class HiddenObjectGame {
       confirmQuit: this.elements.confirmQuitSelect.value,
       previewDefault: this.elements.previewDefaultSelect.value,
       foundFx: this.elements.foundFxSelect.value,
+      magnifierShape: this.elements.magnifierShapeSelect.value,
     });
     this.applySettings();
   }
@@ -429,6 +467,7 @@ export class HiddenObjectGame {
       this.stopElapsedTimer();
       this.clearKeys();
       this.state.runActive = false;
+      this.hideMagnifier();
       this.closeAllOverlays();
     }
     if (name === "home" || name === "levelSelect") {
@@ -890,6 +929,7 @@ export class HiddenObjectGame {
 
   openLevelIntro() {
     const level = this.getCurrentLevel();
+    this.prepareSceneImageLoad();
     this.elements.introLevelLabel.textContent = this.state.runMode === "speedrun"
       ? `Speedrun Pick • ${this.getDisplayLabelForLevelId(level.id)}`
       : this.getCurrentLevelLabel(level);
@@ -910,6 +950,7 @@ export class HiddenObjectGame {
   beginLevel() {
     const level = this.getCurrentLevel();
     this.elements.levelIntroOverlay.classList.add("hidden");
+    this.hideMagnifier();
     this.state.elapsedMs = 0;
     this.state.wrongClicks = 0;
     this.state.pointerImage = null;
@@ -974,6 +1015,8 @@ export class HiddenObjectGame {
     this.startElapsedTimer();
     if (this.state.runMode !== "speedrun") {
       this.preloadLevelAssets(this.getNextLevelIndex());
+    } else {
+      this.preloadSpeedrunAssets();
     }
   }
 
@@ -1014,6 +1057,27 @@ export class HiddenObjectGame {
     nextLevel.targets.forEach((target) => this.preloadImage(target.preview));
   }
 
+  preloadSpeedrunAssets() {
+    const pool = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_MAIN_LEVELS, ...ADVANCED_BONUS_LEVELS];
+    if (!pool.length) {
+      return;
+    }
+    const currentId = this.getCurrentLevel()?.id;
+    const picks = [];
+    const recent = new Set(this.speedrunRecentIds);
+    const preferred = pool.filter((level) => level.id !== currentId && !recent.has(level.id));
+    const fallback = pool.filter((level) => level.id !== currentId);
+    const source = preferred.length ? preferred : fallback;
+    while (source.length && picks.length < 4) {
+      const index = Math.floor(Math.random() * source.length);
+      picks.push(source.splice(index, 1)[0]);
+    }
+    picks.forEach((level) => {
+      this.preloadImage(level.background);
+      level.targets.forEach((target) => this.preloadImage(target.preview));
+    });
+  }
+
   shouldShowAdvancedInfo(level) {
     return false;
   }
@@ -1045,6 +1109,7 @@ export class HiddenObjectGame {
       start: START_SCREEN_BUTTONS.start,
       settings: START_SCREEN_BUTTONS.settings,
       moreGames: START_SCREEN_BUTTONS.moreGames,
+      nameLink: START_SCREEN_BUTTONS.nameLink,
       xOffset: HOME_BUTTON_X_OFFSET,
       yOffset: HOME_BUTTON_Y_OFFSET,
       alphaThreshold: HOME_BUTTON_ALPHA_THRESHOLD,
@@ -1099,6 +1164,7 @@ export class HiddenObjectGame {
       start: START_SCREEN_BUTTONS.start,
       settings: START_SCREEN_BUTTONS.settings,
       moreGames: START_SCREEN_BUTTONS.moreGames,
+      nameLink: START_SCREEN_BUTTONS.nameLink,
       xOffset: HOME_BUTTON_X_OFFSET,
       yOffset: HOME_BUTTON_Y_OFFSET,
       alphaThreshold: HOME_BUTTON_ALPHA_THRESHOLD,
@@ -1240,6 +1306,21 @@ export class HiddenObjectGame {
     if (!this.state.runActive || this.state.paused) {
       return;
     }
+    if (event.button === 2) {
+      event.preventDefault();
+      this.state.magnifier.pointerId = event.pointerId;
+      this.state.magnifier.downAt = performance.now();
+      this.state.magnifier.pointerX = event.clientX;
+      this.state.magnifier.pointerY = event.clientY;
+      this.elements.sceneViewport.setPointerCapture(event.pointerId);
+      window.clearTimeout(this.magnifierHoldTimerId);
+      this.magnifierHoldTimerId = window.setTimeout(() => {
+        if (this.state.magnifier.pointerId === event.pointerId) {
+          this.showMagnifier(event.clientX, event.clientY, false);
+        }
+      }, MAGNIFIER_HOLD_MS);
+      return;
+    }
     this.elements.sceneViewport.setPointerCapture(event.pointerId);
     this.state.drag.pointerId = event.pointerId;
     this.state.drag.startX = event.clientX;
@@ -1255,6 +1336,9 @@ export class HiddenObjectGame {
     }
     this.state.pointerImage = this.clientToImage(event.clientX, event.clientY);
     this.updateDebugReadout();
+    if (this.state.magnifier.pointerId === event.pointerId || this.state.magnifier.active) {
+      this.updateMagnifier(event.clientX, event.clientY);
+    }
     if (this.state.drag.pointerId !== event.pointerId) {
       return;
     }
@@ -1276,6 +1360,22 @@ export class HiddenObjectGame {
       this.clearDragState(event.pointerId);
       return;
     }
+    if (event.button === 2 && this.state.magnifier.pointerId === event.pointerId) {
+      event.preventDefault();
+      window.clearTimeout(this.magnifierHoldTimerId);
+      const held = (performance.now() - this.state.magnifier.downAt) >= MAGNIFIER_HOLD_MS;
+      if (!held) {
+        if (this.state.magnifier.active && this.state.magnifier.persistent) {
+          this.hideMagnifier();
+        } else {
+          this.showMagnifier(event.clientX, event.clientY, true);
+        }
+      } else if (!this.state.magnifier.persistent) {
+        this.hideMagnifier();
+      }
+      this.state.magnifier.pointerId = null;
+      return;
+    }
     if (this.state.drag.pointerId !== event.pointerId) {
       return;
     }
@@ -1289,7 +1389,18 @@ export class HiddenObjectGame {
   }
 
   onPointerCancel(event) {
+    if (this.state.magnifier.pointerId === event.pointerId) {
+      window.clearTimeout(this.magnifierHoldTimerId);
+      if (!this.state.magnifier.persistent) {
+        this.hideMagnifier();
+      }
+      this.state.magnifier.pointerId = null;
+    }
     this.clearDragState(event.pointerId);
+  }
+
+  onSceneContextMenu(event) {
+    event.preventDefault();
   }
 
   clearDragState(pointerId) {
@@ -1415,6 +1526,10 @@ export class HiddenObjectGame {
   }
 
   handleEscapeShortcut() {
+    if (this.state.magnifier.active) {
+      this.hideMagnifier();
+      return;
+    }
     if (!this.elements.quitConfirmOverlay.classList.contains("hidden")) {
       this.closeQuitPrompt();
       return;
@@ -1540,6 +1655,16 @@ export class HiddenObjectGame {
     if (PARTY_SEQUENCE.every((value, index) => this.konamiInput.slice(-PARTY_SEQUENCE.length)[index] === value)) {
       document.body.classList.toggle("easter-party");
       this.showMenuToast(document.body.classList.contains("easter-party") ? "Party mode enabled." : "Party mode disabled.");
+    }
+
+    if (CHEESE_SEQUENCE.every((value, index) => this.konamiInput.slice(-CHEESE_SEQUENCE.length)[index] === value)) {
+      document.body.classList.toggle("easter-cheese");
+      this.showMenuToast(document.body.classList.contains("easter-cheese") ? "Cheese mode enabled." : "Cheese mode disabled.");
+    }
+
+    if (STATIC_SEQUENCE.every((value, index) => this.konamiInput.slice(-STATIC_SEQUENCE.length)[index] === value)) {
+      document.body.classList.toggle("easter-static");
+      this.showMenuToast(document.body.classList.contains("easter-static") ? "Static mode enabled." : "Static mode disabled.");
     }
 
     if (key === "n" && this.sessionTestingUnlocked && this.elements.screens.game.classList.contains("screen-active")) {
@@ -1745,6 +1870,7 @@ export class HiddenObjectGame {
     }
     this.state.levelIndex = nextIndex;
     if (this.save.settings.showLevelIntro === "on") {
+      this.prepareSceneImageLoad();
       this.openLevelIntro();
     } else {
       this.beginLevel();
@@ -1802,6 +1928,9 @@ export class HiddenObjectGame {
   applyTransform() {
     const { x, y, scale } = this.state.transform;
     this.elements.sceneContent.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    if (this.state.magnifier.active) {
+      this.updateMagnifier(this.state.magnifier.pointerX, this.state.magnifier.pointerY);
+    }
   }
 
   clientToImage(clientX, clientY) {
@@ -1814,6 +1943,35 @@ export class HiddenObjectGame {
       return null;
     }
     return { x: Math.round(imageX), y: Math.round(imageY) };
+  }
+
+  showMagnifier(clientX, clientY, persistent) {
+    this.state.magnifier.active = true;
+    this.state.magnifier.persistent = persistent;
+    this.elements.magnifierLens.classList.remove("hidden");
+    this.updateMagnifier(clientX, clientY);
+  }
+
+  hideMagnifier() {
+    this.state.magnifier.active = false;
+    this.state.magnifier.persistent = false;
+    this.elements.magnifierLens.classList.add("hidden");
+  }
+
+  updateMagnifier(clientX, clientY) {
+    if (!this.state.magnifier.active) {
+      return;
+    }
+    const rect = this.elements.sceneViewport.getBoundingClientRect();
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    this.state.magnifier.pointerX = clientX;
+    this.state.magnifier.pointerY = clientY;
+    this.elements.magnifierLens.style.left = `${localX}px`;
+    this.elements.magnifierLens.style.top = `${localY}px`;
+    this.elements.magnifierLens.style.backgroundImage = `url("${this.elements.levelImage.currentSrc || this.elements.levelImage.src}")`;
+    this.elements.magnifierLens.style.backgroundSize = `${this.state.naturalWidth * this.state.transform.scale * this.state.magnifier.zoom}px ${this.state.naturalHeight * this.state.transform.scale * this.state.magnifier.zoom}px`;
+    this.elements.magnifierLens.style.backgroundPosition = `${-(this.state.transform.x * this.state.magnifier.zoom) - (localX * (this.state.magnifier.zoom - 1))}px ${-(this.state.transform.y * this.state.magnifier.zoom) - (localY * (this.state.magnifier.zoom - 1))}px`;
   }
 
   updateDebugReadout() {

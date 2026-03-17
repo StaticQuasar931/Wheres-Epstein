@@ -10,6 +10,7 @@
    DESIGN TOKENS
    ============================================================ */
 :root {
+  /* jh78asd98f7asd9f87as9d8f7as9df87as */
   /* Background */
   --bg:            #060d18;
   --bg-alt:        #0b1c30;
@@ -569,6 +570,7 @@ body.mode-game .site-topbar { display: flex; }
 .color-green  { color: #4df7a6; }
 .color-blue   { color: #56b7ff; }
 .color-orange { color: #ffac57; }
+.color-gold   { color: #ffd86b; }
 
 .home-debug-readout {
   position: absolute;
@@ -759,8 +761,8 @@ body.mode-game .site-topbar { display: flex; }
    ============================================================ */
 .menu-shell {
   min-height: 100vh;
-  padding: 4.75rem 1rem 1rem;
-  max-width: 1680px;
+  padding: 4.55rem 0.5rem 0.75rem;
+  max-width: 1920px;
   margin: 0 auto;
   position: relative;
 }
@@ -816,15 +818,15 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 #settingsScreen .level-select-groups {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1.15fr 1.15fr 0.9fr;
   align-items: start;
 }
 
 #settingsScreen .version-card   { margin-top: 0; grid-column: 1 / -1; }
 #settingsScreen .menu-card,
 #settingsScreen .setting-card   { height: 100%; }
-#settingsScreen .menu-card      { padding: 1rem 1.05rem; }
-#settingsScreen .setting-card   { padding: 0.8rem 0.9rem; }
+#settingsScreen .menu-card      { padding: 0.9rem 0.95rem; }
+#settingsScreen .setting-card   { padding: 0.72rem 0.82rem; }
 #settingsScreen .menu-header,
 #settingsScreen .menu-card-header { gap: 0.5rem; }
 
@@ -847,9 +849,9 @@ body.mode-game .site-topbar { display: flex; }
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: linear-gradient(170deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
-  padding: 0.82rem;
+  padding: 0.68rem;
   text-align: center;
-  min-height: 118px;
+  min-height: 104px;
   cursor: pointer;
   display: grid;
   align-content: space-between;
@@ -920,7 +922,7 @@ body.mode-game .site-topbar { display: flex; }
 
 .level-card h4, .level-card p { margin: 0; }
 .level-card h4 {
-  font-size: 0.93rem;
+  font-size: 0.88rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--text);
@@ -936,13 +938,13 @@ body.mode-game .site-topbar { display: flex; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 76px;
-  padding: 0.28rem 0.56rem;
+  min-width: 70px;
+  padding: 0.22rem 0.5rem;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.07);
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 800;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -952,9 +954,9 @@ body.mode-game .site-topbar { display: flex; }
 
 .level-best-score {
   display: grid;
-  gap: 0.18rem;
+  gap: 0.12rem;
   justify-items: center;
-  font-size: 0.80rem;
+  font-size: 0.76rem;
   font-weight: 800;
 }
 
@@ -992,8 +994,8 @@ body.mode-game .site-topbar { display: flex; }
    SETTINGS GRID
    ============================================================ */
 .settings-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 0.85rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 0.75rem;
 }
 
 .setting-card {
@@ -1053,8 +1055,8 @@ body.mode-game .site-topbar { display: flex; }
   margin: 0;
   padding-left: 1.15rem;
   color: var(--muted);
-  line-height: 1.62;
-  font-size: 0.875rem;
+  line-height: 1.5;
+  font-size: 0.83rem;
 }
 .compact-list { line-height: 1.54; font-size: 0.82rem; }
 
@@ -1062,7 +1064,25 @@ body.mode-game .site-topbar { display: flex; }
 .diagnostic-row { display: flex; gap: 0.75rem; margin-top: 0.85rem; }
 
 /* Version card */
-.version-card { margin-top: 1rem; }
+.version-card {
+  margin-top: 0.4rem;
+  padding: 0.15rem 0.05rem 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.version-text-inline {
+  display: inline-block;
+  margin: 0;
+  padding: 0.15rem 0;
+  color: var(--muted-hi);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
 
 /* ============================================================
    THEME-SPECIFIC OVERRIDES
@@ -1177,7 +1197,6 @@ body.easter-party .home-viewport::after {
 }
 .play-topbar > * { pointer-events: auto; }
 
-.play-top-left,
 .play-top-right,
 .play-top-middle-right {
   display: flex;
@@ -1187,6 +1206,10 @@ body.easter-party .home-viewport::after {
 }
 
 .play-top-middle-left { display: flex; justify-content: flex-start; }
+
+.play-top-left {
+  display: none;
+}
 
 #hudLevelText { cursor: pointer; }
 
@@ -1241,6 +1264,22 @@ body[data-preview="large"] .target-card { width: min(240px, 32vw); }
   gap: 0.45rem;
 }
 
+.play-zoom-controls {
+  position: absolute;
+  right: var(--shell-padding);
+  bottom: calc(var(--shell-padding) + 4.7rem);
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(78px, 1fr));
+  gap: 0.45rem;
+  width: min(220px, 34vw);
+}
+
+.play-zoom-controls .overlay-button {
+  width: 100%;
+  justify-content: center;
+}
+
 .stat-pill { text-align: center; }
 
 .stat-pill span {
@@ -1291,7 +1330,28 @@ body[data-preview="large"] .target-card { width: min(240px, 32vw); }
   white-space: pre-line;
   border-radius: var(--radius-md);
   font-family: 'Courier New', 'Consolas', monospace;
-  font-size: 0.80rem;
+  font-size: 1rem;
+  line-height: 1.58;
+  min-width: 260px;
+}
+
+.magnifier-lens {
+  position: absolute;
+  z-index: 7;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 216, 78, 0.9);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4), 0 0 24px rgba(255, 216, 78, 0.28);
+  pointer-events: none;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(1px);
+}
+
+body[data-magnifier="square"] .magnifier-lens {
+  border-radius: 22px;
 }
 
 .asset-error { color: var(--danger); font-size: 0.84rem; }
@@ -1427,7 +1487,6 @@ body[data-preview="large"] .target-card { width: min(240px, 32vw); }
   .stat-grid, .result-stats { grid-template-columns: 1fr; }
 
   .play-stats,
-  .play-top-left,
   .play-top-right,
   .play-top-middle-right,
   .diagnostic-row,
@@ -1437,6 +1496,11 @@ body[data-preview="large"] .target-card { width: min(240px, 32vw); }
   }
 
   .target-card { width: calc(100% - 1.7rem); bottom: 5.2rem; }
+  .play-zoom-controls {
+    width: calc(100% - 1.7rem);
+    right: 0.85rem;
+    bottom: calc(var(--shell-padding) + 7.8rem);
+  }
 
   .home-debug-readout { left: 0.75rem; right: 0.75rem; min-width: 0; max-width: none; }
 

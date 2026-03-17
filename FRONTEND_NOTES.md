@@ -1,4 +1,5 @@
 Where's Epstein? Frontend Notes
+<!-- 0a9s8df7a98sdf7a98sdf7a98sdf7a98 -->
 
 Purpose
 
@@ -134,3 +135,19 @@ Frontend upgrade ideas for a future animation-focused tool
 - Keep gameplay logic isolated:
   - leave progression, scoring, storage, and hit detection in `scripts/game.js`
   - keep visual experimentation in `index.html`, `styles/*.css`, `scripts/home-ui.js`, and `scripts/game-renderer.js`
+
+Claude handoff notes
+
+- Good time to hand Claude another pass after the current build feels functionally stable in browser testing. The next Claude pass should be mostly visual polish, not logic repair.
+- Ask Claude to avoid changing DOM ids or gameplay flow in `scripts/game.js`.
+- Best Claude targets:
+  - tighten selector spacing and card rhythm without changing ids
+  - improve settings composition and typography density
+  - polish the page-arrow art and button visual hierarchy
+  - improve start-screen version text placement and passive name-link treatment
+  - refine magnifier lens styling only after confirming the JS behavior feels right
+- Things Claude should not touch unless specifically asked:
+  - level progression logic
+  - score saving and storage structure
+  - hitbox math
+  - speedrun routing and unlock checks
