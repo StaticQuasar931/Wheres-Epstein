@@ -640,6 +640,7 @@ body.mode-game .site-topbar { display: flex; }
    DEBUG OVERLAYS
    ============================================================ */
 .home-debug-overlay { pointer-events: none; }
+.home-debug-overlay.editor-active { pointer-events: auto; }
 
 .home-debug-box {
   position: absolute;
@@ -647,6 +648,7 @@ body.mode-game .site-topbar { display: flex; }
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.12);
   overflow: visible;
+  pointer-events: auto;
 }
 .home-debug-label {
   position: absolute;
@@ -679,6 +681,11 @@ body.mode-game .site-topbar { display: flex; }
   box-shadow: 0 0 0 3px rgba(255, 216, 78, 0.32), 0 0 28px rgba(255, 216, 78, 0.18);
 }
 
+.home-debug-box.is-locked {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
 .home-debug-handle {
   position: absolute;
   right: -7px;
@@ -689,6 +696,7 @@ body.mode-game .site-topbar { display: flex; }
   border: 2px solid currentColor;
   background: rgba(3, 8, 16, 0.94);
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
 }
 
 .home-debug-readout {
@@ -755,6 +763,10 @@ body.mode-game .site-topbar { display: flex; }
 
 .home-editor-actions:last-of-type {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-editor-actions-triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .home-editor-help {

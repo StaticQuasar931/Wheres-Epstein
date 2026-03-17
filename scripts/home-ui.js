@@ -26,6 +26,19 @@ export function layoutHomeButtons(game, config) {
     offsetY = (rect.height - drawHeight) / 2;
   }
 
+  const viewScale = game.getHomeEditorViewScale?.() ?? 1;
+  if (viewScale !== 1) {
+    drawWidth *= viewScale;
+    drawHeight *= viewScale;
+    offsetX = (rect.width - drawWidth) / 2;
+    offsetY = (rect.height - drawHeight) / 2;
+  }
+
+  image.style.left = `${offsetX}px`;
+  image.style.top = `${offsetY}px`;
+  image.style.width = `${drawWidth}px`;
+  image.style.height = `${drawHeight}px`;
+
   overlay.style.left = `${offsetX}px`;
   overlay.style.top = `${offsetY}px`;
   overlay.style.width = `${drawWidth}px`;
@@ -157,7 +170,7 @@ export function updateHomeDebug(game, event, config) {
     ? `${game.getHomeEditorExportKey?.(game.homeButtonEditorSelection) ?? game.homeButtonEditorSelection}: { x1: ${Math.round(selectedSource.x1)}, y1: ${Math.round(selectedSource.y1)}, x2: ${Math.round(selectedSource.x2)}, y2: ${Math.round(selectedSource.y2)} }`
     : "selected source: unavailable";
   const editor = game.homeButtonEditorEnabled
-    ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box to move, drag the corner to resize.\nUse [ ] to cycle, arrows to move, Shift plus arrows to resize.`
+    ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box to move, drag the corner to resize.\nUse [ ] to cycle, arrows to move, Shift plus arrows to resize.\nUse B for boxes, K for lock, Z for zoom.`
     : "Editor: off (press H in testing mode)";
   game.elements.homeDebugReadout.textContent = `${pointer}\n${editor}\nselected: ${formatZone(selected)}\n${copyLine}`;
   game.refreshHomeEditorUi?.();
@@ -381,7 +394,7 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
   const debug = game.elements.homeDebugOverlay;
   debug.innerHTML = "";
   const active = game.sessionTestingUnlocked;
-  debug.classList.toggle("hidden", !active);
+  debug.classList.toggle("hidden", !active || !game.homeEditorBoxesVisible);
   debug.classList.toggle("editor-active", active && game.homeButtonEditorEnabled);
   game.elements.homeDebugReadout.classList.toggle("hidden", !active);
   if (!active) {
@@ -403,6 +416,7 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
     node.className = `home-debug-box color-${getDebugColor(label, config)}`;
     node.dataset.editorKey = label;
     node.classList.toggle("is-selected", game.homeButtonEditorEnabled && game.homeButtonEditorSelection === label);
+    node.classList.toggle("is-locked", game.homeEditorLockedKeys?.has(label));
     const tag = document.createElement("span");
     tag.className = "home-debug-label";
     const overlayRect = game.elements.homeButtonOverlay.getBoundingClientRect();
@@ -412,7 +426,7 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
     node.style.width = `${buttonRect.width}px`;
     node.style.height = `${buttonRect.height}px`;
     tag.textContent = actual
-      ? `${label}: ${Math.min(actual.x1, actual.x2)},${Math.min(actual.y1, actual.y2)} -> ${Math.max(actual.x1, actual.x2)},${Math.max(actual.y1, actual.y2)}`
+      ? `${label}${game.homeEditorLockedKeys?.has(label) ? " [locked]" : ""}: ${Math.min(actual.x1, actual.x2)},${Math.min(actual.y1, actual.y2)} -> ${Math.max(actual.x1, actual.x2)},${Math.max(actual.y1, actual.y2)}`
       : `${label}: unavailable`;
     const handle = document.createElement("span");
     handle.className = "home-debug-handle";
@@ -425,6 +439,13 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
 function placeHomeLayer(game, key, element, zone, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
   if (!element || !zone) {
     return;
+  }
+  if (element.naturalWidth && element.naturalHeight) {
+    const fit = fitZoneToAspect(zone, element.naturalWidth / element.naturalHeight);
+    zone.x1 = fit.x1;
+    zone.y1 = fit.y1;
+    zone.x2 = fit.x2;
+    zone.y2 = fit.y2;
   }
   const adjusted = getAdjustedHomeZone(zone, config);
   const left = Math.min(adjusted.x1, adjusted.x2) * (drawWidth / naturalWidth);
@@ -454,6 +475,30 @@ function getHomeElement(game, key) {
     magnifierDecor: game.elements.magnifierDecorLayer,
   };
   return map[key] ?? null;
+}
+
+function fitZoneToAspect(zone, aspect) {
+  const left = Math.min(zone.x1, zone.x2);
+  const right = Math.max(zone.x1, zone.x2);
+  const top = Math.min(zone.y1, zone.y2);
+  const bottom = Math.max(zone.y1, zone.y2);
+  const width = Math.max(1, right - left);
+  const height = Math.max(1, bottom - top);
+  const currentAspect = width / height;
+
+  if (Math.abs(currentAspect - aspect) < 0.002) {
+    return { x1: left, y1: top, x2: right, y2: bottom };
+  }
+
+  if (currentAspect > aspect) {
+    const fittedWidth = height * aspect;
+    const marginX = (width - fittedWidth) / 2;
+    return { x1: left + marginX, y1: top, x2: right - marginX, y2: bottom };
+  }
+
+  const fittedHeight = width / aspect;
+  const marginY = (height - fittedHeight) / 2;
+  return { x1: left, y1: top + marginY, x2: right, y2: bottom - marginY };
 }
 
 function getDebugColor(label, config) {

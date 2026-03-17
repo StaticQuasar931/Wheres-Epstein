@@ -107,6 +107,9 @@ export class HiddenObjectGame {
     this.homeButtonEditorEnabled = false;
     this.homeButtonEditorSelection = "start";
     this.homeEditorDrag = null;
+    this.homeEditorLockedKeys = new Set();
+    this.homeEditorBoxesVisible = true;
+    this.homeEditorViewScale = 1;
     this.sceneNudgeTimerId = null;
     this.magnifierHoldTimerId = null;
     this.state = {
@@ -165,11 +168,16 @@ export class HiddenObjectGame {
       return;
     }
     const zone = this.getHomeEditorZone(this.homeButtonEditorSelection);
-    this.elements.homeEditorSelectionLabel.textContent = this.getHomeEditorExportKey(this.homeButtonEditorSelection);
+    const exportKey = this.getHomeEditorExportKey(this.homeButtonEditorSelection);
+    const locked = this.homeEditorLockedKeys.has(this.homeButtonEditorSelection);
+    this.elements.homeEditorSelectionLabel.textContent = locked ? `${exportKey} (locked)` : exportKey;
     this.elements.homeEditorCoords.textContent = zone
       ? `x1: ${Math.round(zone.x1)}, y1: ${Math.round(zone.y1)}, x2: ${Math.round(zone.x2)}, y2: ${Math.round(zone.y2)}`
       : "unavailable";
     this.elements.homeEditorToggleButton.textContent = this.homeButtonEditorEnabled ? "Editor On" : "Editor Off";
+    this.elements.homeEditorToggleBoxesButton.textContent = this.homeEditorBoxesVisible ? "Boxes On" : "Boxes Off";
+    this.elements.homeEditorLockButton.textContent = locked ? "Locked" : "Unlocked";
+    this.elements.homeEditorZoomButton.textContent = this.homeEditorViewScale < 1 ? "Zoom Normal" : "Zoom Out";
   }
 
   buildHomeEditorExportText(selectedOnly = false) {
@@ -213,6 +221,40 @@ export class HiddenObjectGame {
       return "moreGames";
     }
     return key;
+  }
+
+  isHomeEditorLayerKey(key) {
+    return !["start", "settings", "more", "nameLink"].includes(key);
+  }
+
+  toggleHomeEditorBoxes() {
+    this.homeEditorBoxesVisible = !this.homeEditorBoxesVisible;
+    this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
+  }
+
+  toggleHomeEditorLock() {
+    const key = this.homeButtonEditorSelection;
+    if (this.homeEditorLockedKeys.has(key)) {
+      this.homeEditorLockedKeys.delete(key);
+    } else {
+      this.homeEditorLockedKeys.add(key);
+    }
+    this.refreshHomeEditorUi();
+    this.layoutHomeButtons();
+  }
+
+  toggleHomeEditorZoom() {
+    this.homeEditorViewScale = this.homeEditorViewScale < 1 ? 1 : 0.84;
+    this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
+  }
+
+  getHomeEditorViewScale() {
+    if (!(this.sessionTestingUnlocked && this.elements.screens.home.classList.contains("screen-active"))) {
+      return 1;
+    }
+    return this.homeEditorViewScale;
   }
 
   async copyTextToClipboard(text) {
@@ -283,6 +325,9 @@ export class HiddenObjectGame {
       homeEditorNextButton: document.getElementById("homeEditorNextButton"),
       homeEditorCopySelectedButton: document.getElementById("homeEditorCopySelectedButton"),
       homeEditorCopyAllButton: document.getElementById("homeEditorCopyAllButton"),
+      homeEditorToggleBoxesButton: document.getElementById("homeEditorToggleBoxesButton"),
+      homeEditorLockButton: document.getElementById("homeEditorLockButton"),
+      homeEditorZoomButton: document.getElementById("homeEditorZoomButton"),
       startButtonArt: document.getElementById("startButtonArt"),
       startButtonSheen: document.getElementById("startButtonSheen"),
       settingsButtonArt: document.getElementById("settingsButtonArt"),
@@ -429,6 +474,9 @@ export class HiddenObjectGame {
     bind(this.elements.homeEditorNextButton, "click", () => this.cycleHomeEditorSelection(1));
     bind(this.elements.homeEditorCopySelectedButton, "click", () => this.copyHomeEditorSelected());
     bind(this.elements.homeEditorCopyAllButton, "click", () => this.copyHomeEditorExport());
+    bind(this.elements.homeEditorToggleBoxesButton, "click", () => this.toggleHomeEditorBoxes());
+    bind(this.elements.homeEditorLockButton, "click", () => this.toggleHomeEditorLock());
+    bind(this.elements.homeEditorZoomButton, "click", () => this.toggleHomeEditorZoom());
     bind(this.elements.topMenuButton, "click", () => this.handleTopMenu());
     bind(this.elements.themeSelect, "change", () => this.persistSettings());
     bind(this.elements.densitySelect, "change", () => this.persistSettings());
@@ -1560,11 +1608,27 @@ export class HiddenObjectGame {
         event.preventDefault();
         this.homeButtonEditorSelection = key === "1" ? "start" : key === "2" ? "settings" : "more";
         this.layoutHomeButtons();
+        this.refreshHomeEditorUi();
         return;
       }
       if (key === "[" || key === "]") {
         event.preventDefault();
         this.cycleHomeEditorSelection(key === "]" ? 1 : -1);
+        return;
+      }
+      if (key === "b") {
+        event.preventDefault();
+        this.toggleHomeEditorBoxes();
+        return;
+      }
+      if (key === "k") {
+        event.preventDefault();
+        this.toggleHomeEditorLock();
+        return;
+      }
+      if (key === "z") {
+        event.preventDefault();
+        this.toggleHomeEditorZoom();
         return;
       }
       if (["arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
@@ -1739,7 +1803,7 @@ export class HiddenObjectGame {
 
   nudgeHomeEditorZone(key, amount) {
     const zone = this.getHomeEditorZone(this.homeButtonEditorSelection);
-    if (!zone) {
+    if (!zone || this.homeEditorLockedKeys.has(this.homeButtonEditorSelection)) {
       return;
     }
     if (key === "arrowup") {
@@ -1761,7 +1825,14 @@ export class HiddenObjectGame {
 
   resizeHomeEditorZone(key, amount) {
     const zone = this.getHomeEditorZone(this.homeButtonEditorSelection);
-    if (!zone) {
+    if (!zone || this.homeEditorLockedKeys.has(this.homeButtonEditorSelection)) {
+      return;
+    }
+    const isLayer = this.isHomeEditorLayerKey(this.homeButtonEditorSelection);
+    if (isLayer) {
+      this.resizeHomeEditorLayerZone(zone, key, amount);
+      this.layoutHomeButtons();
+      this.refreshHomeEditorUi();
       return;
     }
     if (key === "arrowup") {
@@ -1777,6 +1848,34 @@ export class HiddenObjectGame {
     this.refreshHomeEditorUi();
   }
 
+  resizeHomeEditorLayerZone(zone, key, amount) {
+    const element = this.getHomeEditorElement(this.homeButtonEditorSelection);
+    const aspect = (element?.naturalWidth && element?.naturalHeight)
+      ? (element.naturalWidth / element.naturalHeight)
+      : (Math.abs(zone.x2 - zone.x1) / Math.max(1, Math.abs(zone.y2 - zone.y1)));
+    const nextWidth = Math.max(8, Math.abs(zone.x2 - zone.x1) + ((key === "arrowleft" || key === "arrowright") ? amount : amount * aspect));
+    const nextHeight = Math.max(8, nextWidth / Math.max(0.01, aspect));
+    const left = Math.min(zone.x1, zone.x2);
+    const top = Math.min(zone.y1, zone.y2);
+    zone.x1 = left;
+    zone.y1 = top;
+    zone.x2 = left + nextWidth;
+    zone.y2 = top + nextHeight;
+  }
+
+  getHomeEditorElement(key) {
+    const map = {
+      titleBanner: this.elements.titleBannerLayer,
+      cloud1: this.elements.cloud1Layer,
+      cloud2: this.elements.cloud2Layer,
+      cloud3: this.elements.cloud3Layer,
+      wheelStand: this.elements.wheelStandLayer,
+      wheel: this.elements.wheelLayer,
+      magnifierDecor: this.elements.magnifierDecorLayer,
+    };
+    return map[key] ?? null;
+  }
+
   onHomeEditorPointerDown(event) {
     if (!this.sessionTestingUnlocked || !this.homeButtonEditorEnabled) {
       return;
@@ -1786,6 +1885,11 @@ export class HiddenObjectGame {
       return;
     }
     this.homeButtonEditorSelection = box.dataset.editorKey;
+    if (this.homeEditorLockedKeys.has(this.homeButtonEditorSelection)) {
+      this.refreshHomeEditorUi();
+      event.preventDefault();
+      return;
+    }
     const mode = event.target.closest(".home-debug-handle") ? "resize" : "move";
     this.homeEditorDrag = {
       key: box.dataset.editorKey,
@@ -1805,14 +1909,27 @@ export class HiddenObjectGame {
     const imageWidth = this.elements.startScreenImage.naturalWidth || 1;
     const imageHeight = this.elements.startScreenImage.naturalHeight || 1;
     const zone = this.getHomeEditorZone(this.homeEditorDrag.key);
-    if (!zone) {
+    if (!zone || this.homeEditorLockedKeys.has(this.homeEditorDrag.key)) {
       return;
     }
     const deltaX = ((event.clientX - this.homeEditorDrag.startX) / overlayRect.width) * imageWidth;
     const deltaY = ((event.clientY - this.homeEditorDrag.startY) / overlayRect.height) * imageHeight;
     if (this.homeEditorDrag.mode === "resize") {
-      zone.x2 += deltaX;
-      zone.y2 += deltaY;
+      if (this.isHomeEditorLayerKey(this.homeEditorDrag.key)) {
+        const element = this.getHomeEditorElement(this.homeEditorDrag.key);
+        const aspect = (element?.naturalWidth && element?.naturalHeight)
+          ? (element.naturalWidth / element.naturalHeight)
+          : (Math.abs(zone.x2 - zone.x1) / Math.max(1, Math.abs(zone.y2 - zone.y1)));
+        const widthFromX = Math.max(8, Math.abs(zone.x2 - zone.x1) + deltaX);
+        const widthFromY = Math.max(8, (Math.abs(zone.y2 - zone.y1) + deltaY) * aspect);
+        const nextWidth = Math.abs(deltaX) >= Math.abs(deltaY) ? widthFromX : widthFromY;
+        const nextHeight = Math.max(8, nextWidth / Math.max(0.01, aspect));
+        zone.x2 = zone.x1 + nextWidth;
+        zone.y2 = zone.y1 + nextHeight;
+      } else {
+        zone.x2 += deltaX;
+        zone.y2 += deltaY;
+      }
     } else {
       zone.x1 += deltaX;
       zone.x2 += deltaX;
