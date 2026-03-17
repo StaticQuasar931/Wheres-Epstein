@@ -526,8 +526,62 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 /* ============================================================
-   HOME BUTTON OVERLAY
+   HOME NAME BUTTON — game title badge, positioned by game.js click handler
    ============================================================ */
+.home-name-button {
+  position: absolute;
+  top: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  background: rgba(4, 10, 20, 0.72);
+  border: 1px solid rgba(255, 216, 78, 0.22);
+  border-radius: 999px;
+  padding: 0.55rem 1.5rem;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(255,216,78,0.06);
+  transition:
+    transform 160ms var(--ease-bounce),
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.home-name-button:hover {
+  transform: translateX(-50%) translateY(-2px);
+  border-color: rgba(255, 216, 78, 0.50);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.48), 0 0 22px rgba(255, 216, 78, 0.14);
+  background: rgba(4, 10, 20, 0.90);
+}
+
+.home-name-button:active {
+  transform: translateX(-50%) translateY(1px) scale(0.97);
+  transition-duration: 50ms;
+}
+
+.home-name-text {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  letter-spacing: 0.10em;
+  color: var(--accent);
+  text-shadow: 0 0 16px rgba(255, 216, 78, 0.36);
+  white-space: nowrap;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Hide it when the boot overlay is visible */
+.home-boot-overlay:not(.is-exiting) ~ .home-name-button {
+  display: none;
+}
+
+/* ============================================================
+   HOME BUTTON OVERLAY
 .home-button-overlay,
 .home-debug-overlay { position: absolute; z-index: 5; }
 
