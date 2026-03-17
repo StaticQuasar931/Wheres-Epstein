@@ -158,6 +158,93 @@ export class HiddenObjectGame {
     this.startHomeBoot();
   }
 
+  refreshHomeEditorUi() {
+    const active = this.sessionTestingUnlocked && this.elements.screens.home.classList.contains("screen-active");
+    this.elements.homeEditorPanel.classList.toggle("hidden", !active);
+    if (!active) {
+      return;
+    }
+    const zone = this.getHomeEditorZone(this.homeButtonEditorSelection);
+    this.elements.homeEditorSelectionLabel.textContent = this.getHomeEditorExportKey(this.homeButtonEditorSelection);
+    this.elements.homeEditorCoords.textContent = zone
+      ? `x1: ${Math.round(zone.x1)}, y1: ${Math.round(zone.y1)}, x2: ${Math.round(zone.x2)}, y2: ${Math.round(zone.y2)}`
+      : "unavailable";
+    this.elements.homeEditorToggleButton.textContent = this.homeButtonEditorEnabled ? "Editor On" : "Editor Off";
+  }
+
+  buildHomeEditorExportText(selectedOnly = false) {
+    const items = selectedOnly
+      ? this.getHomeEditorItems().filter((item) => item.key === this.homeButtonEditorSelection)
+      : this.getHomeEditorItems();
+    const buttonLines = [];
+    const layerLines = [];
+
+    items.forEach(({ key }) => {
+      const zone = this.getHomeEditorZone(key);
+      if (!zone) {
+        return;
+      }
+      const exportKey = this.getHomeEditorExportKey(key);
+      const line = `  ${exportKey}: { x1: ${Math.round(zone.x1)}, y1: ${Math.round(zone.y1)}, x2: ${Math.round(zone.x2)}, y2: ${Math.round(zone.y2)}${zone.color ? `, color: "${zone.color}"` : ""}${zone.src ? `, src: "${zone.src}"` : ""} },`;
+      if (key === "start" || key === "settings" || key === "more" || key === "nameLink") {
+        buttonLines.push(line);
+      } else {
+        layerLines.push(line);
+      }
+    });
+
+    if (selectedOnly) {
+      return [...buttonLines, ...layerLines].join("\n");
+    }
+
+    return [
+      "export const START_SCREEN_BUTTONS = {",
+      ...buttonLines,
+      "};",
+      "",
+      "export const START_SCREEN_LAYERS = {",
+      ...layerLines,
+      "};",
+    ].join("\n");
+  }
+
+  getHomeEditorExportKey(key) {
+    if (key === "more") {
+      return "moreGames";
+    }
+    return key;
+  }
+
+  async copyTextToClipboard(text) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {}
+
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.setAttribute("readonly", "");
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+    document.body.appendChild(textArea);
+    textArea.select();
+    const copied = document.execCommand("copy");
+    document.body.removeChild(textArea);
+    return copied;
+  }
+
+  async copyHomeEditorSelected() {
+    const copied = await this.copyTextToClipboard(this.buildHomeEditorExportText(true));
+    this.showMenuToast(copied ? `Copied ${this.getHomeEditorExportKey(this.homeButtonEditorSelection)}.` : "Copy failed.", !copied);
+  }
+
+  async copyHomeEditorExport() {
+    const copied = await this.copyTextToClipboard(this.buildHomeEditorExportText(false));
+    this.showMenuToast(copied ? "Copied all home layout data." : "Copy failed.", !copied);
+  }
+
   getElements() {
     return {
       body: document.body,
@@ -181,8 +268,6 @@ export class HiddenObjectGame {
       homeLayerOverlay: document.getElementById("homeLayerOverlay"),
       homeDebugOverlay: document.getElementById("homeDebugOverlay"),
       homeDebugReadout: document.getElementById("homeDebugReadout"),
-      startscreenLayer: document.getElementById("startscreenLayer"),
-      titleCardLayer: document.getElementById("titleCardLayer"),
       titleBannerLayer: document.getElementById("titleBannerLayer"),
       cloud1Layer: document.getElementById("cloud1Layer"),
       cloud2Layer: document.getElementById("cloud2Layer"),
@@ -190,6 +275,14 @@ export class HiddenObjectGame {
       wheelStandLayer: document.getElementById("wheelStandLayer"),
       wheelLayer: document.getElementById("wheelLayer"),
       magnifierDecorLayer: document.getElementById("magnifierDecorLayer"),
+      homeEditorPanel: document.getElementById("homeEditorPanel"),
+      homeEditorSelectionLabel: document.getElementById("homeEditorSelectionLabel"),
+      homeEditorCoords: document.getElementById("homeEditorCoords"),
+      homeEditorToggleButton: document.getElementById("homeEditorToggleButton"),
+      homeEditorPrevButton: document.getElementById("homeEditorPrevButton"),
+      homeEditorNextButton: document.getElementById("homeEditorNextButton"),
+      homeEditorCopySelectedButton: document.getElementById("homeEditorCopySelectedButton"),
+      homeEditorCopyAllButton: document.getElementById("homeEditorCopyAllButton"),
       startButtonArt: document.getElementById("startButtonArt"),
       startButtonSheen: document.getElementById("startButtonSheen"),
       settingsButtonArt: document.getElementById("settingsButtonArt"),
@@ -331,6 +424,11 @@ export class HiddenObjectGame {
     this.elements.openSettingsButton.addEventListener("click", () => this.showScreen("settings"));
     this.elements.closeSettingsButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.moreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
+    bind(this.elements.homeEditorToggleButton, "click", () => this.toggleHomeButtonEditor());
+    bind(this.elements.homeEditorPrevButton, "click", () => this.cycleHomeEditorSelection(-1));
+    bind(this.elements.homeEditorNextButton, "click", () => this.cycleHomeEditorSelection(1));
+    bind(this.elements.homeEditorCopySelectedButton, "click", () => this.copyHomeEditorSelected());
+    bind(this.elements.homeEditorCopyAllButton, "click", () => this.copyHomeEditorExport());
     bind(this.elements.topMenuButton, "click", () => this.handleTopMenu());
     bind(this.elements.themeSelect, "change", () => this.persistSettings());
     bind(this.elements.densitySelect, "change", () => this.persistSettings());
@@ -492,6 +590,7 @@ export class HiddenObjectGame {
       this.renderHomeStats();
     }
     this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
     if (name === "home" && this.homeAssetsReady && this.elements.startScreenImage.naturalWidth > 0) {
       this.playHomeButtonIntro();
     }
@@ -504,12 +603,12 @@ export class HiddenObjectGame {
     this.homeBootStarted = true;
     const assets = [
       ["background", this.elements.startScreenImage, "Assets/ui/backgroundplain.png"],
-      ["startscreen", this.elements.startscreenLayer, START_SCREEN_LAYERS.startscreen.src],
-      ["titleCard", this.elements.titleCardLayer, START_SCREEN_LAYERS.titleCard.src],
       ["titleBanner", this.elements.titleBannerLayer, START_SCREEN_LAYERS.titleBanner.src],
       ["cloud1", this.elements.cloud1Layer, START_SCREEN_LAYERS.cloud1.src],
       ["cloud2", this.elements.cloud2Layer, START_SCREEN_LAYERS.cloud2.src],
       ["cloud3", this.elements.cloud3Layer, START_SCREEN_LAYERS.cloud3.src],
+      ["wheelStand", this.elements.wheelStandLayer, START_SCREEN_LAYERS.wheelStand.src],
+      ["wheel", this.elements.wheelLayer, START_SCREEN_LAYERS.wheel.src],
       ["magnifierDecor", this.elements.magnifierDecorLayer, START_SCREEN_LAYERS.magnifierDecor.src],
       ["start", this.elements.startButtonArt, "Assets/ui/startbutton.png"],
       ["settings", this.elements.settingsButtonArt, "Assets/ui/settingsbutton.png"],
@@ -1124,7 +1223,7 @@ export class HiddenObjectGame {
 
   showStartImageError() {
     this.elements.startScreenFallback.classList.remove("hidden");
-    this.elements.startScreenErrorText.textContent = "Tried to load: Assets/ui/nobuttonloadingscreen.jpg";
+    this.elements.startScreenErrorText.textContent = "Tried to load: Assets/ui/backgroundplain.png";
   }
 
   hideStartImageError() {
@@ -1323,6 +1422,7 @@ export class HiddenObjectGame {
       this.elements.debugReadout.classList.remove("hidden");
       this.elements.skipLevelButton.classList.remove("hidden");
       this.layoutHomeButtons();
+      this.refreshHomeEditorUi();
       return;
     }
     this.elements.diagnosticMessage.textContent = "Denied.";
@@ -1604,6 +1704,7 @@ export class HiddenObjectGame {
   toggleHomeButtonEditor() {
     this.homeButtonEditorEnabled = !this.homeButtonEditorEnabled;
     this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
     this.showMenuToast(this.homeButtonEditorEnabled
       ? "Home editor on. Drag boxes to move, drag the corner to resize, use [ ] to cycle, arrows to move, Shift plus arrows to resize."
       : "Home button editor off.");
@@ -1633,6 +1734,7 @@ export class HiddenObjectGame {
     const nextIndex = (currentIndex + direction + items.length) % items.length;
     this.homeButtonEditorSelection = items[nextIndex].key;
     this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
   }
 
   nudgeHomeEditorZone(key, amount) {
@@ -1654,6 +1756,7 @@ export class HiddenObjectGame {
       zone.x2 += amount;
     }
     this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
   }
 
   resizeHomeEditorZone(key, amount) {
@@ -1671,6 +1774,7 @@ export class HiddenObjectGame {
       zone.x2 += amount;
     }
     this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
   }
 
   onHomeEditorPointerDown(event) {
@@ -1689,6 +1793,7 @@ export class HiddenObjectGame {
       startX: event.clientX,
       startY: event.clientY,
     };
+    this.refreshHomeEditorUi();
     event.preventDefault();
   }
 
@@ -1717,6 +1822,7 @@ export class HiddenObjectGame {
     this.homeEditorDrag.startX = event.clientX;
     this.homeEditorDrag.startY = event.clientY;
     this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
   }
 
   onHomeEditorPointerUp() {

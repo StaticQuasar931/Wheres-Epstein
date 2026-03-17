@@ -709,6 +709,60 @@ body.mode-game .site-topbar { display: flex; }
   backdrop-filter: blur(18px);
 }
 
+.home-editor-panel {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 7;
+  width: min(92vw, 430px);
+  display: grid;
+  gap: 0.65rem;
+  border: 1px solid var(--line-mid);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1rem;
+  background: rgba(3, 8, 16, 0.97);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.home-editor-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.home-editor-header strong {
+  font-family: var(--font-display, inherit);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+.home-editor-coords {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-family: 'Courier New', 'Consolas', monospace;
+  word-break: break-word;
+}
+
+.home-editor-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.home-editor-actions:last-of-type {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-editor-help {
+  margin: 0;
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
 /* ============================================================
    HERO SHELLS
    ============================================================ */

@@ -83,8 +83,6 @@ export const START_SCREEN_BUTTONS = {
 };
 
 export const START_SCREEN_LAYERS = {
-  startscreen: { x1: 0, y1: 0, x2: 1500, y2: 1000, color: "cyan", src: "Assets/ui/startscreen.png" },
-  titleCard: { x1: 470, y1: 52, x2: 1030, y2: 260, color: "pink", src: "Assets/ui/titlecard.png" },
   titleBanner: { x1: 420, y1: 34, x2: 1080, y2: 190, color: "purple", src: "Assets/ui/titlebanner.png" },
   cloud1: { x1: 70, y1: 86, x2: 350, y2: 210, color: "white", src: "Assets/ui/cloud1.png" },
   cloud2: { x1: 1080, y1: 58, x2: 1380, y2: 194, color: "white", src: "Assets/ui/cloud2.png" },

@@ -53,6 +53,7 @@ export function layoutHomeButtons(game, config) {
   placeHomeSheen(game, game.elements.settingsButtonSheen, settingsPlacement);
   placeHomeSheen(game, game.elements.moreGamesButtonSheen, morePlacement);
   renderHomeDebugOverlay(game, drawWidth, drawHeight, image.naturalWidth, image.naturalHeight, config);
+  game.refreshHomeEditorUi?.();
 }
 
 export function bindHomeButtonHoverEffects(game) {
@@ -153,12 +154,13 @@ export function updateHomeDebug(game, event, config) {
   const selected = game.homeButtonZones.get(game.homeButtonEditorSelection);
   const selectedSource = game.getHomeEditorZone?.(game.homeButtonEditorSelection);
   const copyLine = selectedSource
-    ? `${game.homeButtonEditorSelection}: { x1: ${Math.round(selectedSource.x1)}, y1: ${Math.round(selectedSource.y1)}, x2: ${Math.round(selectedSource.x2)}, y2: ${Math.round(selectedSource.y2)} }`
+    ? `${game.getHomeEditorExportKey?.(game.homeButtonEditorSelection) ?? game.homeButtonEditorSelection}: { x1: ${Math.round(selectedSource.x1)}, y1: ${Math.round(selectedSource.y1)}, x2: ${Math.round(selectedSource.x2)}, y2: ${Math.round(selectedSource.y2)} }`
     : "selected source: unavailable";
   const editor = game.homeButtonEditorEnabled
     ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box to move, drag the corner to resize.\nUse [ ] to cycle, arrows to move, Shift plus arrows to resize.`
     : "Editor: off (press H in testing mode)";
   game.elements.homeDebugReadout.textContent = `${pointer}\n${editor}\nselected: ${formatZone(selected)}\n${copyLine}`;
+  game.refreshHomeEditorUi?.();
 }
 
 function clearHomeAnimationTimers(game) {
@@ -443,8 +445,6 @@ function placeHomeLayer(game, key, element, zone, drawWidth, drawHeight, natural
 
 function getHomeElement(game, key) {
   const map = {
-    startscreen: game.elements.startscreenLayer,
-    titleCard: game.elements.titleCardLayer,
     titleBanner: game.elements.titleBannerLayer,
     cloud1: game.elements.cloud1Layer,
     cloud2: game.elements.cloud2Layer,
