@@ -425,7 +425,7 @@ body.mode-game .site-topbar { display: flex; }
   object-fit: contain;
   object-position: center;
   z-index: 0;
-  animation: kb-breathe 26s ease-in-out infinite alternate;
+  animation: none;
 }
 
 .home-viewport:not(.home-ready) .hero-background,
