@@ -3,6 +3,6 @@
 
 import { HiddenObjectGame } from "./game.js";
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("load", () => {
   new HiddenObjectGame();
 });

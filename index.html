@@ -153,6 +153,12 @@
                 <div class="stat-card"><span>Avg Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
                 <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
               </div>
+              <div class="speedrun-recent-block">
+                <p class="eyebrow">Recently Played</p>
+                <div id="speedrunRecentStrip" class="speedrun-recent-strip">
+                  <span class="speedrun-recent-empty">No recent speedrun picks yet.</span>
+                </div>
+              </div>
               <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
             </div>
           </section>
@@ -248,6 +254,20 @@
               <option value="hidden">Hidden</option>
             </select>
           </label>
+          <label class="setting-card">
+            <span>Found Target FX</span>
+            <select id="foundFxSelect">
+              <option value="strong">Strong</option>
+              <option value="subtle">Subtle</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Magnifier Shape</span>
+            <select id="magnifierShapeSelect">
+              <option value="circle">Circle</option>
+              <option value="square">Square</option>
+            </select>
+          </label>
         </div>
 
         <div class="level-select-groups">
@@ -330,8 +350,7 @@
           </section>
 
           <div class="menu-card version-card">
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.9.3</p>
-            <p class="subtle-text">Rectangles use <code>x1, y1</code> to <code>x2, y2</code>. Clean runs and testing runs stay separate.</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.1.9.32</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -360,6 +379,7 @@
           <h3 id="sceneFallbackTitle">Unable to load level background</h3>
           <p id="sceneFallbackText">Check the image path and filename.</p>
         </div>
+        <div id="magnifierLens" class="magnifier-lens hidden" aria-hidden="true"></div>
 
         <!-- HUD: 2-row layout
              Row 1 (top): info pills + action buttons

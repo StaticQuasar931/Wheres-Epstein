@@ -313,6 +313,11 @@ export class HiddenObjectGame {
   }
 
   bindEvents() {
+    const bind = (element, eventName, handler) => {
+      if (element) {
+        element.addEventListener(eventName, handler);
+      }
+    };
     this.elements.startGameButton.addEventListener("click", () => this.showScreen("levelSelect"));
     this.elements.homeNameButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.closeLevelSelectButton.addEventListener("click", () => this.showScreen("home"));
@@ -320,16 +325,16 @@ export class HiddenObjectGame {
     this.elements.closeSettingsButton.addEventListener("click", () => this.showScreen("home"));
     this.elements.moreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.topMenuButton.addEventListener("click", () => this.handleTopMenu());
-    this.elements.themeSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.densitySelect.addEventListener("change", () => this.persistSettings());
-    this.elements.motionSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.previewSizeSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.levelIntroSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.panTipSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.confirmQuitSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.previewDefaultSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.foundFxSelect.addEventListener("change", () => this.persistSettings());
-    this.elements.magnifierShapeSelect.addEventListener("change", () => this.persistSettings());
+    bind(this.elements.themeSelect, "change", () => this.persistSettings());
+    bind(this.elements.densitySelect, "change", () => this.persistSettings());
+    bind(this.elements.motionSelect, "change", () => this.persistSettings());
+    bind(this.elements.previewSizeSelect, "change", () => this.persistSettings());
+    bind(this.elements.levelIntroSelect, "change", () => this.persistSettings());
+    bind(this.elements.panTipSelect, "change", () => this.persistSettings());
+    bind(this.elements.confirmQuitSelect, "change", () => this.persistSettings());
+    bind(this.elements.previewDefaultSelect, "change", () => this.persistSettings());
+    bind(this.elements.foundFxSelect, "change", () => this.persistSettings());
+    bind(this.elements.magnifierShapeSelect, "change", () => this.persistSettings());
     this.elements.settingsDiscordButton.addEventListener("click", () => this.openExternalLink(DISCORD_URL, "Add your Discord invite URL in scripts/game.js to enable this button."));
     this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
@@ -355,14 +360,14 @@ export class HiddenObjectGame {
         }
       });
     });
-    this.elements.zoomOutButton.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
-    this.elements.zoomInButton.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
-    this.elements.fitZoomButton.addEventListener("click", () => this.fitLevelToViewport());
-    this.elements.resetZoomButton.addEventListener("click", () => this.fitLevelToViewport());
-    this.elements.zoomOutButtonBottom.addEventListener("click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
-    this.elements.zoomInButtonBottom.addEventListener("click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
-    this.elements.fitZoomButtonBottom.addEventListener("click", () => this.fitLevelToViewport());
-    this.elements.resetZoomButtonBottom.addEventListener("click", () => this.fitLevelToViewport());
+    bind(this.elements.zoomOutButton, "click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
+    bind(this.elements.zoomInButton, "click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
+    bind(this.elements.fitZoomButton, "click", () => this.fitLevelToViewport());
+    bind(this.elements.resetZoomButton, "click", () => this.fitLevelToViewport());
+    bind(this.elements.zoomOutButtonBottom, "click", () => this.zoomFromCenter(1 / BUTTON_ZOOM_FACTOR));
+    bind(this.elements.zoomInButtonBottom, "click", () => this.zoomFromCenter(BUTTON_ZOOM_FACTOR));
+    bind(this.elements.fitZoomButtonBottom, "click", () => this.fitLevelToViewport());
+    bind(this.elements.resetZoomButtonBottom, "click", () => this.fitLevelToViewport());
     this.elements.skipLevelButton.addEventListener("click", () => this.skipLevel());
     this.elements.pauseButton.addEventListener("click", () => this.pauseGame());
     this.elements.returnHomeButton.addEventListener("click", () => this.quitRun());
@@ -415,16 +420,16 @@ export class HiddenObjectGame {
   }
 
   applySettings() {
-    this.elements.themeSelect.value = this.save.settings.theme;
-    this.elements.densitySelect.value = this.save.settings.density;
-    this.elements.motionSelect.value = this.save.settings.motion;
-    this.elements.previewSizeSelect.value = this.save.settings.previewSize;
-    this.elements.levelIntroSelect.value = this.save.settings.showLevelIntro;
-    this.elements.panTipSelect.value = this.save.settings.showPanTip;
-    this.elements.confirmQuitSelect.value = this.save.settings.confirmQuit;
-    this.elements.previewDefaultSelect.value = this.save.settings.previewDefault;
-    this.elements.foundFxSelect.value = this.save.settings.foundFx;
-    this.elements.magnifierShapeSelect.value = this.save.settings.magnifierShape ?? "circle";
+    if (this.elements.themeSelect) this.elements.themeSelect.value = this.save.settings.theme;
+    if (this.elements.densitySelect) this.elements.densitySelect.value = this.save.settings.density;
+    if (this.elements.motionSelect) this.elements.motionSelect.value = this.save.settings.motion;
+    if (this.elements.previewSizeSelect) this.elements.previewSizeSelect.value = this.save.settings.previewSize;
+    if (this.elements.levelIntroSelect) this.elements.levelIntroSelect.value = this.save.settings.showLevelIntro;
+    if (this.elements.panTipSelect) this.elements.panTipSelect.value = this.save.settings.showPanTip;
+    if (this.elements.confirmQuitSelect) this.elements.confirmQuitSelect.value = this.save.settings.confirmQuit;
+    if (this.elements.previewDefaultSelect) this.elements.previewDefaultSelect.value = this.save.settings.previewDefault;
+    if (this.elements.foundFxSelect) this.elements.foundFxSelect.value = this.save.settings.foundFx;
+    if (this.elements.magnifierShapeSelect) this.elements.magnifierShapeSelect.value = this.save.settings.magnifierShape ?? "circle";
     this.elements.body.dataset.theme = this.save.settings.theme;
     this.elements.body.dataset.density = this.save.settings.density;
     this.elements.body.dataset.motion = this.save.settings.motion;
@@ -441,16 +446,16 @@ export class HiddenObjectGame {
 
   persistSettings() {
     this.save = saveSettings({
-      theme: this.elements.themeSelect.value,
-      density: this.elements.densitySelect.value,
-      motion: this.elements.motionSelect.value,
-      previewSize: this.elements.previewSizeSelect.value,
-      showLevelIntro: this.elements.levelIntroSelect.value,
-      showPanTip: this.elements.panTipSelect.value,
-      confirmQuit: this.elements.confirmQuitSelect.value,
-      previewDefault: this.elements.previewDefaultSelect.value,
-      foundFx: this.elements.foundFxSelect.value,
-      magnifierShape: this.elements.magnifierShapeSelect.value,
+      theme: this.elements.themeSelect?.value ?? this.save.settings.theme,
+      density: this.elements.densitySelect?.value ?? this.save.settings.density,
+      motion: this.elements.motionSelect?.value ?? this.save.settings.motion,
+      previewSize: this.elements.previewSizeSelect?.value ?? this.save.settings.previewSize,
+      showLevelIntro: this.elements.levelIntroSelect?.value ?? this.save.settings.showLevelIntro,
+      showPanTip: this.elements.panTipSelect?.value ?? this.save.settings.showPanTip,
+      confirmQuit: this.elements.confirmQuitSelect?.value ?? this.save.settings.confirmQuit,
+      previewDefault: this.elements.previewDefaultSelect?.value ?? this.save.settings.previewDefault,
+      foundFx: this.elements.foundFxSelect?.value ?? this.save.settings.foundFx,
+      magnifierShape: this.elements.magnifierShapeSelect?.value ?? (this.save.settings.magnifierShape ?? "circle"),
     });
     this.applySettings();
   }
@@ -616,6 +621,9 @@ export class HiddenObjectGame {
 
   renderSpeedrunRecentStrip(levelIds) {
     const strip = this.elements.speedrunRecentStrip;
+    if (!strip) {
+      return;
+    }
     strip.innerHTML = "";
     if (!levelIds.length) {
       const empty = document.createElement("span");
