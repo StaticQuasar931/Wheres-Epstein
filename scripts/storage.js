@@ -13,6 +13,7 @@ const DEFAULT_SAVE = {
     previewDefault: "shown",
     foundFx: "strong",
     magnifierShape: "circle",
+    magnifierSize: "large",
   },
   meta: {
     advancedMultiSeen: false,

@@ -12,12 +12,12 @@
 }
 
 .image-button:hover {
-  background: rgba(255, 255, 255, 0.018);
-  box-shadow: 0 0 30px rgba(255, 216, 78, 0.24);
+  background: transparent;
+  box-shadow: none;
 }
 
 .image-button:active {
-  transform: scale(0.980);
+  transform: none;
 }
 
 /* ============================================================
@@ -43,11 +43,11 @@
 .home-button-art.is-hovered,
 .image-button:focus-visible + .home-button-art {
   filter:
-    drop-shadow(0 30px 46px rgba(0, 0, 0, 0.44))
-    drop-shadow(0 0 38px rgba(255, 216, 78, 0.38))
-    brightness(1.10)
-    saturate(1.15);
-  transform: translateY(-7px) scale(1.06);
+    drop-shadow(0 22px 34px rgba(0, 0, 0, 0.34))
+    drop-shadow(0 0 18px rgba(255, 216, 78, 0.18))
+    brightness(1.04)
+    saturate(1.08);
+  transform: translateY(-2px) scale(1.035);
   transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1.05), filter 220ms ease;
 }
 

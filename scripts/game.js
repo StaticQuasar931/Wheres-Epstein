@@ -229,6 +229,7 @@ export class HiddenObjectGame {
       previewDefaultSelect: document.getElementById("previewDefaultSelect"),
       foundFxSelect: document.getElementById("foundFxSelect"),
       magnifierShapeSelect: document.getElementById("magnifierShapeSelect"),
+      magnifierSizeSelect: document.getElementById("magnifierSizeSelect"),
       settingsDiscordButton: document.getElementById("settingsDiscordButton"),
       settingsMoreGamesButton: document.getElementById("settingsMoreGamesButton"),
       settingsLevelSelectButton: document.getElementById("settingsLevelSelectButton"),
@@ -335,6 +336,7 @@ export class HiddenObjectGame {
     bind(this.elements.previewDefaultSelect, "change", () => this.persistSettings());
     bind(this.elements.foundFxSelect, "change", () => this.persistSettings());
     bind(this.elements.magnifierShapeSelect, "change", () => this.persistSettings());
+    bind(this.elements.magnifierSizeSelect, "change", () => this.persistSettings());
     this.elements.settingsDiscordButton.addEventListener("click", () => this.openExternalLink(DISCORD_URL, "Add your Discord invite URL in scripts/game.js to enable this button."));
     this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
@@ -430,12 +432,14 @@ export class HiddenObjectGame {
     if (this.elements.previewDefaultSelect) this.elements.previewDefaultSelect.value = this.save.settings.previewDefault;
     if (this.elements.foundFxSelect) this.elements.foundFxSelect.value = this.save.settings.foundFx;
     if (this.elements.magnifierShapeSelect) this.elements.magnifierShapeSelect.value = this.save.settings.magnifierShape ?? "circle";
+    if (this.elements.magnifierSizeSelect) this.elements.magnifierSizeSelect.value = this.save.settings.magnifierSize ?? "large";
     this.elements.body.dataset.theme = this.save.settings.theme;
     this.elements.body.dataset.density = this.save.settings.density;
     this.elements.body.dataset.motion = this.save.settings.motion;
     this.elements.body.dataset.preview = this.save.settings.previewSize;
     this.elements.body.dataset.foundfx = this.save.settings.foundFx;
     this.elements.body.dataset.magnifier = this.save.settings.magnifierShape ?? "circle";
+    this.elements.body.dataset.magnifierSize = this.save.settings.magnifierSize ?? "large";
     this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
     this.elements.skipLevelButton.classList.toggle("hidden", !this.sessionTestingUnlocked);
     this.elements.settingsDiscordButton.disabled = !DISCORD_URL;
@@ -456,6 +460,7 @@ export class HiddenObjectGame {
       previewDefault: this.elements.previewDefaultSelect?.value ?? this.save.settings.previewDefault,
       foundFx: this.elements.foundFxSelect?.value ?? this.save.settings.foundFx,
       magnifierShape: this.elements.magnifierShapeSelect?.value ?? (this.save.settings.magnifierShape ?? "circle"),
+      magnifierSize: this.elements.magnifierSizeSelect?.value ?? (this.save.settings.magnifierSize ?? "large"),
     });
     this.applySettings();
   }
@@ -788,6 +793,7 @@ export class HiddenObjectGame {
   }
 
   syncLevelSelectPage() {
+    const levelSelectActive = this.elements.screens.levelSelect.classList.contains("screen-active");
     const page = this.state.levelSelectPage;
     const onAdvancedPage = page === 2 && this.isAdvancedUnlocked();
     const onSpeedrunPage = page === 3 && this.isSpeedrunUnlocked();
@@ -802,10 +808,10 @@ export class HiddenObjectGame {
     this.elements.advancedRouteSection.classList.toggle("hidden", !onAdvancedPage);
     this.elements.advancedBonusSection.classList.toggle("hidden", !onAdvancedPage);
     this.elements.speedrunRouteSection.classList.toggle("hidden", !onSpeedrunPage);
-    this.elements.levelSelectPrevPageButton.classList.toggle("hidden", !onAdvancedPage);
-    this.elements.levelSelectNextPageButton.classList.toggle("hidden", !this.isAdvancedUnlocked() || page !== 1);
-    this.elements.levelSelectThirdPageButton.classList.toggle("hidden", !this.isSpeedrunUnlocked() || !onAdvancedPage);
-    this.elements.levelSelectBackFromSpeedrunButton.classList.toggle("hidden", !onSpeedrunPage);
+    this.elements.levelSelectPrevPageButton.classList.toggle("hidden", !levelSelectActive || !onAdvancedPage);
+    this.elements.levelSelectNextPageButton.classList.toggle("hidden", !levelSelectActive || !this.isAdvancedUnlocked() || page !== 1);
+    this.elements.levelSelectThirdPageButton.classList.toggle("hidden", !levelSelectActive || !this.isSpeedrunUnlocked() || !onAdvancedPage);
+    this.elements.levelSelectBackFromSpeedrunButton.classList.toggle("hidden", !levelSelectActive || !onSpeedrunPage);
   }
 
   startNextLevel() {
@@ -1076,7 +1082,7 @@ export class HiddenObjectGame {
     const preferred = pool.filter((level) => level.id !== currentId && !recent.has(level.id));
     const fallback = pool.filter((level) => level.id !== currentId);
     const source = preferred.length ? preferred : fallback;
-    while (source.length && picks.length < 4) {
+    while (source.length && picks.length < 8) {
       const index = Math.floor(Math.random() * source.length);
       picks.push(source.splice(index, 1)[0]);
     }

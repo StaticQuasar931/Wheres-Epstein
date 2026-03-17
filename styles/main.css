@@ -206,9 +206,9 @@ body.mode-game .site-topbar { display: flex; }
   gap: 0.4rem;
   border: 1px solid transparent;
   border-radius: 999px;
-  padding: 0.78rem 1.25rem;
+  padding: 0.62rem 1rem;
   font-family: var(--font-body);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1;
@@ -530,49 +530,37 @@ body.mode-game .site-topbar { display: flex; }
    ============================================================ */
 .home-name-button {
   position: absolute;
-  top: 1.4rem;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 0;
   z-index: 6;
-  background: rgba(4, 10, 20, 0.72);
-  border: 1px solid rgba(255, 216, 78, 0.22);
-  border-radius: 999px;
-  padding: 0.55rem 1.5rem;
+  background: transparent;
+  border: 0;
+  padding: 0;
   cursor: pointer;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(255,216,78,0.06);
-  transition:
-    transform 160ms var(--ease-bounce),
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
+  box-shadow: none;
+  transition: none;
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-.home-name-button:hover {
-  transform: translateX(-50%) translateY(-2px);
-  border-color: rgba(255, 216, 78, 0.50);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.48), 0 0 22px rgba(255, 216, 78, 0.14);
-  background: rgba(4, 10, 20, 0.90);
-}
-
+.home-name-button:hover,
 .home-name-button:active {
-  transform: translateX(-50%) translateY(1px) scale(0.97);
-  transition-duration: 50ms;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 .home-name-text {
-  font-family: var(--font-display);
-  font-size: clamp(1rem, 2.5vw, 1.4rem);
-  letter-spacing: 0.10em;
-  color: var(--accent);
-  text-shadow: 0 0 16px rgba(255, 216, 78, 0.36);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-  line-height: 1;
-  pointer-events: none;
+  border: 0;
 }
 
 /* Hide it when the boot overlay is visible */
@@ -582,6 +570,7 @@ body.mode-game .site-topbar { display: flex; }
 
 /* ============================================================
    HOME BUTTON OVERLAY
+   ============================================================ */
 .home-button-overlay,
 .home-debug-overlay { position: absolute; z-index: 5; }
 
@@ -806,7 +795,9 @@ body.mode-game .site-topbar { display: flex; }
    ============================================================ */
 .menu-shell {
   min-height: 100vh;
-  padding: 5rem var(--shell-padding) 2rem;
+  padding: 4.6rem 0.9rem 1rem;
+  width: min(100%, 1460px);
+  margin: 0 auto;
   /* Full width — no artificial max-width restriction that creates dead space */
   position: relative;
 }
@@ -851,7 +842,7 @@ body.mode-game .site-topbar { display: flex; }
 }
 .setting-card span, .menu-card h4, .menu-header h2 { color: var(--text); }
 
-.level-select-groups { display: grid; gap: 1.25rem; margin-top: 0; }
+.level-select-groups { display: grid; gap: 0.95rem; margin-top: 0; }
 
 #levelSelectScreen .level-select-groups {
   grid-template-columns: 1fr;
@@ -859,7 +850,7 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 #settingsScreen .level-select-groups {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1.1fr 1.1fr 0.95fr;
   align-items: start;
 }
 
@@ -896,13 +887,13 @@ body.mode-game .site-topbar { display: flex; }
     rgba(255, 255, 255, 0.022) 100%
   );
   /* More padding, bigger feel */
-  padding: 1.1rem 1rem;
+  padding: 0.8rem 0.72rem;
   text-align: center;
-  min-height: 140px;
+  min-height: 112px;
   cursor: pointer;
   display: grid;
   align-content: space-between;
-  gap: 0.7rem;
+  gap: 0.45rem;
   /* Stagger fires on every renderLevelGrid call */
   animation: card-pop 300ms var(--ease-out) both;
   transition:
@@ -963,13 +954,13 @@ body.mode-game .site-topbar { display: flex; }
 .level-card:hover:not(.locked)::after  { opacity: 1; }
 
 .level-card:hover:not(.locked) {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
   border-color: rgba(255, 216, 78, 0.44);
   background: rgba(255, 255, 255, 0.11);
   box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.40),
-    0 0 0 1px rgba(255,216,78,0.10),
-    0 0 22px rgba(255, 216, 78, 0.08);
+    0 10px 22px rgba(0, 0, 0, 0.26),
+    0 0 0 1px rgba(255,216,78,0.08),
+    0 0 12px rgba(255, 216, 78, 0.06);
 }
 
 .level-card:active:not(.locked) {
@@ -1060,14 +1051,14 @@ body.mode-game .site-topbar { display: flex; }
    SETTINGS
    ============================================================ */
 .settings-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 0.85rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 0.7rem;
 }
 
 .setting-card {
   display: grid;
-  gap: 0.48rem;
-  padding: 0.9rem 1rem;
+  gap: 0.38rem;
+  padding: 0.72rem 0.8rem;
   align-content: start;
   border-left: 2px solid transparent;
   transition: border-left-color 200ms ease, border-color 200ms ease, background 200ms ease;
@@ -1117,13 +1108,13 @@ body.mode-game .site-topbar { display: flex; }
   margin: 0.5rem 0 0;
   padding-left: 1.1rem;
   color: var(--muted);
-  line-height: 1.68;
-  font-size: 0.875rem;
+  line-height: 1.5;
+  font-size: 0.82rem;
 }
 .compact-list { line-height: 1.56; font-size: 0.82rem; }
 
 .diagnostic-row { display: flex; gap: 0.72rem; margin-top: 0.85rem; }
-.version-card { margin-top: 0; }
+.version-card { margin-top: 0; text-align: center; }
 
 /* ============================================================
    THEME OVERRIDES
@@ -1273,10 +1264,29 @@ body.easter-party .home-viewport::after {
 .play-top-zoom .overlay-button.zoom-btn {
   flex: 1;
   justify-content: center;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding-left: 0.42rem;
+  padding-right: 0.42rem;
   min-width: 0;
 }
+
+.magnifier-lens {
+  position: absolute;
+  z-index: 7;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 216, 78, 0.92);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.42), 0 0 22px rgba(255, 216, 78, 0.24);
+  pointer-events: none;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  transform: translate(-50%, -50%);
+}
+
+body[data-magnifier="square"] .magnifier-lens { border-radius: 18px; }
+body[data-magnifier-size="normal"] .magnifier-lens { width: 200px; height: 200px; }
+body[data-magnifier-size="large"] .magnifier-lens { width: 240px; height: 240px; }
+body[data-magnifier-size="huge"] .magnifier-lens { width: 300px; height: 300px; }
 
 /* Level badge clickable hint */
 .hud-level-badge {
@@ -1403,9 +1413,9 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   top: 50%;
   transform: translateY(-50%);
   z-index: 20; /* above content, below modals (z:40) */
-  width: 5.2rem;
-  min-height: 7.5rem;
-  padding: 1rem 0.7rem;
+  width: 4.4rem;
+  min-height: 6.5rem;
+  padding: 0.76rem 0.5rem;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 216, 78, 0.20);
   background:
@@ -1429,8 +1439,8 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
     background    160ms ease;
 }
 
-.page-arrow-left  { left:  0.75rem; }
-.page-arrow-right { right: 0.75rem; }
+.page-arrow-left  { left:  0.4rem; }
+.page-arrow-right { right: 0.4rem; }
 
 .page-arrow:hover {
   transform: translateY(-50%) scale(1.06);
@@ -1461,7 +1471,7 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   transform: scale(1.10);
 }
 
-.page-arrow svg { width: 1.5rem; height: 1.5rem; }
+.page-arrow svg { width: 1.25rem; height: 1.25rem; }
 
 .page-arrow-text {
   display: flex;
@@ -1469,12 +1479,12 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   gap: 0.06rem;
 }
 .page-arrow-text strong {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 800;
   line-height: 1.1;
 }
 .page-arrow-text span {
-  font-size: 0.64rem;
+  font-size: 0.58rem;
   color: var(--muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
