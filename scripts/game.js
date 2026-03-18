@@ -32,6 +32,7 @@ const HOME_EDITOR_NUDGE_STEP = 4;
 const MAGNIFIER_HOLD_MS = 240;
 const MAGNIFIER_MIN_ZOOM = 1.4;
 const MAGNIFIER_MAX_ZOOM = 8;
+const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 const WALDO_SEQUENCE = ["w", "a", "l", "d", "o"];
 const PARTY_SEQUENCE = ["p", "a", "r", "t", "y"];
 const CHEESE_SEQUENCE = ["c", "h", "e", "e", "s", "e"];
@@ -2781,7 +2782,6 @@ export class HiddenObjectGame {
     this.elements.homeViewport.classList.remove("easter-wheelrush");
     void this.elements.homeViewport.offsetWidth;
     this.elements.homeViewport.classList.add("easter-wheelrush");
-    this.showMenuToast("Wheel rush.");
     window.clearTimeout(this.homeWheelRushTimerId);
     this.homeWheelRushTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-wheelrush");
@@ -2792,7 +2792,6 @@ export class HiddenObjectGame {
     this.elements.homeViewport.classList.remove("easter-airmail");
     void this.elements.homeViewport.offsetWidth;
     this.elements.homeViewport.classList.add("easter-airmail");
-    this.showMenuToast("Air mail.");
     window.clearTimeout(this.homeAirballTimerId);
     this.homeAirballTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-airmail");
@@ -2803,7 +2802,6 @@ export class HiddenObjectGame {
     this.elements.homeViewport.classList.remove("easter-photo");
     void this.elements.homeViewport.offsetWidth;
     this.elements.homeViewport.classList.add("easter-photo");
-    this.showMenuToast("Photo plate.");
     window.clearTimeout(this.homeFacesTimerId);
     this.homeFacesTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-photo");
@@ -2814,7 +2812,6 @@ export class HiddenObjectGame {
     this.elements.homeViewport.classList.remove("easter-banner");
     void this.elements.homeViewport.offsetWidth;
     this.elements.homeViewport.classList.add("easter-banner");
-    this.showMenuToast("Banner burst.");
     window.clearTimeout(this.homeBannerTimerId);
     this.homeBannerTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-banner");
@@ -2825,7 +2822,6 @@ export class HiddenObjectGame {
     this.elements.homeViewport.classList.remove("easter-focus");
     void this.elements.homeViewport.offsetWidth;
     this.elements.homeViewport.classList.add("easter-focus");
-    this.showMenuToast("Focus lock.");
     window.clearTimeout(this.homeFocusTimerId);
     this.homeFocusTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-focus");
@@ -2836,7 +2832,6 @@ export class HiddenObjectGame {
     this.elements.homeViewport.classList.remove("easter-skydrift");
     void this.elements.homeViewport.offsetWidth;
     this.elements.homeViewport.classList.add("easter-skydrift");
-    this.showMenuToast("Sky drift.");
     window.clearTimeout(this.homeSkyTimerId);
     this.homeSkyTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-skydrift");
@@ -2847,7 +2842,6 @@ export class HiddenObjectGame {
     document.body.classList.remove("easter-scorespark");
     void document.body.offsetWidth;
     document.body.classList.add("easter-scorespark");
-    this.showMenuToast("Score spark.");
     window.clearTimeout(this.scoreSparkTimerId);
     this.scoreSparkTimerId = window.setTimeout(() => {
       document.body.classList.remove("easter-scorespark");
@@ -2858,7 +2852,6 @@ export class HiddenObjectGame {
     document.body.classList.remove("easter-timeripple");
     void document.body.offsetWidth;
     document.body.classList.add("easter-timeripple");
-    this.showMenuToast("Time ripple.");
     window.clearTimeout(this.timeRippleTimerId);
     this.timeRippleTimerId = window.setTimeout(() => {
       document.body.classList.remove("easter-timeripple");
@@ -2869,7 +2862,6 @@ export class HiddenObjectGame {
     document.body.classList.remove("easter-starsburst");
     void document.body.offsetWidth;
     document.body.classList.add("easter-starsburst");
-    this.showMenuToast("Stars burst.");
     window.clearTimeout(this.starsBurstTimerId);
     this.starsBurstTimerId = window.setTimeout(() => {
       document.body.classList.remove("easter-starsburst");
