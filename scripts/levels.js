@@ -102,7 +102,7 @@ export const START_SCREEN_LAYERS = {
   wheelStand: { x1: 1055, y1: 171, x2: 1189, y2: 271, color: "orange", src: "Assets/ui/WheelStand.png" },
   wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
   magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, rotation: -6, color: "red", src: "Assets/ui/mglassempty.png" },
-  magnifierFaces: { x1: 560, y1: 361, x2: 958, y2: 647, rotation: -6, color: "gold", src: "Assets/ui/startscreenfaces.png" },
+  magnifierFaces: { x1: 574, y1: 342, x2: 931, y2: 589, rotation: -6, color: "gold", src: "Assets/ui/startscreenfaces.png" },
 };
 // uh783kjs9tya8tji3chq8ugajskaere9h3v198jk
 

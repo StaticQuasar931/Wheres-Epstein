@@ -183,23 +183,27 @@
             </div>
             <div class="speedrun-grid">
               <div class="speedrun-card speedrun-card-primary">
-                <p class="subtle-text">Speedrun routes stay grouped here. Repeats are possible but nudged to feel less common.</p>
+                <p class="subtle-text">Pick a route and jump straight into a focused challenge.</p>
                 <div class="speedrun-bubble-grid speedrun-bubble-grid-wide">
                   <button id="startSpeedrunButton" class="primary-button speedrun-bubble speedrun-bubble-primary" type="button">
-                    All Pools Random
-                    <small>Main, bonus, advanced, and special when authored</small>
+                    All Random
+                    <small>Any authored route</small>
                   </button>
                   <button id="startMainSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
-                    Main Route Random
-                    <small>Story levels only</small>
+                    Main Speedrun
+                    <small>Main levels only</small>
                   </button>
                   <button id="startAdvancedSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
-                    Advanced Random
-                    <small>Advanced main levels only</small>
+                    Advanced Speedrun
+                    <small>Advanced levels only</small>
                   </button>
                   <button id="startBonusSpeedrunButton" class="ghost-button speedrun-bubble" type="button">
                     Bonus Blitz
-                    <small>Bonus and advanced bonus</small>
+                    <small>Bonus pools only</small>
+                  </button>
+                  <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble" type="button">
+                    Special Levels
+                    <small>Authored special route</small>
                   </button>
                 </div>
                 <div class="stat-grid speedrun-stats">
@@ -215,22 +219,7 @@
                   </div>
                 </div>
                 <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
-              </div>
-              <div class="speedrun-sidecards">
-                <section class="menu-card speedrun-mini-card">
-                  <div class="menu-card-header">
-                    <div>
-                      <p class="eyebrow">Special Levels</p>
-                      <h4>Alternate Target Pool</h4>
-                    </div>
-                  </div>
-                  <p class="subtle-text">Framework is ready for `sl1`, `sl2`, and future special routes once that art pool is authored.</p>
-                  <p id="specialLevelsStatusText" class="subtle-text">No special levels authored yet.</p>
-                  <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble" type="button">
-                    Special Levels
-                    <small>Reserved for the authored special route</small>
-                  </button>
-                </section>
+                <p id="specialLevelsStatusText" class="subtle-text speedrun-status-line">No special levels authored yet.</p>
               </div>
             </div>
           </section>
@@ -412,7 +401,7 @@
           </section>
 
           <div class="version-line">
-<p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.4.0</p>
+<p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.4.2</p>
             <div class="button-row settings-links-row">
               <button id="settingsDiscordButton" class="secondary-button" type="button">Join Discord</button>
               <button id="settingsMoreGamesButton" class="ghost-button" type="button">More Games</button>
@@ -656,7 +645,7 @@
   <div id="changelogOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card changelog-card">
       <p class="eyebrow">Patch Notes</p>
-<h2 id="changelogTitle">Alpha Version 0.0.0.1.2.4.0</h2>
+<h2 id="changelogTitle">Alpha Version 0.0.0.1.2.4.2</h2>
       <div class="changelog-columns">
         <section>
           <h3>Changelog</h3>

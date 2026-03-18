@@ -22,9 +22,9 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.4.0";
-const HOME_BUTTON_STAGGER_MS = 400;
-const HOME_BUTTON_ANIMATION_MS = 1960;
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.4.2";
+const HOME_BUTTON_STAGGER_MS = 520;
+const HOME_BUTTON_ANIMATION_MS = 2550;
 const HOME_BUTTON_X_OFFSET = 0;
 const HOME_BUTTON_Y_OFFSET = 0;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
@@ -43,11 +43,10 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Home button hover and press feedback was rebuilt again so the three main buttons react more clearly.",
-  "Start screen decorative interactions now respond more reliably on the live art layers.",
-  "The home editor now respects its own keyboard controls instead of letting the menu shortcuts steal them.",
-  "Escape now backs out of the home editor first before leaving the screen.",
-  "The ferris wheel reaction was sharpened up and home motion was smoothed again for consistency.",
+  "The title, magnifying glass, wheel, and faces layers were retimed so the start screen reveals more smoothly.",
+  "Clouds now wait until the rest of the scene is established before they appear and drift in.",
+  "Page Three was tightened up with cleaner labels and a simpler extras layout.",
+  "The home editor still keeps the start screen aligned, and the faces layer position was updated again.",
   "In-level zoom range was expanded again for closer inspection.",
 ];
 
@@ -693,13 +692,9 @@ export class HiddenObjectGame {
     this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
     bind(this.elements.wheelLayer, "click", () => this.triggerHomeWheelRush());
-    bind(this.elements.airballLayer, "click", () => this.triggerHomeAirballBoost());
     bind(this.elements.magnifierFacesLayer, "click", () => this.triggerHomeFacesFlash());
-    bind(this.elements.titleBannerLayer, "dblclick", () => this.triggerHomeBannerPulse());
+    bind(this.elements.titleBannerLayer, "click", () => this.triggerHomeBannerPulse());
     bind(this.elements.magnifierDecorLayer, "dblclick", () => this.triggerHomeFocusBloom());
-    bind(this.elements.cloud1Layer, "click", () => this.triggerHomeSkyDrift());
-    bind(this.elements.cloud2Layer, "click", () => this.triggerHomeSkyDrift());
-    bind(this.elements.cloud3Layer, "click", () => this.triggerHomeSkyDrift());
     bind(this.elements.hudScoreText, "dblclick", () => this.triggerScoreSpark());
     bind(this.elements.hudTimerText, "dblclick", () => this.triggerTimeRipple());
     bind(this.elements.hudStarsText, "dblclick", () => this.triggerStarsBurst());
@@ -908,7 +903,7 @@ export class HiddenObjectGame {
     this.homeButtonsReady = false;
     this.homeDecorStarted = false;
     this.stopHomeDecorAnimations(true);
-    this.elements.homeViewport.classList.remove("home-background-ready", "home-decor-ready", "home-buttons-ready", "home-animating", "home-ready");
+    this.elements.homeViewport.classList.remove("home-background-ready", "home-decor-ready", "home-clouds-ready", "home-buttons-ready", "home-animating", "home-ready");
     this.elements.homeBootOverlay.classList.remove("hidden", "is-exiting");
     this.elements.homeBootStatus.textContent = "Loading menu art, buttons, and interface layers.";
     Promise.allSettled(assets.map(([key, element, src]) => this.preloadImageAsset(element, src, key))).then((results) => {
@@ -927,17 +922,23 @@ export class HiddenObjectGame {
       window.setTimeout(() => {
         this.elements.homeBootOverlay.classList.add("hidden");
         this.elements.homeBootOverlay.classList.remove("is-exiting");
-        this.elements.homeViewport.classList.add("home-background-ready");
-        window.setTimeout(() => {
-          this.homeDecorReady = true;
-          this.elements.homeViewport.classList.add("home-decor-ready");
-          this.startHomeDecorAnimations(true);
-        }, 340);
-        window.setTimeout(() => {
-          this.homeButtonsReady = true;
-          this.elements.homeViewport.classList.add("home-buttons-ready", "home-ready");
-          this.playHomeButtonIntro();
-        }, 980);
+        window.requestAnimationFrame(() => {
+          this.layoutHomeButtons();
+          this.elements.homeViewport.classList.add("home-background-ready");
+          window.setTimeout(() => {
+            this.homeDecorReady = true;
+            this.elements.homeViewport.classList.add("home-decor-ready");
+            this.startHomeDecorAnimations(true);
+          }, 420);
+          window.setTimeout(() => {
+            this.homeButtonsReady = true;
+            this.elements.homeViewport.classList.add("home-buttons-ready", "home-ready");
+            this.playHomeButtonIntro();
+          }, 1320);
+          window.setTimeout(() => {
+            this.elements.homeViewport.classList.add("home-clouds-ready");
+          }, 2900);
+        });
       }, 880);
     });
   }
@@ -1599,7 +1600,7 @@ export class HiddenObjectGame {
     this.homeDecorStarted = true;
     viewport.classList.remove("home-decor-paused", "home-live");
     viewport.classList.add("home-animating");
-    const settleDelay = this.save.settings.motion === "reduced" ? 2400 : 5600;
+    const settleDelay = this.save.settings.motion === "reduced" ? 2600 : 7300;
     this.homeDecorSettleTimerId = window.setTimeout(() => {
       viewport.classList.remove("home-animating");
       viewport.classList.add("home-live");
@@ -1636,7 +1637,7 @@ export class HiddenObjectGame {
     }
     this.elements.homeBootOverlay.classList.add("hidden");
     this.elements.homeBootOverlay.classList.remove("is-exiting");
-    this.elements.homeViewport.classList.add("home-background-ready", "home-decor-ready", "home-buttons-ready", "home-ready");
+    this.elements.homeViewport.classList.add("home-background-ready", "home-decor-ready", "home-clouds-ready", "home-buttons-ready", "home-ready");
     this.homeDecorReady = true;
     this.homeButtonsReady = true;
     this.startHomeDecorAnimations(true);

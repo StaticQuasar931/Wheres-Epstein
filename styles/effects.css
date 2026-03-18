@@ -136,88 +136,88 @@
 .home-viewport.home-animating #homeNameButton,
 .home-viewport.home-animating .home-debug-box[data-editor-key="titleBanner"],
 .home-viewport.home-animating .home-debug-box[data-editor-key="nameLink"] {
-  animation: layer-fade-in 980ms cubic-bezier(0.18, 0.82, 0.2, 1) 180ms both, title-float 9.6s ease-in-out infinite;
-  animation-delay: 180ms, 1600ms;
+  animation: layer-fade-in 1240ms cubic-bezier(0.18, 0.82, 0.2, 1) 260ms both, title-float 12.5s ease-in-out infinite;
+  animation-delay: 260ms, 2200ms;
 }
 
 .home-viewport.home-animating #magnifierDecorLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="magnifierDecor"] {
-  animation: layer-fade-in 1040ms cubic-bezier(0.18, 0.82, 0.2, 1) 640ms both, magnifier-float 10.2s ease-in-out infinite;
-  animation-delay: 640ms, 1720ms;
+  animation: layer-fade-in 1320ms cubic-bezier(0.18, 0.82, 0.2, 1) 900ms both, magnifier-float 13.2s ease-in-out infinite;
+  animation-delay: 900ms, 2500ms;
 }
 
 .home-viewport.home-animating #magnifierFacesLayer {
   transform-origin: center center;
-  animation: faces-fade-in 980ms cubic-bezier(0.18, 0.82, 0.2, 1) 1040ms both, magnifier-float-faces 10.2s ease-in-out infinite;
-  animation-delay: 1040ms, 1720ms;
+  animation: faces-fade-in 1240ms cubic-bezier(0.18, 0.82, 0.2, 1) 1460ms both, magnifier-float-faces 13.2s ease-in-out infinite;
+  animation-delay: 1460ms, 2500ms;
 }
 
 .home-viewport.home-animating #wheelStandLayer {
-  animation: layer-fade-in 960ms ease 1320ms both;
+  animation: layer-fade-in 1220ms ease 1780ms both;
 }
 
 .home-viewport.home-animating #wheelLayer {
   transform-origin: center center;
-  animation: layer-fade-in 980ms ease 1380ms both, ferris-spin 32s linear infinite;
-  animation-delay: 1380ms, 1380ms;
+  animation: layer-fade-in 1260ms ease 1860ms both, ferris-spin 42s linear infinite;
+  animation-delay: 1860ms, 1860ms;
 }
 
 .home-viewport.home-animating #airballLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="airball"] {
-  animation: layer-fade-in 980ms ease 1260ms both, airball-float 13.4s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
-  animation-delay: 1260ms, 2140ms;
+  animation: layer-fade-in 1240ms ease 1740ms both, airball-float 17.4s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
+  animation-delay: 1740ms, 2780ms;
 }
 
 .home-viewport.home-animating #cloud1Layer {
-  animation: layer-fade-in 1320ms cubic-bezier(0.18, 0.82, 0.2, 1) 2620ms both, cloud-drift-1 44s linear infinite;
-  animation-delay: 2620ms, -8s;
+  animation: layer-fade-in 1680ms cubic-bezier(0.18, 0.82, 0.2, 1) 3280ms both, cloud-drift-1 57s linear infinite;
+  animation-delay: 3280ms, -12s;
 }
 
 .home-viewport.home-animating #cloud2Layer {
-  animation: layer-fade-in 1380ms cubic-bezier(0.18, 0.82, 0.2, 1) 2740ms both, cloud-drift-2 59s linear infinite;
-  animation-delay: 2740ms, -22s;
+  animation: layer-fade-in 1760ms cubic-bezier(0.18, 0.82, 0.2, 1) 3440ms both, cloud-drift-2 77s linear infinite;
+  animation-delay: 3440ms, -28s;
 }
 
 .home-viewport.home-animating #cloud3Layer {
-  animation: layer-fade-in 1460ms cubic-bezier(0.18, 0.82, 0.2, 1) 2860ms both, cloud-drift-3 73s linear infinite;
-  animation-delay: 2860ms, -34s;
+  animation: layer-fade-in 1860ms cubic-bezier(0.18, 0.82, 0.2, 1) 3600ms both, cloud-drift-3 95s linear infinite;
+  animation-delay: 3600ms, -42s;
 }
 
 .home-viewport.home-live #titleBannerLayer,
 .home-viewport.home-live #homeNameButton {
-  animation: title-float 9.6s ease-in-out infinite;
+  animation: title-float 12.5s ease-in-out infinite;
 }
 
 .home-viewport.home-live #magnifierDecorLayer {
-  animation: magnifier-float 10.2s ease-in-out infinite;
+  animation: magnifier-float 13.2s ease-in-out infinite;
 }
 
 .home-viewport.home-live #magnifierFacesLayer {
-  animation: magnifier-float-faces 10.2s ease-in-out infinite;
+  animation: magnifier-float-faces 13.2s ease-in-out infinite;
 }
 
 .home-viewport.home-live #wheelLayer {
   transform-origin: center center;
-  animation: ferris-spin 32s linear infinite;
+  animation: ferris-spin 42s linear infinite;
 }
 
 .home-viewport.home-live #airballLayer {
-  animation: airball-float 13.4s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
+  animation: airball-float 17.4s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
 }
 
 .home-viewport.home-live #cloud1Layer {
-  animation: cloud-drift-1 44s linear infinite;
-  animation-delay: -8s;
+  animation: cloud-drift-1 57s linear infinite;
+  animation-delay: -12s;
 }
 
 .home-viewport.home-live #cloud2Layer {
-  animation: cloud-drift-2 59s linear infinite;
-  animation-delay: -22s;
+  animation: cloud-drift-2 77s linear infinite;
+  animation-delay: -28s;
 }
 
 .home-viewport.home-live #cloud3Layer {
-  animation: cloud-drift-3 73s linear infinite;
-  animation-delay: -34s;
+  animation: cloud-drift-3 95s linear infinite;
+  animation-delay: -42s;
 }
 
 .home-viewport.home-editor-active #cloud1Layer,

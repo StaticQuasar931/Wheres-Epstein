@@ -507,6 +507,20 @@ body.mode-game .site-topbar { display: flex; }
   visibility: visible;
 }
 
+.home-viewport:not(.home-clouds-ready) #cloud1Layer,
+.home-viewport:not(.home-clouds-ready) #cloud2Layer,
+.home-viewport:not(.home-clouds-ready) #cloud3Layer {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.home-viewport.home-clouds-ready #cloud1Layer,
+.home-viewport.home-clouds-ready #cloud2Layer,
+.home-viewport.home-clouds-ready #cloud3Layer {
+  opacity: 1;
+  visibility: visible;
+}
+
 .home-viewport:not(.home-decor-ready) .home-name-button,
 .home-viewport:not(.home-buttons-ready) .home-button-overlay {
   opacity: 0;
@@ -1289,32 +1303,31 @@ body.mode-game .site-topbar { display: flex; }
 .speedrun-stats  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .speedrun-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
   align-items: start;
 }
 .speedrun-card-primary {
   min-height: 100%;
-}
-.speedrun-sidecards {
-  display: grid;
-  gap: 1rem;
+  padding: 1.1rem 1.15rem 1rem;
 }
 
 .speedrun-bubble-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
   margin-top: 0.9rem;
 }
 
 .speedrun-bubble {
-  min-height: 5.5rem;
+  min-height: 5rem;
   display: grid;
   place-items: center;
   text-align: center;
-  padding: 0.95rem;
+  padding: 0.85rem 0.8rem;
   border-radius: 22px;
+  line-height: 1.12;
+  font-size: 0.98rem;
 }
 
 .speedrun-bubble:disabled {
@@ -1324,10 +1337,14 @@ body.mode-game .site-topbar { display: flex; }
 
 .speedrun-bubble small {
   display: block;
-  margin-top: 0.3rem;
+  margin-top: 0.22rem;
   color: var(--muted);
-  font-size: 0.76rem;
-  line-height: 1.3;
+  font-size: 0.72rem;
+  line-height: 1.22;
+}
+.speedrun-status-line {
+  margin-top: 0.2rem;
+  font-size: 0.83rem;
 }
 .speedrun-mini-card h4 {
   margin: 0;
