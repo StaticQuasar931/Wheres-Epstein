@@ -98,11 +98,12 @@ export const START_SCREEN_LAYERS = {
   cloud1: { x1: 70, y1: 18, x2: 350, y2: 142, color: "white", src: "Assets/ui/cloud1.png" },
   cloud2: { x1: 580, y1: -6, x2: 880, y2: 130, color: "white", src: "Assets/ui/cloud2.png" },
   cloud3: { x1: 1108, y1: -8, x2: 1428, y2: 126, color: "white", src: "Assets/ui/cloud3.png" },
+  blimp: { x1: 257, y1: 18, x2: 373, y2: 61, color: "skyblue", src: "Assets/ui/blimp.png" },
   airball: { x1: 123, y1: 94, x2: 245, y2: 256, color: "cyan", src: "Assets/ui/airball.png" },
   wheelStand: { x1: 1055, y1: 171, x2: 1189, y2: 271, color: "orange", src: "Assets/ui/WheelStand.png" },
   wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
   magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, rotation: -6, color: "red", src: "Assets/ui/mglassempty.png" },
-  magnifierFaces: { x1: 574, y1: 342, x2: 931, y2: 589, rotation: -1, color: "gold", src: "Assets/ui/startscreenfaces.png" },
+  magnifierFaces: { x1: 574, y1: 331, x2: 930, y2: 600, rotation: -1, color: "gold", src: "Assets/ui/startscreenfaces.png" },
 };
 // uh783kjs9tya8tji3chq8ugajskaere9h3v198jk
 
@@ -380,7 +381,16 @@ for (let number = 21; number <= 20; number += 1) {
 export const MAIN_LEVELS = MAIN_LEVELS_RAW.map(normalizeLevel);
 export const BONUS_LEVELS = BONUS_LEVELS_RAW.map(normalizeLevel);
 export const ADVANCED_LEVELS = ADVANCED_LEVELS_RAW.map(normalizeLevel);
-export const SPECIAL_LEVELS = [];
+const SPECIAL_LEVELS_RAW = [
+  makeSpecialLevel(1, [
+    makeTarget("special-01-a", "kju1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
+  ], {
+    name: "Special 1",
+    needsSetup: true,
+  }),
+];
+
+export const SPECIAL_LEVELS = SPECIAL_LEVELS_RAW.map(normalizeLevel);
 
 export const LEVELS = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_LEVELS, ...SPECIAL_LEVELS];
 
@@ -392,4 +402,5 @@ export const DEFAULT_SETTINGS = {
     two: 38000,
     one: 70000,
   },
+  magnifierZoomSpeed: "normal",
 };

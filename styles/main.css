@@ -711,13 +711,22 @@ body.mode-game .site-topbar { display: flex; }
   z-index: 1;
 }
 
-#airballLayer {
+#blimpLayer {
   z-index: 2;
+}
+
+#airballLayer {
+  z-index: 3;
 }
 
 #wheelStandLayer,
 #wheelLayer {
-  z-index: 3;
+  z-index: 4;
+}
+
+#wheelLayer {
+  transform: rotate(var(--home-wheel-angle, 0deg));
+  transform-origin: 50% 50%;
 }
 
 #titleBannerLayer,
@@ -732,6 +741,39 @@ body.mode-game .site-topbar { display: flex; }
 .home-decor-clickable {
   pointer-events: auto;
   cursor: pointer;
+}
+
+.settings-discord-button {
+  background: linear-gradient(135deg, #5865f2 0%, #7289ff 100%);
+  border-color: rgba(203, 210, 255, 0.4);
+  color: #ffffff;
+}
+
+.settings-discord-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6674ff 0%, #8097ff 100%);
+  box-shadow: 0 10px 26px rgba(88, 101, 242, 0.34);
+}
+
+.settings-moregames-button {
+  background: linear-gradient(135deg, rgba(255, 173, 43, 0.18), rgba(255, 119, 28, 0.18));
+  border-color: rgba(255, 180, 74, 0.34);
+  color: #ffd998;
+}
+
+.settings-moregames-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(255, 186, 78, 0.24), rgba(255, 132, 39, 0.28));
+  box-shadow: 0 10px 26px rgba(255, 136, 36, 0.2);
+}
+
+.settings-changelog-button {
+  background: linear-gradient(135deg, rgba(95, 214, 255, 0.16), rgba(143, 122, 255, 0.18));
+  border-color: rgba(149, 193, 255, 0.34);
+  color: #dceeff;
+}
+
+.settings-changelog-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(115, 224, 255, 0.22), rgba(162, 142, 255, 0.24));
+  box-shadow: 0 10px 26px rgba(106, 176, 255, 0.2);
 }
 
 .home-button-overlay {
@@ -1303,7 +1345,7 @@ body.mode-game .site-topbar { display: flex; }
 .speedrun-stats  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .speedrun-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
   gap: 1.1rem;
   align-items: start;
 }
@@ -1330,6 +1372,20 @@ body.mode-game .site-topbar { display: flex; }
   font-size: 0.98rem;
 }
 
+.speedrun-mode-bubble {
+  min-height: 5.45rem;
+}
+
+.speedrun-mode-mirror {
+  background: linear-gradient(135deg, rgba(88, 171, 255, 0.18), rgba(120, 110, 255, 0.2));
+  border-color: rgba(123, 184, 255, 0.34);
+}
+
+.speedrun-mode-upside {
+  background: linear-gradient(135deg, rgba(255, 124, 177, 0.14), rgba(255, 177, 92, 0.18));
+  border-color: rgba(255, 191, 115, 0.32);
+}
+
 .speedrun-bubble:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -1350,6 +1406,16 @@ body.mode-game .site-topbar { display: flex; }
   display: grid;
   gap: 0.8rem;
   padding: 1rem 1.05rem;
+  align-content: start;
+}
+
+.speedrun-grid > .speedrun-specials-card:last-child {
+  grid-column: 1 / -1;
+}
+
+.speedrun-card-primary .subtle-text,
+.speedrun-specials-card .subtle-text {
+  line-height: 1.4;
 }
 
 .special-placeholder-grid {
@@ -1360,6 +1426,11 @@ body.mode-game .site-topbar { display: flex; }
 
 .special-placeholder-card {
   min-height: 7.2rem;
+}
+
+.level-unplayed {
+  color: var(--accent-soft);
+  font-weight: 700;
 }
 .speedrun-mini-card h4 {
   margin: 0;
@@ -1516,6 +1587,10 @@ body.mode-game .site-topbar { display: flex; }
   flex-wrap: wrap;
 }
 
+.settings-links-row > button {
+  min-width: 180px;
+}
+
 /* ============================================================
    THEME OVERRIDES
    ============================================================ */
@@ -1584,6 +1659,8 @@ body[data-theme="dark"] .secondary-button  { background: rgba(255,255,255,0.09);
 
 body[data-theme="dark"] .setting-card select option { background: #0b1c30; color: #f2f9ff; }
 body[data-theme="light"] .setting-card select option { background: #fff;    color: #0b1b2c; }
+body[data-theme="forest"] .setting-card select option { background: #10261f; color: #eefaf3; }
+body[data-theme="dusk"] .setting-card select option { background: #1b1631; color: #f5f1ff; }
 
 /* ============================================================
    EASTER EGGS
@@ -1731,6 +1808,22 @@ body.easter-starsburst #hudStarsText {
 .scene-content.scene-mirrored .hitbox-overlay {
   transform: scaleX(-1);
   transform-origin: center center;
+}
+
+.scene-content.scene-upside-down .level-image,
+.scene-content.scene-upside-down .hitbox-overlay {
+  transform: scaleY(-1);
+  transform-origin: center center;
+}
+
+body[data-route-variant="mirror"] .menu-shell,
+body[data-route-variant="mirror"] .modal-card {
+  border-color: rgba(108, 182, 255, 0.34);
+}
+
+body[data-route-variant="upside"] .menu-shell,
+body[data-route-variant="upside"] .modal-card {
+  border-color: rgba(255, 184, 118, 0.34);
 }
 
 .asset-loading { opacity: 0; }

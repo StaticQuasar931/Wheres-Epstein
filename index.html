@@ -55,6 +55,7 @@
           <img id="cloud1Layer" class="home-decor-layer" src="Assets/ui/cloud1.png" alt="" aria-hidden="true">
           <img id="cloud2Layer" class="home-decor-layer" src="Assets/ui/cloud2.png" alt="" aria-hidden="true">
           <img id="cloud3Layer" class="home-decor-layer" src="Assets/ui/cloud3.png" alt="" aria-hidden="true">
+          <img id="blimpLayer" class="home-decor-layer" src="Assets/ui/blimp.png" alt="" aria-hidden="true">
           <img id="airballLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/airball.png" alt="" aria-hidden="true">
           <img id="wheelStandLayer" class="home-decor-layer" src="Assets/ui/WheelStand.png" alt="" aria-hidden="true">
           <img id="wheelLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/Wheel.png" alt="" aria-hidden="true">
@@ -184,31 +185,23 @@
             </div>
             <div class="speedrun-grid">
               <div class="speedrun-card speedrun-card-primary">
-                <p class="subtle-text">Pick a route and jump straight into a focused challenge.</p>
+                <p class="subtle-text">Pick a route and jump into a focused challenge run.</p>
                 <div class="speedrun-bubble-grid speedrun-bubble-grid-wide">
                   <button id="startSpeedrunButton" class="primary-button speedrun-bubble speedrun-bubble-primary" type="button">
-                    All Random
-                    <small>Any authored route</small>
+                    Mixed Speedrun
+                    <small>Main, advanced, and bonus</small>
                   </button>
                   <button id="startMainSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
-                    Main Speedrun
-                    <small>Main levels only</small>
+                    Main Only
+                    <small>Page one route</small>
                   </button>
                   <button id="startAdvancedSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
-                    Advanced Speedrun
-                    <small>Advanced levels only</small>
+                    Advanced Only
+                    <small>Page two route</small>
                   </button>
                   <button id="startBonusSpeedrunButton" class="ghost-button speedrun-bubble" type="button">
                     Bonus Blitz
                     <small>Bonus pools only</small>
-                  </button>
-                  <button id="startMirrorModeButton" class="secondary-button speedrun-bubble" type="button">
-                    Mirror Mode
-                    <small>Pick any unlocked level</small>
-                  </button>
-                  <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble" type="button">
-                    Special Levels
-                    <small>Authored special route</small>
                   </button>
                 </div>
                 <div class="stat-grid speedrun-stats">
@@ -224,16 +217,38 @@
                   </div>
                 </div>
                 <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
-                <p id="specialLevelsStatusText" class="subtle-text speedrun-status-line">No special levels authored yet.</p>
               </div>
               <section class="menu-card speedrun-specials-card">
                 <div class="menu-card-header">
                   <div>
-                    <p class="eyebrow">Special Levels</p>
-                    <h4>Coming Soon</h4>
+                    <p class="eyebrow">Variant Runs</p>
+                    <h4>Twist Modes</h4>
                   </div>
                 </div>
-                <p class="subtle-text">Reserved for alternate target pools and one-off authored challenge scenes.</p>
+                <p class="subtle-text">These runs stay separate from normal clears.</p>
+                <div class="speedrun-bubble-grid">
+                  <button id="startMirrorModeButton" class="secondary-button speedrun-bubble speedrun-mode-bubble speedrun-mode-mirror" type="button">
+                    Mirror Mode
+                    <small>Flip scenes sideways</small>
+                  </button>
+                  <button id="startUpsideDownModeButton" class="secondary-button speedrun-bubble speedrun-mode-bubble speedrun-mode-upside" type="button">
+                    Upsideown Levels
+                    <small>Flip scenes upside down</small>
+                  </button>
+                </div>
+              </section>
+              <section class="menu-card speedrun-specials-card">
+                <div class="menu-card-header">
+                  <div>
+                    <p class="eyebrow">Special Levels</p>
+                    <h4>Special Route</h4>
+                  </div>
+                </div>
+                <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble speedrun-mode-bubble" type="button">
+                  Special Levels
+                  <small>Reserved for custom target packs</small>
+                </button>
+                <p id="specialLevelsStatusText" class="subtle-text speedrun-status-line">No special levels authored yet.</p>
                 <div class="special-placeholder-grid">
                   <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 1</h4><span class="level-number">SL 1</span></div><p class="level-lock">Needs setup</p></button>
                   <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 2</h4><span class="level-number">SL 2</span></div><p class="level-lock">Needs setup</p></button>
@@ -369,6 +384,14 @@
               <option value="huge">Huge</option>
             </select>
           </label>
+          <label class="setting-card">
+            <span>Magnifier Zoom Speed</span>
+            <select id="magnifierZoomSpeedSelect">
+              <option value="slow">Slow</option>
+              <option value="normal">Normal</option>
+              <option value="fast">Fast</option>
+            </select>
+          </label>
         </div>
 
         <div class="level-select-groups">
@@ -423,13 +446,12 @@
 
           <div class="version-line">
             <div class="button-row settings-links-row">
-              <button id="settingsDiscordButton" class="secondary-button" type="button" title="Opens in a new tab">Join Discord</button>
-              <button id="settingsMoreGamesButton" class="ghost-button" type="button" title="Opens in a new tab">More Games</button>
-              <button id="settingsLevelSelectButton" class="ghost-button" type="button">Level Select</button>
-              <button id="settingsChangelogButton" class="ghost-button" type="button">Changelog</button>
+              <button id="settingsDiscordButton" class="secondary-button settings-discord-button" type="button" title="Opens in a new tab">Join Discord</button>
+              <button id="settingsChangelogButton" class="ghost-button settings-changelog-button" type="button">Changelog</button>
+              <button id="settingsMoreGamesButton" class="ghost-button settings-moregames-button" type="button" title="Opens in a new tab">More Games</button>
             </div>
             <p id="settingsLinkHint" class="subtle-text">Suggestions, bug reports, and feedback can be sent in Discord.</p>
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.4.3</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.4.5</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -667,7 +689,7 @@
   <div id="changelogOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card changelog-card">
       <p class="eyebrow">Patch Notes</p>
-<h2 id="changelogTitle">Alpha Version 0.0.0.1.2.4.3</h2>
+        <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.4.5</h2>
       <div class="changelog-columns">
         <section>
           <h3>Changelog</h3>

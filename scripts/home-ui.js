@@ -500,6 +500,7 @@ function getHomeElement(game, key) {
     cloud1: game.elements.cloud1Layer,
     cloud2: game.elements.cloud2Layer,
     cloud3: game.elements.cloud3Layer,
+    blimp: game.elements.blimpLayer,
     airball: game.elements.airballLayer,
     wheelStand: game.elements.wheelStandLayer,
     wheel: game.elements.wheelLayer,

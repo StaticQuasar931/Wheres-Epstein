@@ -14,6 +14,7 @@ const DEFAULT_SAVE = {
     foundFx: "strong",
     magnifierShape: "circle",
     magnifierSize: "normal",
+    magnifierZoomSpeed: "normal",
   },
   meta: {
     advancedMultiSeen: false,
