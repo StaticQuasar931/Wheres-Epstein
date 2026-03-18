@@ -47,8 +47,8 @@
     drop-shadow(0 0 16px rgba(255, 216, 78, 0.16))
     brightness(1.03)
     saturate(1.05);
-  transform: translateY(0) scale(1);
-  transition: filter 220ms ease;
+  transform: translateY(0) scale(1.02);
+  transition: filter 220ms ease, transform 220ms ease;
 }
 
 .home-button-art.is-prepping {
@@ -71,7 +71,7 @@
 }
 
 .home-button-art.is-pressed {
-  transform: translateY(2px) scale(1);
+  transform: translateY(2px) scale(0.985);
   filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.34));
 }
 
@@ -114,6 +114,63 @@
 
 .home-button-sheen.is-pressed {
   transform: translateY(3px) scale(0.982);
+}
+
+.home-viewport.home-animating #cloud1Layer,
+.home-viewport.home-animating #cloud2Layer,
+.home-viewport.home-animating #cloud3Layer,
+.home-viewport.home-animating #wheelLayer,
+.home-viewport.home-animating #titleBannerLayer,
+.home-viewport.home-animating #magnifierDecorLayer,
+.home-viewport.home-animating #airballLayer,
+.home-viewport.home-animating #homeNameButton {
+  will-change: transform, opacity;
+}
+
+.home-viewport.home-animating #cloud1Layer {
+  animation: cloud-fade-in 820ms ease 120ms both, cloud-drift-1 32s linear infinite;
+}
+
+.home-viewport.home-animating #cloud2Layer {
+  animation: cloud-fade-in 940ms ease 180ms both, cloud-drift-2 40s linear infinite;
+}
+
+.home-viewport.home-animating #cloud3Layer {
+  animation: cloud-fade-in 1040ms ease 240ms both, cloud-drift-3 48s linear infinite;
+}
+
+.home-viewport.home-animating #wheelLayer {
+  transform-origin: center center;
+  animation: ferris-spin 24s linear infinite;
+}
+
+.home-viewport.home-animating #titleBannerLayer,
+.home-viewport.home-animating #homeNameButton,
+.home-viewport.home-animating .home-debug-box[data-editor-key="titleBanner"],
+.home-viewport.home-animating .home-debug-box[data-editor-key="nameLink"] {
+  animation: title-float 6.8s ease-in-out infinite;
+}
+
+.home-viewport.home-animating #magnifierDecorLayer,
+.home-viewport.home-animating .home-debug-box[data-editor-key="magnifierDecor"] {
+  animation: magnifier-float 7.6s ease-in-out infinite;
+}
+
+.home-viewport.home-animating #airballLayer,
+.home-viewport.home-animating .home-debug-box[data-editor-key="airball"] {
+  animation: airball-float 8.4s ease-in-out infinite;
+}
+
+.home-viewport.home-editor-active #cloud1Layer,
+.home-viewport.home-editor-active #cloud2Layer,
+.home-viewport.home-editor-active #cloud3Layer,
+.home-viewport.home-editor-active #wheelLayer,
+.home-viewport.home-editor-active #titleBannerLayer,
+.home-viewport.home-editor-active #magnifierDecorLayer,
+.home-viewport.home-editor-active #airballLayer,
+.home-viewport.home-editor-active #homeNameButton,
+.home-viewport.home-editor-active .home-debug-box {
+  animation: none !important;
 }
 
 /* ============================================================
@@ -235,6 +292,48 @@ body.easter-arcade .result-star--filled {
   72%      { opacity: 0.88; }
   84%      { transform: translateX(350%) skewX(-24deg); opacity: 0.88; }
   100%     { transform: translateX(370%) skewX(-24deg); opacity: 0; }
+}
+
+@keyframes cloud-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cloud-drift-1 {
+  from { transform: translateX(-8%); }
+  to { transform: translateX(118%); }
+}
+
+@keyframes cloud-drift-2 {
+  from { transform: translateX(-12%); }
+  to { transform: translateX(112%); }
+}
+
+@keyframes cloud-drift-3 {
+  from { transform: translateX(-10%); }
+  to { transform: translateX(114%); }
+}
+
+@keyframes ferris-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes title-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes magnifier-float {
+  0%, 100% { transform: translate(0, 0) rotate(-1.2deg); }
+  50% { transform: translate(8px, -6px) rotate(1deg); }
+}
+
+@keyframes airball-float {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(8px, -12px); }
+  50% { transform: translate(16px, -20px); }
+  75% { transform: translate(6px, -8px); }
 }
 
 @keyframes found-cross-pulse {

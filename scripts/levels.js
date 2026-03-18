@@ -79,7 +79,7 @@ export const START_SCREEN_BUTTONS = {
   start: { x1: 107, y1: 827, x2: 494, y2: 934, color: "green" },
   settings: { x1: 593, y1: 826, x2: 971, y2: 934, color: "blue" },
   moreGames: { x1: 1097, y1: 830, x2: 1501, y2: 934, color: "orange" },
-  nameLink: { x1: 1166, y1: 182, x2: 1425, y2: 260, color: "gold" },
+  nameLink: { x1: 906, y1: 179, x2: 1177, y2: 257, color: "gold" },
 };
 
 export const START_SCREEN_LAYERS = {
@@ -87,7 +87,8 @@ export const START_SCREEN_LAYERS = {
   cloud1: { x1: 70, y1: 18, x2: 350, y2: 142, color: "white", src: "Assets/ui/cloud1.png" },
   cloud2: { x1: 580, y1: -6, x2: 880, y2: 130, color: "white", src: "Assets/ui/cloud2.png" },
   cloud3: { x1: 1108, y1: -8, x2: 1428, y2: 126, color: "white", src: "Assets/ui/cloud3.png" },
-  wheelStand: { x1: 1058, y1: 178, x2: 1192, y2: 278, color: "orange", src: "Assets/ui/WheelStand.png" },
+  airball: { x1: 123, y1: 94, x2: 245, y2: 256, color: "cyan", src: "Assets/ui/airball.png" },
+  wheelStand: { x1: 1055, y1: 171, x2: 1189, y2: 271, color: "orange", src: "Assets/ui/WheelStand.png" },
   wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
   magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, color: "red", src: "Assets/ui/mglassempty.png" },
 };

@@ -160,7 +160,7 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
 }
 
 export function updateHomeDebug(game, event, config) {
-  if (!game.sessionTestingUnlocked) {
+  if (!game.isStartHitboxCheatEnabled()) {
     return;
   }
   const imagePoint = clientToHomeImage(game, event.clientX, event.clientY);
@@ -299,48 +299,6 @@ function placeHomeZoneButton(game, key, element, zone, drawWidth, drawHeight, na
   });
 }
 
-function getHomeArtBounds(game, imageElement, alphaThreshold) {
-  const existing = game.homeArtBounds.get(imageElement.id);
-  if (existing) {
-    return existing;
-  }
-  if (!imageElement.complete || !imageElement.naturalWidth || !imageElement.naturalHeight) {
-    return null;
-  }
-
-  const canvas = document.createElement("canvas");
-  canvas.width = imageElement.naturalWidth;
-  canvas.height = imageElement.naturalHeight;
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  context.drawImage(imageElement, 0, 0);
-  const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
-
-  let minX = width;
-  let minY = height;
-  let maxX = -1;
-  let maxY = -1;
-
-  for (let index = 3; index < data.length; index += 4) {
-    if (data[index] < alphaThreshold) {
-      continue;
-    }
-    const pixelIndex = (index - 3) / 4;
-    const x = pixelIndex % width;
-    const y = Math.floor(pixelIndex / width);
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
-  }
-
-  const bounds = maxX >= 0
-    ? { left: minX, top: minY, width: Math.max(1, (maxX - minX) + 1), height: Math.max(1, (maxY - minY) + 1) }
-    : { left: 0, top: 0, width: imageElement.naturalWidth, height: imageElement.naturalHeight };
-
-  game.homeArtBounds.set(imageElement.id, bounds);
-  return bounds;
-}
-
 function placeHomeArt(game, imageElement, zone, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
   if (!imageElement || !zone) {
     return;
@@ -385,7 +343,7 @@ function placeHomeSheen(game, sheenElement, placement) {
 function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, naturalHeight, config) {
   const debug = game.elements.homeDebugOverlay;
   debug.innerHTML = "";
-  const active = game.sessionTestingUnlocked;
+  const active = game.isStartHitboxCheatEnabled();
   debug.classList.toggle("hidden", !active || !game.homeEditorBoxesVisible);
   debug.classList.toggle("editor-active", active && game.homeButtonEditorEnabled);
   game.elements.homeDebugReadout.classList.toggle("hidden", !active);
@@ -440,7 +398,6 @@ function placeHomeLayer(game, key, element, zone, drawWidth, drawHeight, natural
   if (!element || !zone) {
     return;
   }
-  const bounds = getHomeArtBounds(game, element, config.alphaThreshold);
   const adjusted = getAdjustedHomeZone(zone, config);
   const left = Math.min(adjusted.x1, adjusted.x2);
   const right = Math.max(adjusted.x1, adjusted.x2);
@@ -450,40 +407,16 @@ function placeHomeLayer(game, key, element, zone, drawWidth, drawHeight, natural
   const targetTop = top * (drawHeight / naturalHeight);
   const targetWidth = (right - left) * (drawWidth / naturalWidth);
   const targetHeight = (bottom - top) * (drawHeight / naturalHeight);
-  if (!bounds) {
-    element.style.left = `${targetLeft}px`;
-    element.style.top = `${targetTop}px`;
-    element.style.width = `${targetWidth}px`;
-    element.style.height = `${targetHeight}px`;
-    game.homeRenderedRects.set(key, {
-      left: targetLeft,
-      top: targetTop,
-      width: targetWidth,
-      height: targetHeight,
-    });
-  } else {
-    const scale = Math.min(targetWidth / bounds.width, targetHeight / bounds.height);
-    const targetCenterX = targetLeft + (targetWidth / 2);
-    const targetCenterY = targetTop + (targetHeight / 2);
-    const artCenterX = (bounds.left + (bounds.width / 2)) * scale;
-    const artCenterY = (bounds.top + (bounds.height / 2)) * scale;
-    const finalLeft = targetCenterX - artCenterX;
-    const finalTop = targetCenterY - artCenterY;
-    const visibleLeft = finalLeft + (bounds.left * scale);
-    const visibleTop = finalTop + (bounds.top * scale);
-    const visibleWidth = bounds.width * scale;
-    const visibleHeight = bounds.height * scale;
-    element.style.left = `${finalLeft}px`;
-    element.style.top = `${finalTop}px`;
-    element.style.width = `${element.naturalWidth * scale}px`;
-    element.style.height = `${element.naturalHeight * scale}px`;
-    game.homeRenderedRects.set(key, {
-      left: visibleLeft,
-      top: visibleTop,
-      width: visibleWidth,
-      height: visibleHeight,
-    });
-  }
+  element.style.left = `${targetLeft}px`;
+  element.style.top = `${targetTop}px`;
+  element.style.width = `${targetWidth}px`;
+  element.style.height = `${targetHeight}px`;
+  game.homeRenderedRects.set(key, {
+    left: targetLeft,
+    top: targetTop,
+    width: targetWidth,
+    height: targetHeight,
+  });
   game.homeButtonZones.set(key, {
     x1: Math.round(Math.min(adjusted.x1, adjusted.x2)),
     y1: Math.round(Math.min(adjusted.y1, adjusted.y2)),
@@ -498,6 +431,7 @@ function getHomeElement(game, key) {
     cloud1: game.elements.cloud1Layer,
     cloud2: game.elements.cloud2Layer,
     cloud3: game.elements.cloud3Layer,
+    airball: game.elements.airballLayer,
     wheelStand: game.elements.wheelStandLayer,
     wheel: game.elements.wheelLayer,
     magnifierDecor: game.elements.magnifierDecorLayer,

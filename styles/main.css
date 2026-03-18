@@ -426,14 +426,38 @@ body.mode-game .site-topbar { display: flex; }
   object-position: center;
   z-index: 0;
   animation: none;
+  opacity: 0;
+  transition: opacity 420ms ease;
 }
 
-.home-viewport:not(.home-ready) .hero-background,
-.home-viewport:not(.home-ready) .home-button-overlay,
-.home-viewport:not(.home-ready) .home-debug-overlay,
-.home-viewport:not(.home-ready) .home-debug-readout,
-.home-viewport:not(.home-ready) .home-name-button,
-.home-viewport:not(.home-ready) .home-ambient {
+.home-viewport:not(.home-background-ready) .hero-background,
+.home-viewport:not(.home-background-ready) .home-button-overlay,
+.home-viewport:not(.home-background-ready) .home-debug-overlay,
+.home-viewport:not(.home-background-ready) .home-debug-readout,
+.home-viewport:not(.home-background-ready) .home-name-button,
+.home-viewport:not(.home-background-ready) .home-ambient,
+.home-viewport:not(.home-background-ready) .home-layer-overlay {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.home-viewport.home-background-ready .hero-background {
+  opacity: 1;
+  visibility: visible;
+}
+
+.home-viewport:not(.home-decor-ready) .home-layer-overlay {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.home-viewport.home-decor-ready .home-layer-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+.home-viewport:not(.home-decor-ready) .home-name-button,
+.home-viewport:not(.home-buttons-ready) .home-button-overlay {
   opacity: 0;
   visibility: hidden;
 }
@@ -597,8 +621,10 @@ body.mode-game .site-topbar { display: flex; }
 
 .home-layer-overlay {
   pointer-events: none;
-  overflow: visible;
+  overflow: hidden;
   z-index: auto;
+  opacity: 0;
+  transition: opacity 520ms ease;
 }
 
 .home-decor-layer {
@@ -614,6 +640,10 @@ body.mode-game .site-topbar { display: flex; }
 #cloud2Layer,
 #cloud3Layer {
   z-index: 1;
+}
+
+#airballLayer {
+  z-index: 2;
 }
 
 #wheelStandLayer,
@@ -633,7 +663,7 @@ body.mode-game .site-topbar { display: flex; }
   transition: opacity 340ms ease;
   z-index: 6;
 }
-.home-viewport.home-ready .home-button-overlay { opacity: 1; }
+.home-viewport.home-buttons-ready .home-button-overlay { opacity: 1; }
 
 .image-button {
   position: absolute;
@@ -1274,6 +1304,38 @@ body.mode-game .site-topbar { display: flex; }
   padding: 0.35rem 0 0;
 }
 
+.version-label {
+  cursor: pointer;
+  user-select: none;
+}
+
+.version-label:hover,
+.version-label:focus-visible {
+  color: var(--text);
+}
+
+.diagnostic-cheat-panel {
+  display: grid;
+  gap: 0.75rem;
+  width: min(760px, 100%);
+  margin-top: 0.75rem;
+}
+
+.diagnostic-cheat-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.diagnostic-cheat-actions {
+  grid-template-columns: 1fr;
+}
+
+.cheat-toggle-enabled {
+  border-color: rgba(255, 216, 78, 0.38);
+  background: rgba(255, 216, 78, 0.14);
+  color: var(--text);
+  box-shadow: 0 0 0 1px rgba(255, 216, 78, 0.24) inset;
+}
+
 .settings-links-row {
   width: min(720px, 100%);
 }
@@ -1316,11 +1378,52 @@ body.easter-party .home-viewport::after {
     radial-gradient(circle at 48% 72%, rgba(111,227,168,0.15), transparent 18%);
 }
 
+body.easter-sunset .home-viewport {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 144, 88, 0.22), transparent 34%),
+    linear-gradient(180deg, #1b355a 0%, #d06b4c 45%, #f8c168 100%);
+}
+
+body.easter-float .home-viewport.home-animating #titleBannerLayer,
+body.easter-float .home-viewport.home-animating #magnifierDecorLayer,
+body.easter-float .home-viewport.home-animating #airballLayer {
+  animation-duration: 4.6s !important;
+}
+
+body.easter-glass .home-viewport::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), transparent 20%),
+    radial-gradient(circle at 76% 42%, rgba(255,255,255,0.09), transparent 16%);
+  backdrop-filter: blur(2px);
+}
+
 /* ============================================================
    GAMEPLAY SCREEN
    ============================================================ */
 .game-screen,
 .scene-viewport { min-height: 100vh; }
+
+.changelog-card {
+  width: min(920px, calc(100vw - 2rem));
+}
+
+.changelog-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  text-align: left;
+}
+
+.changelog-columns h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display, inherit);
+  font-size: 1.1rem;
+}
 
 .scene-viewport {
   position: relative;

@@ -16,6 +16,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.0";
 const HOME_BUTTON_STAGGER_MS = 260;
 const HOME_BUTTON_ANIMATION_MS = 1320;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -30,7 +31,24 @@ const WALDO_SEQUENCE = ["w", "a", "l", "d", "o"];
 const PARTY_SEQUENCE = ["p", "a", "r", "t", "y"];
 const CHEESE_SEQUENCE = ["c", "h", "e", "e", "s", "e"];
 const STATIC_SEQUENCE = ["s", "t", "a", "t", "i", "c"];
+const SUNSET_SEQUENCE = ["s", "u", "n"];
+const FLOAT_SEQUENCE = ["f", "l", "o", "a", "t"];
+const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
+
+const CHANGELOG_PUBLIC_NOTES = [
+  "Start screen now loads the background first, then decorative art, then the menu buttons.",
+  "Cloud layers drift across the menu, the ferris wheel spins, and the title and magnifying glass float lightly.",
+  "The version label now opens a proper changelog window.",
+  "The hidden title link follows the title banner motion so it stays paired correctly.",
+  "Cheat tools now open behind a stricter Alt-click flow instead of exposing everything immediately.",
+];
+
+const CHANGELOG_PRIVATE_NOTES = [
+  "Home editor now supports layered decorative art including the airball placeholder.",
+  "Cheat tools can be enabled individually for level hitboxes, start hitboxes, editor mode, and run cheats.",
+  "Alt-clicking the confirm button while entering the diagnostic code enables every cheat toggle at once.",
+];
 
 const ADVANCED_MAIN_LEVELS = ADVANCED_LEVELS.filter((level) => !level.isAdvancedBonus);
 const ADVANCED_BONUS_LEVELS = ADVANCED_LEVELS.filter((level) => level.isAdvancedBonus);
@@ -104,6 +122,9 @@ export class HiddenObjectGame {
     this.homeIntroPlayed = false;
     this.homeAssetsReady = false;
     this.homeBootStarted = false;
+    this.homeDecorReady = false;
+    this.homeButtonsReady = false;
+    this.homeAnimationFrame = null;
     this.speedrunRecentIds = [];
     this.homeButtonEditorEnabled = false;
     this.homeButtonEditorSelection = "start";
@@ -111,6 +132,12 @@ export class HiddenObjectGame {
     this.homeEditorLockedKeys = new Set();
     this.homeEditorBoxesVisible = true;
     this.homeEditorViewScale = 1;
+    this.cheatFlags = {
+      levelHitboxes: false,
+      startHitboxes: false,
+      homeEditor: false,
+      runTools: false,
+    };
     this.sceneNudgeTimerId = null;
     this.magnifierHoldTimerId = null;
     this.state = {
@@ -163,8 +190,9 @@ export class HiddenObjectGame {
   }
 
   refreshHomeEditorUi() {
-    const active = this.sessionTestingUnlocked && this.elements.screens.home.classList.contains("screen-active");
+    const active = this.sessionTestingUnlocked && this.isStartHitboxCheatEnabled() && this.elements.screens.home.classList.contains("screen-active");
     this.elements.homeEditorPanel.classList.toggle("hidden", !active);
+    this.elements.homeViewport.classList.toggle("home-editor-active", active && this.homeButtonEditorEnabled);
     if (!active) {
       return;
     }
@@ -179,6 +207,108 @@ export class HiddenObjectGame {
     this.elements.homeEditorToggleBoxesButton.textContent = this.homeEditorBoxesVisible ? "Boxes On" : "Boxes Off";
     this.elements.homeEditorLockButton.textContent = locked ? "Locked" : "Unlocked";
     this.elements.homeEditorZoomButton.textContent = this.homeEditorViewScale < 1 ? "Zoom Normal" : "Zoom Out";
+  }
+
+  isLevelHitboxCheatEnabled() {
+    return this.sessionTestingUnlocked && this.cheatFlags.levelHitboxes;
+  }
+
+  isStartHitboxCheatEnabled() {
+    return this.sessionTestingUnlocked && (this.cheatFlags.startHitboxes || this.cheatFlags.homeEditor);
+  }
+
+  isRunCheatEnabled() {
+    return this.sessionTestingUnlocked && this.cheatFlags.runTools;
+  }
+
+  refreshCheatUi() {
+    if (!this.elements.diagnosticCheatPanel) {
+      return;
+    }
+    const unlocked = this.sessionTestingUnlocked;
+    this.elements.diagnosticCheatPanel.classList.toggle("hidden", !unlocked);
+    this.elements.diagnosticCheatPanel.setAttribute("aria-hidden", String(!unlocked));
+    const mappings = [
+      [this.elements.cheatLevelsButton, this.cheatFlags.levelHitboxes],
+      [this.elements.cheatHomeBoxesButton, this.cheatFlags.startHitboxes],
+      [this.elements.cheatHomeEditorButton, this.cheatFlags.homeEditor],
+      [this.elements.cheatRunToolsButton, this.cheatFlags.runTools],
+    ];
+    mappings.forEach(([button, enabled]) => {
+      if (!button) {
+        return;
+      }
+      button.classList.toggle("cheat-toggle-enabled", enabled);
+    });
+    if (this.elements.hitboxOverlay) {
+      this.elements.hitboxOverlay.classList.toggle("hidden", !this.isLevelHitboxCheatEnabled());
+    }
+    if (this.elements.debugReadout) {
+      this.elements.debugReadout.classList.toggle("hidden", !this.isLevelHitboxCheatEnabled());
+    }
+    if (this.elements.skipLevelButton) {
+      this.elements.skipLevelButton.classList.toggle("hidden", !this.isRunCheatEnabled());
+    }
+    this.renderChangelog();
+    this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
+  }
+
+  toggleCheatFlag(flag) {
+    if (!this.sessionTestingUnlocked) {
+      return;
+    }
+    this.cheatFlags[flag] = !this.cheatFlags[flag];
+    if (!this.cheatFlags.homeEditor) {
+      this.homeButtonEditorEnabled = false;
+    }
+    this.refreshCheatUi();
+    this.showMenuToast(`${flag} ${this.cheatFlags[flag] ? "enabled" : "disabled"}.`);
+  }
+
+  enableAllCheats() {
+    this.cheatFlags.levelHitboxes = true;
+    this.cheatFlags.startHitboxes = true;
+    this.cheatFlags.homeEditor = true;
+    this.cheatFlags.runTools = true;
+    this.refreshCheatUi();
+  }
+
+  disableCheats() {
+    this.sessionTestingUnlocked = false;
+    this.homeButtonEditorEnabled = false;
+    this.cheatFlags.levelHitboxes = false;
+    this.cheatFlags.startHitboxes = false;
+    this.cheatFlags.homeEditor = false;
+    this.cheatFlags.runTools = false;
+    this.elements.diagnosticUnlock.classList.add("hidden");
+    this.elements.diagnosticCheatPanel?.classList.add("hidden");
+    this.elements.diagnosticMessage.textContent = "Cheats disabled.";
+    this.refreshCheatUi();
+  }
+
+  renderChangelog() {
+    if (this.elements.changelogTitle) {
+      this.elements.changelogTitle.textContent = VERSION_LABEL;
+    }
+    if (this.elements.changelogPublicList) {
+      this.elements.changelogPublicList.innerHTML = CHANGELOG_PUBLIC_NOTES.map((item) => `<li>${item}</li>`).join("");
+    }
+    if (this.elements.changelogPrivateList) {
+      this.elements.changelogPrivateList.innerHTML = CHANGELOG_PRIVATE_NOTES.map((item) => `<li>${item}</li>`).join("");
+    }
+    if (this.elements.changelogPrivateSection) {
+      this.elements.changelogPrivateSection.classList.toggle("hidden", !this.sessionTestingUnlocked);
+    }
+  }
+
+  openChangelog() {
+    this.renderChangelog();
+    this.elements.changelogOverlay.classList.remove("hidden");
+  }
+
+  closeChangelog() {
+    this.elements.changelogOverlay.classList.add("hidden");
   }
 
   buildHomeEditorExportText(selectedOnly = false) {
@@ -315,6 +445,7 @@ export class HiddenObjectGame {
       cloud1Layer: document.getElementById("cloud1Layer"),
       cloud2Layer: document.getElementById("cloud2Layer"),
       cloud3Layer: document.getElementById("cloud3Layer"),
+      airballLayer: document.getElementById("airballLayer"),
       wheelStandLayer: document.getElementById("wheelStandLayer"),
       wheelLayer: document.getElementById("wheelLayer"),
       magnifierDecorLayer: document.getElementById("magnifierDecorLayer"),
@@ -394,6 +525,12 @@ export class HiddenObjectGame {
       diagnosticCodeInput: document.getElementById("diagnosticCodeInput"),
       unlockDiagnosticButton: document.getElementById("unlockDiagnosticButton"),
       diagnosticMessage: document.getElementById("diagnosticMessage"),
+      diagnosticCheatPanel: document.getElementById("diagnosticCheatPanel"),
+      cheatLevelsButton: document.getElementById("cheatLevelsButton"),
+      cheatHomeBoxesButton: document.getElementById("cheatHomeBoxesButton"),
+      cheatHomeEditorButton: document.getElementById("cheatHomeEditorButton"),
+      cheatRunToolsButton: document.getElementById("cheatRunToolsButton"),
+      cheatDisableAllButton: document.getElementById("cheatDisableAllButton"),
       sceneViewport: document.getElementById("sceneViewport"),
       sceneContent: document.getElementById("sceneContent"),
       levelImage: document.getElementById("levelImage"),
@@ -454,6 +591,12 @@ export class HiddenObjectGame {
       completionStars: document.getElementById("completionStars"),
       playAgainButton: document.getElementById("playAgainButton"),
       completionLevelSelectButton: document.getElementById("completionLevelSelectButton"),
+      changelogOverlay: document.getElementById("changelogOverlay"),
+      changelogTitle: document.getElementById("changelogTitle"),
+      changelogPublicList: document.getElementById("changelogPublicList"),
+      changelogPrivateSection: document.getElementById("changelogPrivateSection"),
+      changelogPrivateList: document.getElementById("changelogPrivateList"),
+      closeChangelogButton: document.getElementById("closeChangelogButton"),
       menuToast: document.getElementById("menuToast"),
     };
   }
@@ -498,8 +641,14 @@ export class HiddenObjectGame {
     this.elements.levelSelectThirdPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
     this.elements.levelSelectBackFromSpeedrunButton.addEventListener("click", () => this.changeLevelSelectPage(-1));
     this.elements.startSpeedrunButton.addEventListener("click", () => this.startRandomSpeedrun());
-    this.elements.versionTapTarget.addEventListener("click", () => this.handleVersionTap());
-    this.elements.unlockDiagnosticButton.addEventListener("click", () => this.unlockDiagnostics());
+    this.elements.versionTapTarget.addEventListener("click", (event) => this.handleVersionTap(event));
+    this.elements.unlockDiagnosticButton.addEventListener("click", (event) => this.unlockDiagnostics(event));
+    bind(this.elements.cheatLevelsButton, "click", () => this.toggleCheatFlag("levelHitboxes"));
+    bind(this.elements.cheatHomeBoxesButton, "click", () => this.toggleCheatFlag("startHitboxes"));
+    bind(this.elements.cheatHomeEditorButton, "click", () => this.toggleCheatFlag("homeEditor"));
+    bind(this.elements.cheatRunToolsButton, "click", () => this.toggleCheatFlag("runTools"));
+    bind(this.elements.cheatDisableAllButton, "click", () => this.disableCheats());
+    bind(this.elements.closeChangelogButton, "click", () => this.closeChangelog());
     this.elements.levelImage.addEventListener("load", () => this.onLevelImageLoaded());
     this.elements.levelImage.addEventListener("error", () => this.onLevelImageError());
     this.elements.startScreenImage.addEventListener("error", () => this.showStartImageError());
@@ -590,11 +739,16 @@ export class HiddenObjectGame {
     this.elements.body.dataset.magnifier = this.save.settings.magnifierShape ?? "circle";
     this.elements.body.dataset.magnifierSize = this.save.settings.magnifierSize ?? "large";
     this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
-    this.elements.skipLevelButton.classList.toggle("hidden", !this.sessionTestingUnlocked);
+    this.elements.skipLevelButton.classList.toggle("hidden", !this.isRunCheatEnabled());
     this.elements.settingsDiscordButton.disabled = !DISCORD_URL;
     this.elements.settingsLinkHint.textContent = DISCORD_URL
       ? "Community links open in a new tab."
       : "Set your Discord invite URL in scripts/game.js to turn on the Discord button.";
+    if (this.elements.versionTapTarget) {
+      this.elements.versionTapTarget.textContent = VERSION_LABEL;
+    }
+    this.renderChangelog();
+    this.refreshCheatUi();
   }
 
   persistSettings() {
@@ -640,8 +794,12 @@ export class HiddenObjectGame {
     }
     this.layoutHomeButtons();
     this.refreshHomeEditorUi();
+    this.refreshCheatUi();
     if (name === "home" && this.homeAssetsReady && this.elements.startScreenImage.naturalWidth > 0) {
       this.playHomeButtonIntro();
+      this.startHomeDecorAnimations();
+    } else if (name !== "home") {
+      this.stopHomeDecorAnimations();
     }
   }
 
@@ -656,6 +814,7 @@ export class HiddenObjectGame {
       ["cloud1", this.elements.cloud1Layer, START_SCREEN_LAYERS.cloud1.src],
       ["cloud2", this.elements.cloud2Layer, START_SCREEN_LAYERS.cloud2.src],
       ["cloud3", this.elements.cloud3Layer, START_SCREEN_LAYERS.cloud3.src],
+      ["airball", this.elements.airballLayer, START_SCREEN_LAYERS.airball.src],
       ["wheelStand", this.elements.wheelStandLayer, START_SCREEN_LAYERS.wheelStand.src],
       ["wheel", this.elements.wheelLayer, START_SCREEN_LAYERS.wheel.src],
       ["magnifierDecor", this.elements.magnifierDecorLayer, START_SCREEN_LAYERS.magnifierDecor.src],
@@ -663,7 +822,11 @@ export class HiddenObjectGame {
       ["settings", this.elements.settingsButtonArt, "Assets/ui/settingsbutton.png"],
       ["moreGames", this.elements.moreGamesButtonArt, "Assets/ui/moregbutton.png"],
     ];
-    this.elements.homeViewport.classList.remove("home-ready");
+    this.homeAssetsReady = false;
+    this.homeDecorReady = false;
+    this.homeButtonsReady = false;
+    this.stopHomeDecorAnimations();
+    this.elements.homeViewport.classList.remove("home-background-ready", "home-decor-ready", "home-buttons-ready", "home-animating", "home-ready");
     this.elements.homeBootOverlay.classList.remove("hidden", "is-exiting");
     this.elements.homeBootStatus.textContent = "Loading menu art, buttons, and interface layers.";
     Promise.allSettled(assets.map(([key, element, src]) => this.preloadImageAsset(element, src, key))).then((results) => {
@@ -682,8 +845,17 @@ export class HiddenObjectGame {
       window.setTimeout(() => {
         this.elements.homeBootOverlay.classList.add("hidden");
         this.elements.homeBootOverlay.classList.remove("is-exiting");
-        this.elements.homeViewport.classList.add("home-ready");
-        this.playHomeButtonIntro();
+        this.elements.homeViewport.classList.add("home-background-ready");
+        window.setTimeout(() => {
+          this.homeDecorReady = true;
+          this.elements.homeViewport.classList.add("home-decor-ready");
+          this.startHomeDecorAnimations();
+        }, 180);
+        window.setTimeout(() => {
+          this.homeButtonsReady = true;
+          this.elements.homeViewport.classList.add("home-buttons-ready", "home-ready");
+          this.playHomeButtonIntro();
+        }, 520);
       }, 620);
     });
   }
@@ -1032,7 +1204,7 @@ export class HiddenObjectGame {
   }
 
   skipLevel() {
-    if (!this.sessionTestingUnlocked) {
+    if (!this.isRunCheatEnabled()) {
       return;
     }
     const nextIndex = this.getNextLevelIndex();
@@ -1292,8 +1464,20 @@ export class HiddenObjectGame {
     });
   }
 
+  startHomeDecorAnimations() {
+    if (!this.homeDecorReady || this.homeButtonEditorEnabled || this.elements.body.dataset.motion === "reduced") {
+      this.stopHomeDecorAnimations();
+      return;
+    }
+    this.elements.homeViewport.classList.add("home-animating");
+  }
+
+  stopHomeDecorAnimations() {
+    this.elements.homeViewport.classList.remove("home-animating");
+  }
+
   playHomeButtonIntro() {
-    if (!this.homeAssetsReady) {
+    if (!this.homeAssetsReady || !this.homeButtonsReady) {
       return;
     }
     playHomeButtonIntroUi(this, HOME_BUTTON_ANIMATION_MS, HOME_BUTTON_STAGGER_MS);
@@ -1350,6 +1534,7 @@ export class HiddenObjectGame {
 
   renderHitboxes(targets, foundTargetIds = new Set()) {
     renderHitboxesUi(this, targets, foundTargetIds);
+    this.refreshCheatUi();
   }
 
   startElapsedTimer() {
@@ -1451,27 +1636,35 @@ export class HiddenObjectGame {
       this.elements.quitConfirmOverlay,
       this.elements.resultOverlay,
       this.elements.completionOverlay,
+      this.elements.changelogOverlay,
     ].forEach((node) => node.classList.add("hidden"));
   }
 
-  handleVersionTap() {
-    this.diagnosticTapCount += 1;
-    if (this.diagnosticTapCount >= 4) {
-      this.elements.diagnosticUnlock.classList.remove("hidden");
-      this.elements.diagnosticCodeInput.focus();
-      this.diagnosticTapCount = 0;
+  handleVersionTap(event) {
+    if (event.altKey) {
+      this.diagnosticTapCount += 1;
+      if (this.diagnosticTapCount >= 4) {
+        this.elements.diagnosticUnlock.classList.remove("hidden");
+        this.elements.diagnosticCodeInput.focus();
+        this.elements.diagnosticMessage.textContent = "Enter the code.";
+        this.diagnosticTapCount = 0;
+      }
+      return;
     }
+    this.diagnosticTapCount = 0;
+    this.openChangelog();
   }
 
-  unlockDiagnostics() {
+  unlockDiagnostics(event) {
     if (this.elements.diagnosticCodeInput.value.trim() === DIAGNOSTIC_CODE) {
       this.sessionTestingUnlocked = true;
-      this.elements.diagnosticMessage.textContent = "Opened.";
-      this.elements.hitboxOverlay.classList.remove("hidden");
-      this.elements.debugReadout.classList.remove("hidden");
-      this.elements.skipLevelButton.classList.remove("hidden");
-      this.layoutHomeButtons();
-      this.refreshHomeEditorUi();
+      if (event.altKey) {
+        this.enableAllCheats();
+        this.elements.diagnosticMessage.textContent = "Opened with all cheats enabled.";
+      } else {
+        this.elements.diagnosticMessage.textContent = "Opened. Choose the tools you want below.";
+        this.refreshCheatUi();
+      }
       return;
     }
     this.elements.diagnosticMessage.textContent = "Denied.";
@@ -1599,7 +1792,7 @@ export class HiddenObjectGame {
       this.handleEscapeShortcut();
       return;
     }
-    if (key === "h" && this.sessionTestingUnlocked && this.elements.screens.home.classList.contains("screen-active")) {
+    if (key === "h" && this.cheatFlags.homeEditor && this.elements.screens.home.classList.contains("screen-active")) {
       event.preventDefault();
       this.toggleHomeButtonEditor();
       return;
@@ -1733,6 +1926,10 @@ export class HiddenObjectGame {
       this.hideMagnifier();
       return;
     }
+    if (!this.elements.changelogOverlay.classList.contains("hidden")) {
+      this.closeChangelog();
+      return;
+    }
     if (!this.elements.quitConfirmOverlay.classList.contains("hidden")) {
       this.closeQuitPrompt();
       return;
@@ -1767,7 +1964,16 @@ export class HiddenObjectGame {
   }
 
   toggleHomeButtonEditor() {
+    if (!this.cheatFlags.homeEditor) {
+      this.showMenuToast("Enable Screen Editor in the cheat tools first.", true);
+      return;
+    }
     this.homeButtonEditorEnabled = !this.homeButtonEditorEnabled;
+    if (this.homeButtonEditorEnabled) {
+      this.stopHomeDecorAnimations();
+    } else {
+      this.startHomeDecorAnimations();
+    }
     this.layoutHomeButtons();
     this.refreshHomeEditorUi();
     this.showMenuToast(this.homeButtonEditorEnabled
@@ -1873,6 +2079,7 @@ export class HiddenObjectGame {
       cloud1: this.elements.cloud1Layer,
       cloud2: this.elements.cloud2Layer,
       cloud3: this.elements.cloud3Layer,
+      airball: this.elements.airballLayer,
       wheelStand: this.elements.wheelStandLayer,
       wheel: this.elements.wheelLayer,
       magnifierDecor: this.elements.magnifierDecorLayer,
@@ -1988,7 +2195,22 @@ export class HiddenObjectGame {
       this.showMenuToast(document.body.classList.contains("easter-static") ? "Static mode enabled." : "Static mode disabled.");
     }
 
-    if (key === "n" && this.sessionTestingUnlocked && this.elements.screens.game.classList.contains("screen-active")) {
+    if (SUNSET_SEQUENCE.every((value, index) => this.konamiInput.slice(-SUNSET_SEQUENCE.length)[index] === value)) {
+      document.body.classList.toggle("easter-sunset");
+      this.showMenuToast(document.body.classList.contains("easter-sunset") ? "Sunset mode enabled." : "Sunset mode disabled.");
+    }
+
+    if (FLOAT_SEQUENCE.every((value, index) => this.konamiInput.slice(-FLOAT_SEQUENCE.length)[index] === value)) {
+      document.body.classList.toggle("easter-float");
+      this.showMenuToast(document.body.classList.contains("easter-float") ? "Float mode enabled." : "Float mode disabled.");
+    }
+
+    if (GLASS_SEQUENCE.every((value, index) => this.konamiInput.slice(-GLASS_SEQUENCE.length)[index] === value)) {
+      document.body.classList.toggle("easter-glass");
+      this.showMenuToast(document.body.classList.contains("easter-glass") ? "Glass mode enabled." : "Glass mode disabled.");
+    }
+
+    if (key === "n" && this.isRunCheatEnabled() && this.elements.screens.game.classList.contains("screen-active")) {
       this.skipLevel();
     }
   }
@@ -2318,7 +2540,7 @@ export class HiddenObjectGame {
   }
 
   updateDebugReadout() {
-    if (!this.sessionTestingUnlocked) {
+    if (!this.isLevelHitboxCheatEnabled()) {
       return;
     }
     const pointer = this.state.pointerImage ? `Pointer: ${this.state.pointerImage.x}, ${this.state.pointerImage.y}` : "Pointer: outside image";

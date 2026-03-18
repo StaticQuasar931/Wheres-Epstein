@@ -98,6 +98,6 @@ export function renderHitboxes(game, targets, foundTargetIds = new Set()) {
     }
     game.elements.hitboxOverlay.appendChild(node);
   });
-  game.elements.hitboxOverlay.classList.toggle("hidden", !game.sessionTestingUnlocked);
-  game.elements.debugReadout.classList.toggle("hidden", !game.sessionTestingUnlocked);
+  game.elements.hitboxOverlay.classList.toggle("hidden", !game.isLevelHitboxCheatEnabled());
+  game.elements.debugReadout.classList.toggle("hidden", !game.isLevelHitboxCheatEnabled());
 }
