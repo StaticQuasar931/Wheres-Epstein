@@ -128,6 +128,9 @@ export function bindHomeButtonHoverEffects(game) {
 
 export function playHomeButtonIntro(game, animationMs, staggerMs) {
   clearHomeAnimationTimers(game);
+  const reducedMotion = game.save?.settings?.motion === "reduced";
+  const introAnimationMs = reducedMotion ? Math.round(animationMs * 0.72) : animationMs;
+  const introStaggerMs = reducedMotion ? Math.round(staggerMs * 0.78) : staggerMs;
   const artLayers = [
     game.elements.startButtonArt,
     game.elements.settingsButtonArt,
@@ -172,12 +175,12 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
       const settleTimerId = window.setTimeout(() => {
         layer.classList.remove("is-entering");
         layer.classList.add("is-settled");
-      }, animationMs);
+      }, introAnimationMs);
       game.homeAnimationTimers.push(settleTimerId);
-    }, index * staggerMs);
+    }, index * introStaggerMs);
     game.homeAnimationTimers.push(timerId);
   });
-  scheduleIntroSheenSequence(game, sheenLayers, animationMs, staggerMs);
+  scheduleIntroSheenSequence(game, sheenLayers, introAnimationMs, introStaggerMs);
   game.homeIntroPlayed = true;
 }
 

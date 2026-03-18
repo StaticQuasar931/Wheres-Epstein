@@ -16,7 +16,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.3.2";
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.3.4";
 const HOME_BUTTON_STAGGER_MS = 320;
 const HOME_BUTTON_ANIMATION_MS = 1680;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -37,11 +37,11 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Start screen visuals are now staged more cleanly, with the background appearing first and the decorative layers following in sequence.",
-  "Cloud motion, ferris wheel spin, balloon drift, and menu fades were polished to feel smoother and more alive.",
-  "The magnifying glass face layer is now supported as part of the start screen stack.",
-  "The version label opens a larger changelog window with cleaner public notes.",
-  "The home scene now uses softened edge fills so the menu art blends better into widescreen layouts.",
+  "Reduced motion now trims back decorative motion instead of replaying every animation at full strength.",
+  "The start screen now keeps its big intro to the first boot instead of replaying it every time you return home.",
+  "Cloud motion, ferris wheel spin, balloon drift, and the magnifying-glass face layer were smoothed out again.",
+  "Page Three was expanded into a fuller extras page with more route buttons and better future support.",
+  "The changelog stays focused on public-facing updates only.",
 ];
 
 const ADVANCED_MAIN_LEVELS = ADVANCED_LEVELS.filter((level) => !level.isAdvancedBonus);
@@ -478,6 +478,10 @@ export class HiddenObjectGame {
       advancedBonusLevelGrid: document.getElementById("advancedBonusLevelGrid"),
       speedrunRouteSection: document.getElementById("speedrunRouteSection"),
       startSpeedrunButton: document.getElementById("startSpeedrunButton"),
+      startMainSpeedrunButton: document.getElementById("startMainSpeedrunButton"),
+      startAdvancedSpeedrunButton: document.getElementById("startAdvancedSpeedrunButton"),
+      startBonusSpeedrunButton: document.getElementById("startBonusSpeedrunButton"),
+      startSpecialLevelsButton: document.getElementById("startSpecialLevelsButton"),
       speedrunRoundsText: document.getElementById("speedrunRoundsText"),
       speedrunAverageScoreText: document.getElementById("speedrunAverageScoreText"),
       speedrunAverageTimeText: document.getElementById("speedrunAverageTimeText"),
@@ -638,6 +642,10 @@ export class HiddenObjectGame {
     this.elements.levelSelectThirdPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
     this.elements.levelSelectBackFromSpeedrunButton.addEventListener("click", () => this.changeLevelSelectPage(-1));
     this.elements.startSpeedrunButton.addEventListener("click", () => this.startRandomSpeedrun());
+    this.elements.startMainSpeedrunButton?.addEventListener("click", () => this.startRandomSpeedrun("main"));
+    this.elements.startAdvancedSpeedrunButton?.addEventListener("click", () => this.startRandomSpeedrun("advanced"));
+    this.elements.startBonusSpeedrunButton?.addEventListener("click", () => this.startRandomSpeedrun("bonus"));
+    this.elements.startSpecialLevelsButton?.addEventListener("click", () => this.startRandomSpeedrun("special"));
     this.elements.versionTapTarget.addEventListener("click", (event) => this.handleVersionTap(event));
     this.elements.unlockDiagnosticButton.addEventListener("click", (event) => this.unlockDiagnostics(event));
     bind(this.elements.cheatLevelsButton, "click", () => this.toggleCheatFlag("levelHitboxes"));
@@ -793,8 +801,18 @@ export class HiddenObjectGame {
     this.refreshHomeEditorUi();
     this.refreshCheatUi();
     if (name === "home" && this.homeAssetsReady && this.elements.startScreenImage.naturalWidth > 0) {
-      this.playHomeButtonIntro();
-      this.startHomeDecorAnimations();
+      if (!this.homeIntroPlayed) {
+        this.playHomeButtonIntro();
+      }
+      if (this.homeDecorReady) {
+        this.startHomeDecorAnimations();
+      }
+    }
+    if (name !== "levelSelect") {
+      this.elements.levelSelectPrevPageButton.classList.add("hidden");
+      this.elements.levelSelectNextPageButton.classList.add("hidden");
+      this.elements.levelSelectThirdPageButton.classList.add("hidden");
+      this.elements.levelSelectBackFromSpeedrunButton.classList.add("hidden");
     }
   }
 
@@ -822,7 +840,7 @@ export class HiddenObjectGame {
     this.homeDecorReady = false;
     this.homeButtonsReady = false;
     this.homeDecorStarted = false;
-    this.stopHomeDecorAnimations();
+    this.stopHomeDecorAnimations(true);
     this.elements.homeViewport.classList.remove("home-background-ready", "home-decor-ready", "home-buttons-ready", "home-animating", "home-ready");
     this.elements.homeBootOverlay.classList.remove("hidden", "is-exiting");
     this.elements.homeBootStatus.textContent = "Loading menu art, buttons, and interface layers.";
@@ -846,7 +864,7 @@ export class HiddenObjectGame {
         window.setTimeout(() => {
           this.homeDecorReady = true;
           this.elements.homeViewport.classList.add("home-decor-ready");
-          this.startHomeDecorAnimations();
+          this.startHomeDecorAnimations(true);
         }, 180);
         window.setTimeout(() => {
           this.homeButtonsReady = true;
@@ -1145,6 +1163,14 @@ export class HiddenObjectGame {
     this.elements.levelSelectNextPageButton.classList.toggle("hidden", !levelSelectActive || !this.isAdvancedUnlocked() || page !== 1);
     this.elements.levelSelectThirdPageButton.classList.toggle("hidden", !levelSelectActive || !this.isSpeedrunUnlocked() || !onAdvancedPage);
     this.elements.levelSelectBackFromSpeedrunButton.classList.toggle("hidden", !levelSelectActive || !onSpeedrunPage);
+    if (this.elements.startSpecialLevelsButton) {
+      this.elements.startSpecialLevelsButton.disabled = SPECIAL_LEVELS.length === 0;
+    }
+    if (this.elements.specialLevelsStatusText) {
+      this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
+        ? `${SPECIAL_LEVELS.length} special levels are currently authored.`
+        : "No special levels authored yet.";
+    }
   }
 
   startNextLevel() {
@@ -1161,10 +1187,29 @@ export class HiddenObjectGame {
     }
   }
 
-  startRandomSpeedrun() {
-    const level = this.pickRandomSpeedrunLevel();
+  getSpeedrunPool(pool = "all") {
+    if (pool === "main") {
+      return [...MAIN_LEVELS];
+    }
+    if (pool === "advanced") {
+      return [...ADVANCED_MAIN_LEVELS];
+    }
+    if (pool === "bonus") {
+      return [...BONUS_LEVELS, ...ADVANCED_BONUS_LEVELS];
+    }
+    if (pool === "special") {
+      return [...SPECIAL_LEVELS];
+    }
+    return [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_MAIN_LEVELS, ...ADVANCED_BONUS_LEVELS, ...SPECIAL_LEVELS];
+  }
+
+  startRandomSpeedrun(pool = "all") {
+    const level = this.pickRandomSpeedrunLevel(pool);
     if (!level) {
-      this.showMenuToast("No speedrun level could be selected.", true);
+      const message = pool === "special"
+        ? "No special levels are authored yet."
+        : "No speedrun level could be selected.";
+      this.showMenuToast(message, true);
       return;
     }
     const index = LEVELS.findIndex((item) => item.id === level.id);
@@ -1176,8 +1221,8 @@ export class HiddenObjectGame {
     this.startCampaignFromLevel(index);
   }
 
-  pickRandomSpeedrunLevel() {
-    const available = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_MAIN_LEVELS, ...ADVANCED_BONUS_LEVELS];
+  pickRandomSpeedrunLevel(pool = "all") {
+    const available = this.getSpeedrunPool(pool).filter((level) => !level.needsSetup);
     if (!available.length) {
       return null;
     }
@@ -1466,19 +1511,33 @@ export class HiddenObjectGame {
     });
   }
 
-  startHomeDecorAnimations() {
-    if (this.homeDecorStarted || !this.homeDecorReady || this.homeButtonEditorEnabled) {
-      this.stopHomeDecorAnimations();
+  startHomeDecorAnimations(force = false) {
+    if (!this.homeDecorReady) {
+      return;
+    }
+    if (this.homeButtonEditorEnabled) {
+      this.stopHomeDecorAnimations(false);
+      return;
+    }
+    if (this.homeDecorStarted && !force) {
+      this.elements.homeViewport.classList.remove("home-decor-paused");
       return;
     }
     this.homeDecorStarted = true;
+    this.elements.homeViewport.classList.remove("home-decor-paused");
     this.elements.homeViewport.classList.add("home-animating");
   }
 
-  stopHomeDecorAnimations() {
-    if (!this.homeDecorStarted) {
-      this.elements.homeViewport.classList.remove("home-animating");
+  stopHomeDecorAnimations(force = false) {
+    if (force) {
+      this.homeDecorStarted = false;
+      this.elements.homeViewport.classList.remove("home-animating", "home-decor-paused");
+      return;
     }
+    if (!this.homeDecorStarted) {
+      return;
+    }
+    this.elements.homeViewport.classList.add("home-decor-paused");
   }
 
   playHomeButtonIntro() {
@@ -1856,6 +1915,11 @@ export class HiddenObjectGame {
         this.handleResultPrimary();
         return;
       }
+      if (!this.elements.quitConfirmOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.confirmQuitRun();
+        return;
+      }
     }
     if (event.code === "Space") {
       if (!this.elements.advancedInfoOverlay.classList.contains("hidden")) {
@@ -1878,6 +1942,11 @@ export class HiddenObjectGame {
         this.resumeGame();
         return;
       }
+      if (!this.elements.quitConfirmOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.confirmQuitRun();
+        return;
+      }
     }
     if (key === "enter") {
       if (!this.elements.advancedInfoOverlay.classList.contains("hidden")) {
@@ -1898,6 +1967,11 @@ export class HiddenObjectGame {
       if (!this.elements.pauseOverlay.classList.contains("hidden")) {
         event.preventDefault();
         this.resumeGame();
+        return;
+      }
+      if (!this.elements.quitConfirmOverlay.classList.contains("hidden")) {
+        event.preventDefault();
+        this.confirmQuitRun();
         return;
       }
     }
@@ -1975,9 +2049,9 @@ export class HiddenObjectGame {
     }
     this.homeButtonEditorEnabled = !this.homeButtonEditorEnabled;
     if (this.homeButtonEditorEnabled) {
-      this.stopHomeDecorAnimations();
+      this.stopHomeDecorAnimations(false);
     } else {
-      this.startHomeDecorAnimations();
+      this.startHomeDecorAnimations(false);
     }
     this.layoutHomeButtons();
     this.refreshHomeEditorUi();

@@ -267,13 +267,13 @@ const ADVANCED_LEVELS_RAW = [
   // Advanced Level 12: LEGO Party                    
   makeAdvancedLevel(12, [        
     makeTarget("advanced-12-a", "tru10", { type: "rect", x1: 1112, y1: 364, x2: 1072, y2: 317 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-12-b", "ep10", { type: "rect", x1: 420, y1: 315, x2: 397, y2: 275 }, "Assets/Waldos/advanced"),
   ], {
     name: "LEGO Party",
   }),
   // Advanced Level 13: Crossed Paths                         
   makeAdvancedLevel(13, [
-    makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 399, y1: 273, x2: 421, y2: 314 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 16, y1: 255, x2: 0, y2: 221 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 894, y1: 258, x2: 869, y2: 230 }, "Assets/Waldos/advanced"),
   ], {
     name: "Bookoff",
@@ -321,9 +321,9 @@ const ADVANCED_LEVELS_RAW = [
     name: "Déjà Vu",
     needsSetup: false,
   }),
-  makeAdvancedBonusLevel(3, [             
+  makeAdvancedBonusLevel(3, [
     makeTarget("advanced-bonus-03-a", "tru8", { type: "rect", x1: 792, y1: 117, x2: 785, y2: 109 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 782, y1: 511, x2: 846, y2: 496 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 779, y1: 511, x2: 752, y2: 465 }, "Assets/Waldos/advanced"),
   ], {
     name: "Celebrity Overmash",
     needsSetup: false,

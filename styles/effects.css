@@ -109,7 +109,7 @@
 
 .home-button-sheen.is-hovered::before,
 .home-button-sheen.is-glinting::before {
-  animation: home-shimmer 7s ease-in-out infinite;
+  animation: home-shimmer 1100ms ease-in-out 1;
 }
 
 .home-button-sheen.is-pressed {
@@ -169,8 +169,9 @@
 }
 
 .home-viewport.home-animating #magnifierFacesLayer {
-  animation: layer-fade-in 1200ms cubic-bezier(0.18, 0.82, 0.2, 1) 1180ms both, faces-glow 10.4s ease-in-out infinite;
-  animation-delay: 1180ms, 2360ms;
+  transform-origin: center center;
+  animation: faces-fade-in 1120ms cubic-bezier(0.18, 0.82, 0.2, 1) 1180ms both, magnifier-float-faces 9.2s ease-in-out infinite;
+  animation-delay: 1180ms, 1260ms;
 }
 
 .home-viewport.home-animating #airballLayer,
@@ -366,6 +367,16 @@ body.easter-arcade .result-star--filled {
   50% { opacity: 1; transform: translate(2px, -2px); }
 }
 
+@keyframes faces-fade-in {
+  from { opacity: 0; transform: rotate(-6deg) scale(0.985); }
+  to { opacity: 1; transform: rotate(-6deg) scale(1); }
+}
+
+@keyframes magnifier-float-faces {
+  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+  50% { transform: translate(8px, -6px) rotate(-4.8deg); }
+}
+
 @keyframes airball-float {
   0%, 100% { transform: translate(0, 0) rotate(-0.4deg); }
   18% { transform: translate(3px, -4px) rotate(-0.1deg); }
@@ -374,17 +385,53 @@ body.easter-arcade .result-star--filled {
   84% { transform: translate(2px, -8px) rotate(0.1deg); }
 }
 
-body[data-motion="reduced"] .home-viewport.home-animating #cloud1Layer,
-body[data-motion="reduced"] .home-viewport.home-animating #cloud2Layer,
-body[data-motion="reduced"] .home-viewport.home-animating #cloud3Layer,
-body[data-motion="reduced"] .home-viewport.home-animating #wheelLayer,
+body[data-motion="reduced"] .home-viewport.home-animating #cloud1Layer {
+  animation: layer-fade-in 420ms ease 980ms both, cloud-drift-1 74s linear infinite !important;
+  animation-delay: 980ms, -8s !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #cloud2Layer {
+  animation: layer-fade-in 420ms ease 980ms both, cloud-drift-2 88s linear infinite !important;
+  animation-delay: 980ms, -28s !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #cloud3Layer {
+  animation: layer-fade-in 420ms ease 980ms both, cloud-drift-3 102s linear infinite !important;
+  animation-delay: 980ms, -42s !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #wheelLayer {
+  animation: layer-fade-in 340ms ease 760ms both, ferris-spin 96s linear infinite !important;
+  animation-delay: 760ms, 760ms !important;
+}
+
 body[data-motion="reduced"] .home-viewport.home-animating #wheelStandLayer,
 body[data-motion="reduced"] .home-viewport.home-animating #titleBannerLayer,
 body[data-motion="reduced"] .home-viewport.home-animating #magnifierDecorLayer,
-body[data-motion="reduced"] .home-viewport.home-animating #magnifierFacesLayer,
 body[data-motion="reduced"] .home-viewport.home-animating #airballLayer,
 body[data-motion="reduced"] .home-viewport.home-animating #homeNameButton {
-  animation-duration: 1600ms, 20s !important;
+  animation-duration: 360ms !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #magnifierFacesLayer {
+  animation: faces-fade-in 360ms ease 980ms both !important;
+}
+
+body[data-motion="reduced"] .home-button-art.is-settled {
+  animation: none !important;
+}
+
+.home-viewport.home-decor-paused #cloud1Layer,
+.home-viewport.home-decor-paused #cloud2Layer,
+.home-viewport.home-decor-paused #cloud3Layer,
+.home-viewport.home-decor-paused #wheelLayer,
+.home-viewport.home-decor-paused #wheelStandLayer,
+.home-viewport.home-decor-paused #titleBannerLayer,
+.home-viewport.home-decor-paused #magnifierDecorLayer,
+.home-viewport.home-decor-paused #magnifierFacesLayer,
+.home-viewport.home-decor-paused #airballLayer,
+.home-viewport.home-decor-paused #homeNameButton {
+  animation-play-state: paused !important;
 }
 
 @keyframes found-cross-pulse {

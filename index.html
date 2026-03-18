@@ -217,11 +217,24 @@
                       <h4>Challenge Room</h4>
                     </div>
                   </div>
-                  <ul class="control-list compact-list">
-                    <li>Main-only random runs are planned next.</li>
-                    <li>Advanced-only random runs fit this page well too.</li>
-                    <li>Special levels will plug into this page once authored.</li>
-                  </ul>
+                  <div class="speedrun-bubble-grid">
+                    <button id="startMainSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
+                      Main Route Random
+                      <small>Story levels only</small>
+                    </button>
+                    <button id="startAdvancedSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
+                      Advanced Random
+                      <small>Advanced main levels only</small>
+                    </button>
+                    <button id="startBonusSpeedrunButton" class="ghost-button speedrun-bubble" type="button">
+                      Bonus Blitz
+                      <small>Bonus and advanced bonus</small>
+                    </button>
+                    <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble" type="button">
+                      Special Levels
+                      <small>Reserved for the special route</small>
+                    </button>
+                  </div>
                 </section>
               </div>
             </div>
@@ -400,7 +413,7 @@
           </section>
 
           <div class="version-line">
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.3</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.3.4</p>
             <div class="button-row settings-links-row">
               <button id="settingsDiscordButton" class="secondary-button" type="button">Join Discord</button>
               <button id="settingsMoreGamesButton" class="ghost-button" type="button">More Games</button>
@@ -644,7 +657,7 @@
   <div id="changelogOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card changelog-card">
       <p class="eyebrow">Patch Notes</p>
-      <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.3.2</h2>
+      <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.3.4</h2>
       <div class="changelog-columns">
         <section>
           <h3>Changelog</h3>
