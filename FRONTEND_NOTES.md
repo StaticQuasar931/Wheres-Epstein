@@ -1,153 +1,184 @@
 Where's Epstein? Frontend Notes
-<!-- 0a9s8df7a98sdf7a98sdf7a98sdf7a98 -->
 
 Purpose
 
-This file is a handoff note for future frontend or animation work. The gameplay logic stays in `scripts/game.js`, but the visual systems were split so another tool or service can replace the presentation without having to rediscover how the project is wired.
+This file is the handoff note for future frontend or animation work. The project keeps gameplay and save logic in `scripts/game.js`, while the more visual placement and animation work is split into the HTML, CSS, and start-screen helper files.
 
 Core split
 
 - `index.html`
-  Holds the screens, overlays, buttons, and all DOM ids that the game code expects.
+  Holds all screens, overlays, start-screen layers, buttons, and DOM ids expected by the JavaScript.
 - `styles/main.css`
-  Main layout, theme variables, menu shells, play HUD layout, responsive structure.
+  Layout, themes, settings layout, page 3 layout, game HUD, scene viewport, magnifier lens, and responsive rules.
 - `styles/effects.css`
-  Animation-heavy styling, hover states, home button entrance, page arrows, found-target effects.
+  Start-screen animation timing, hover states, cloud motion, decor motion, sheen timing, result polish, and easter-egg visuals.
 - `scripts/game.js`
-  Game state, progression, scoring, input, storage calls, level start/end flow, unlock logic.
+  Main game state, progression, unlocks, score saving, input, magnifier logic, preloading, route variants, changelog rendering, and settings.
 - `scripts/home-ui.js`
-  Home screen button placement, start-screen coordinate math, intro animation sequencing, home debug overlay.
+  Start-screen coordinate math, home button placement, sheen placement, and editor/debug overlay rendering.
 - `scripts/game-renderer.js`
-  Preview image rendering, found-target visual sync, hitbox overlay rendering, toast messages.
+  Preview list rendering, hitbox rendering, and found-target visual sync.
 - `scripts/levels.js`
-  Level data only. Hitboxes, image paths, names, targets, advanced placeholders.
+  Level data, names, backgrounds, preview assets, target hitboxes, start-screen button rectangles, and start-screen decor rectangles.
+- `scripts/storage.js`
+  Local save schema, settings persistence, level results, view counts, and speedrun stats.
 
-Home screen boot flow
+Start-screen asset flow
 
-1. `game.js` calls `startHomeBoot()` in the constructor.
-2. `startHomeBoot()` waits for these assets:
-   - `Assets/ui/nobuttonloadingscreen.jpg`
-   - `Assets/ui/startbutton.png`
-   - `Assets/ui/settingsbutton.png`
-   - `Assets/ui/moregbutton.png`
-3. While they load, `#homeBootOverlay` stays visible.
-4. When loading finishes, `home-ready` is added to `#homeViewport`.
-5. Then `playHomeButtonIntro()` runs the staggered button entrance.
+`game.js` boots the home screen in a staged order:
 
-Home button system
+1. Wait for base home assets during `startHomeBoot()`
+2. Show the background image first
+3. Fade in layered decor in sequence
+4. Run the one-time button intro
+5. Keep decorative motion live only after the intro settles
 
-- The clickable rectangles come from `START_SCREEN_BUTTONS` in `scripts/levels.js`.
-- `scripts/home-ui.js` converts those original image coordinates into the rendered browser coordinates.
-- The button art PNGs are not assumed to be tightly cropped.
-- `getHomeArtBounds()` scans alpha so the visible painted part of the PNG is centered into the intended hitbox.
+Important start-screen assets currently used
 
-Home animation classes
+- `Assets/ui/backgroundplain.png`
+- `Assets/ui/titlebanner.png`
+- `Assets/ui/mglassempty.png`
+- `Assets/ui/startscreenfaces.png`
+- `Assets/ui/Wheel.png`
+- `Assets/ui/WheelStand.png`
+- `Assets/ui/Blimp.png`
+- `Assets/ui/airball.png`
+- `Assets/ui/cloud1.png`
+- `Assets/ui/cloud2.png`
+- `Assets/ui/cloud3.png`
+- `Assets/ui/CloudChart.png`
+- `Assets/ui/startbutton.png`
+- `Assets/ui/settingsbutton.png`
+- `Assets/ui/moregbutton.png`
 
-- `is-prepping`
-  Button art starts below the screen using `--home-enter-offset`.
-- `is-entering`
-  Button slides upward into place.
-- `is-settled`
-  Button stays in place and can idle-pulse.
-- `is-hovered`
-  Hover enlargement and stronger glow.
-- `is-pressed`
-  Click squash / press-down response.
+Start-screen coordinate system
 
-Home sheen layers
+- `START_SCREEN_BUTTONS` in `scripts/levels.js`
+  Stores home button rectangles in original source-image pixels.
+- `START_SCREEN_LAYERS` in `scripts/levels.js`
+  Stores decor layer rectangles, sources, and optional rotation.
+- `scripts/home-ui.js`
+  Converts those original coordinates into rendered browser placement every time the viewport changes.
 
-- Each button has a separate `home-button-sheen` layer in `index.html`.
-- These are aligned in `scripts/home-ui.js` with `placeHomeSheen()`.
-- The shimmer is visual only. It does not affect hitboxes.
+The current start-screen layering order is:
 
-If another frontend tool replaces the start screen
+1. Base background image
+2. Main clouds and tiny distant cloud sprites
+3. Blimp
+4. Air balloon
+5. Ferris stand and ferris wheel
+6. Title banner
+7. Magnifying glass frame
+8. Magnifying glass faces
+9. Home button art and sheen
+10. Invisible clickable buttons
+11. Editor/debug overlay
 
-- Keep the DOM ids the same if possible.
-- If the button art changes, either:
-  - keep the current alpha-bound scan logic, or
-  - replace `placeHomeArt()` and `placeHomeSheen()` in `scripts/home-ui.js`.
-- If a video or canvas intro is added later, it can still end by calling:
-  - `game.layoutHomeButtons()`
-  - `game.playHomeButtonIntro()`
+Cloud depth system
 
-Level select layout
+The screen uses:
 
-- Main route and advanced route are the large left-column sections.
-- Bonus and progress cards sit on the right.
-- Page arrows are pure HTML buttons with SVG icons and label text.
-- Card sizing is mostly controlled in `styles/main.css`.
+- three main cloud images
+- three tiny cloud sprite layers sourced from `CloudChart.png`
 
-Multi-target levels
+The tiny clouds are meant to add depth. They should stay behind the main decor and feel farther away by:
 
-- Levels with more than one target use `targets: []` in `scripts/levels.js`.
-- Clicking a target adds its id to `state.foundTargetIds`.
-- `scripts/game-renderer.js` crosses out found targets in the preview panel and marks their hitboxes as found.
+- smaller scale
+- lower opacity
+- slower drift
+- later entrance timing
 
-Missing art behavior
+Home editor controls
 
-- If a preview image path is missing or wrong, the preview panel shows the exact path it tried to load.
-- If a background image is missing, the scene fallback shows the exact background path it tried to load.
-- Placeholder advanced entries currently exist up to advanced level 20 and advanced bonus 5 so expansion does not need another structural pass.
+When the home editor cheat is enabled:
 
-Speedrun route
+- `H`
+  Toggle the home editor on the start screen
+- `1`, `2`, `3`
+  Select start, settings, or more games
+- `4`
+  Select title banner
+- `5`
+  Select magnifying glass frame
+- `6`
+  Select magnifying glass faces
+- `7`
+  Select air balloon
+- `8`
+  Select blimp
+- `9`
+  Select ferris wheel
+- `0`
+  Select ferris stand
+- `[` and `]`
+  Cycle through editable items
+- Drag box
+  Move the selected item
+- Drag corner handle
+  Resize the selected item
+- Arrow keys
+  Nudge position
+- `Shift + Arrow keys`
+  Resize
+- `Q` and `E`
+  Rotate
+- `Shift + Q` and `Shift + E`
+  Fine rotate
+- `B`
+  Show or hide editor boxes
+- `K`
+  Lock or unlock the selected item
+- `Z`
+  Toggle zoomed-out editor view
+- `Esc`
+  Close the editor
 
-- Page 3 is the random speedrun route.
-- Unlock logic lives in `game.js` with `isSpeedrunUnlocked()`.
-- The current unlock uses:
-  - all main levels completed
-  - all authored advanced levels completed
-- Random picking happens in `pickRandomSpeedrunLevel()`.
-- It can repeat levels, but recent picks are softly avoided with rerolls.
-- Speedrun stats are saved in `storage.js` under `bucket.speedrun`.
+Preloading and caching
 
-Safe places to change visuals later
+The game keeps a `preloadedAssets` map in memory for the current session.
 
-- Change animation timing:
-  - `HOME_BUTTON_STAGGER_MS` and `HOME_BUTTON_ANIMATION_MS` in `scripts/game.js`
-- Change hover / shimmer / pulse:
-  - `styles/effects.css`
-- Change home coordinate offsets:
-  - `HOME_BUTTON_X_OFFSET` and `HOME_BUTTON_Y_OFFSET` in `scripts/game.js`
-- Change real home hitboxes:
-  - `START_SCREEN_BUTTONS` in `scripts/levels.js`
+Current behavior:
 
-Frontend upgrade ideas for a future animation-focused tool
+- Home boot preloads early gameplay art
+- Starting on the home screen warms level 1 and level 2
+- Entering a level warms that level plus upcoming levels based on `renderAhead`
+- Speedrun mode warms a wider random candidate pool
+- Once an image is in the session cache, the game reuses it instead of creating a new request path
 
-- Replace the home PNG stack with layered parallax plates instead of one flat scene.
-- Add a real loading progress bar tied to the same boot assets the game already waits for.
-- Turn the current sheen into a per-button timeline:
-  - intro sweeps
-  - slower idle loops
-  - hover-triggered accent sweep
-- Add more depth to the home buttons:
-  - tiny rotation on hover
-  - stronger click squash
-  - per-button glow colors
-- Add a soft light-follow effect over the start screen based on pointer position.
-- Give level cards staggered row reveals instead of all appearing at once.
-- Add score count-up and star pop timing on the result screen.
-- Turn the settings page into a denser dashboard:
-  - gameplay options
-  - visual options
-  - local stats
-  - links and credits
-- Make page arrows slide in from the edges on unlock.
-- Keep gameplay logic isolated:
-  - leave progression, scoring, storage, and hit detection in `scripts/game.js`
-  - keep visual experimentation in `index.html`, `styles/*.css`, `scripts/home-ui.js`, and `scripts/game-renderer.js`
+The settings menu now includes:
 
-Claude handoff notes
+- magnifier zoom speed
+- preload depth
+- motion
+- theme
+- density
+- target card size
 
-- Good time to hand Claude another pass after the current build feels functionally stable in browser testing. The next Claude pass should be mostly visual polish, not logic repair.
-- Ask Claude to avoid changing DOM ids or gameplay flow in `scripts/game.js`.
-- Best Claude targets:
-  - tighten selector spacing and card rhythm without changing ids
-  - improve settings composition and typography density
-  - polish the page-arrow art and button visual hierarchy
-  - improve start-screen version text placement and passive name-link treatment
-  - refine magnifier lens styling only after confirming the JS behavior feels right
-- Things Claude should not touch unless specifically asked:
-  - level progression logic
-  - score saving and storage structure
-  - hitbox math
-  - speedrun routing and unlock checks
+Mirror and upsideown routes
+
+- These are separate route variants
+- They do not save over standard clear results
+- The body gets a route-variant dataset flag so the frontend can tint those routes differently
+- Returning to level select from a mirror or upsideown run preserves the route context
+
+Special levels
+
+- Special levels are authored from `Assets/Bakgrounds/Special/` and `Assets/Waldos/Special/`
+- The page 3 special section shows ten slots for future content
+- Slots marked `needsSetup` stay locked in the UI
+- Authored slots without `needsSetup` can be opened directly
+
+Magnifier notes
+
+- In-level magnifier state lives in `game.js`
+- Lens size is controlled by settings and CSS
+- The lens now uses scale variables so mirrored and upsideown routes can visually match the variant orientation
+- Click detection still uses image-space coordinates from `clientToImage()` and `clientToImagePrecise()`
+
+Good future frontend targets
+
+- Make page 3 feel more distinct with stronger visual grouping between speedrun, variants, and specials
+- Add richer loading text or rotating tips while a scene image is still warming
+- Replace some of the current typed easter eggs with more interactive visual secrets
+- Add per-route art accents for mirror, upsideown, and future special categories
+- Give the settings screen even better density without making it feel crowded

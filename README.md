@@ -1,27 +1,63 @@
 # Where's Epstein?
-<!-- 77asd9f87as9df87as9d8f7a9sdf87a -->
 
-Plain HTML, CSS, and JavaScript hidden-object game built for normal websites.
+Where's Epstein? is a browser hidden-object game built with plain HTML, CSS, and JavaScript. The game includes a cinematic start screen, main levels, bonus levels, advanced multi-target levels, mirrored runs, upsideown runs, speedrun routes, and special-level slots for future event content.
 
-## File map
+## What the game includes
 
-- `index.html`: Full-screen home screen, level select, settings, play view, and overlays.
-- `styles/main.css`: Theme-aware layout, full-screen play HUD, and responsive styling.
-- `scripts/app.js`: Starts the game.
-- `scripts/game.js`: Level flow, scoring, stars, progression locks, zoom and pan, and image loading.
-- `scripts/levels.js`: Level data, image paths, and hitboxes.
-- `scripts/storage.js`: Local save data for settings, progression, and per-level results.
+- Story route with normal level progression
+- Bonus levels with separate unlock logic
+- Advanced levels with two-target scenes
+- Advanced bonus levels
+- Extras page with speedrun routes, mirror mode, upsideown mode, and special-level slots
+- In-level magnifier tool
+- Local save data for score, stars, progress, and settings
+- Theme, motion, magnifier, and preload settings
 
-## Asset naming
+## Tech stack
 
-- Start screen: `Assets/startscreen.png`
-- Main backgrounds: `Assets/Bakgrounds/level1.png` through `Assets/Bakgrounds/level10.png`
-- Target previews: `Assets/Waldos/*.png`
-- Bonus background: `Assets/Bakgrounds/bonus1.png`
+- `index.html`
+  Main app structure, screens, overlays, buttons, and required DOM ids.
+- `styles/main.css`
+  Layout, themes, menu structure, play HUD, start-screen layering, and responsive styling.
+- `styles/effects.css`
+  Animation timing, hover states, button entrance effects, cloud and decor motion, and easter-egg visuals.
+- `scripts/app.js`
+  Boot entry point.
+- `scripts/game.js`
+  Main game controller, progression, scoring, input, overlays, caching, speedrun logic, and settings.
+- `scripts/home-ui.js`
+  Start-screen placement math, home button alignment, sheen timing, and editor/debug rendering.
+- `scripts/game-renderer.js`
+  Preview rendering, hitbox rendering, and UI sync for found targets.
+- `scripts/levels.js`
+  Level data, names, asset paths, start-screen layout data, and target hitboxes.
+- `scripts/storage.js`
+  Local storage schema, settings save/load, level results, and speedrun stats.
+
+## Assets and structure
+
+- Main backgrounds:
+  `Assets/Bakgrounds/`
+- Bonus backgrounds:
+  `Assets/Bakgrounds/`
+- Advanced backgrounds:
+  `Assets/Bakgrounds/advanced/`
+- Special backgrounds:
+  `Assets/Bakgrounds/Special/`
+- Main target previews:
+  `Assets/Waldos/`
+- Advanced target previews:
+  `Assets/Waldos/advanced/`
+- Special target previews:
+  `Assets/Waldos/Special/`
+- Start-screen UI art:
+  `Assets/ui/`
+- Social/share image:
+  `Assets/thumb.png`
 
 ## Editing hitboxes
 
-All hitboxes use the original image pixel coordinates.
+All target hitboxes use original image pixel coordinates from the source art.
 
 Rectangle example:
 
@@ -35,9 +71,42 @@ Circle example:
 hitbox: { type: "circle", x: 640, y: 380, radius: 60 }
 ```
 
-Rectangle rules:
+The game normalizes reversed rectangle corners automatically, so either order still works.
 
-- `x1, y1` is the top-left corner
-- `x2, y2` is the bottom-right corner
+## Start-screen layout editing
 
-That format is easier to tune exactly than width and height.
+The start screen uses two exported data blocks from `scripts/levels.js`:
+
+- `START_SCREEN_BUTTONS`
+- `START_SCREEN_LAYERS`
+
+These values are original-image coordinates, not browser pixels.
+
+When cheat tools are enabled, the home editor can:
+
+- move layers
+- resize layers
+- rotate layers
+- hide or show editor boxes
+- lock individual items
+- export the selected item or the whole start-screen layout block
+
+## Performance notes
+
+- Loaded images stay cached in memory through the game session
+- Home boot preloads start-screen assets before the intro begins
+- Early gameplay preloads upcoming level art and preview images
+- Speedrun preloading warms a wider pool based on the preload setting
+- The project is tuned with lower-power devices like Chromebooks in mind
+
+## Important gameplay notes
+
+- Mirror and upsideown variants do not overwrite standard progress
+- Level Clearance is an unlock-only cheat mode intended for authored-level testing
+- Full cheat tools still separate cheated runs from normal runs
+- Missing art produces readable fallback messages instead of silently failing
+
+## Credits
+
+- Game by StaticQuasar931
+- Start-screen UI help and art-layer work by Cheese_Cat

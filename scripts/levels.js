@@ -98,8 +98,11 @@ export const START_SCREEN_LAYERS = {
   cloud1: { x1: 70, y1: 18, x2: 350, y2: 142, color: "white", src: "Assets/ui/cloud1.png" },
   cloud2: { x1: 580, y1: -6, x2: 880, y2: 130, color: "white", src: "Assets/ui/cloud2.png" },
   cloud3: { x1: 1108, y1: -8, x2: 1428, y2: 126, color: "white", src: "Assets/ui/cloud3.png" },
-  blimp: { x1: 257, y1: 18, x2: 373, y2: 61, color: "skyblue", src: "Assets/ui/blimp.png" },
+  blimp: { x1: 257, y1: 18, x2: 373, y2: 61, color: "skyblue", src: "Assets/ui/Blimp.png" },
   airball: { x1: 123, y1: 94, x2: 245, y2: 256, color: "cyan", src: "Assets/ui/airball.png" },
+  cloudTiny1: { x1: 212, y1: 118, x2: 286, y2: 156, color: "white", src: "Assets/ui/CloudChart.png" },
+  cloudTiny2: { x1: 874, y1: 104, x2: 940, y2: 136, color: "white", src: "Assets/ui/CloudChart.png" },
+  cloudTiny3: { x1: 1368, y1: 96, x2: 1458, y2: 140, color: "white", src: "Assets/ui/CloudChart.png" },
   wheelStand: { x1: 1055, y1: 171, x2: 1189, y2: 271, color: "orange", src: "Assets/ui/WheelStand.png" },
   wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
   magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, rotation: -6, color: "red", src: "Assets/ui/mglassempty.png" },
@@ -351,8 +354,8 @@ const ADVANCED_LEVELS_RAW = [
     needsSetup: false,
   }),
   makeAdvancedBonusLevel(4, [
-    makePlaceholderTarget("advanced-bonus-04-a"),
-    makePlaceholderTarget("advanced-bonus-04-b"),
+    makeTarget("advanced-bonus-04-a", "di1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-04-b", "ep12", { type: "rect", x1: 440, y1: 260, x2: 520, y2: 360 }, "Assets/Waldos/advanced"),
   ], {
     name: "Advanced Bonus 4",
     needsSetup: true,
@@ -386,7 +389,7 @@ const SPECIAL_LEVELS_RAW = [
     makeTarget("special-01-a", "kju1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
   ], {
     name: "Special 1",
-    needsSetup: true,
+    needsSetup: false,
   }),
 ];
 
@@ -403,4 +406,5 @@ export const DEFAULT_SETTINGS = {
     one: 70000,
   },
   magnifierZoomSpeed: "normal",
+  renderAhead: "3",
 };

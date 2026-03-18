@@ -707,9 +707,29 @@ body.mode-game .site-topbar { display: flex; }
 
 #cloud1Layer,
 #cloud2Layer,
-#cloud3Layer {
+#cloud3Layer,
+#cloudTiny1Layer,
+#cloudTiny2Layer,
+#cloudTiny3Layer {
   z-index: 1;
 }
+
+#cloudTiny1Layer,
+#cloudTiny2Layer,
+#cloudTiny3Layer {
+  opacity: 0.62;
+}
+
+.home-cloud-sprite {
+  background-image: url("../Assets/ui/CloudChart.png");
+  background-repeat: no-repeat;
+  background-size: 600% 800%;
+  filter: blur(0.15px) drop-shadow(0 10px 16px rgba(0, 0, 0, 0.12));
+}
+
+#cloudTiny1Layer { background-position: 0% 0%; }
+#cloudTiny2Layer { background-position: 40% 28%; }
+#cloudTiny3Layer { background-position: 80% 54%; }
 
 #blimpLayer {
   z-index: 2;
@@ -745,8 +765,9 @@ body.mode-game .site-topbar { display: flex; }
 
 .settings-discord-button {
   background: linear-gradient(135deg, #5865f2 0%, #7289ff 100%);
-  border-color: rgba(203, 210, 255, 0.4);
+  border-color: rgba(203, 210, 255, 0.55);
   color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 12px 28px rgba(88, 101, 242, 0.22);
 }
 
 .settings-discord-button:hover:not(:disabled) {
@@ -755,9 +776,10 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 .settings-moregames-button {
-  background: linear-gradient(135deg, rgba(255, 173, 43, 0.18), rgba(255, 119, 28, 0.18));
-  border-color: rgba(255, 180, 74, 0.34);
-  color: #ffd998;
+  background: linear-gradient(135deg, rgba(255, 188, 61, 0.92), rgba(255, 136, 24, 0.92));
+  border-color: rgba(255, 214, 142, 0.55);
+  color: #fff9ee;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 12px 28px rgba(255, 136, 36, 0.18);
 }
 
 .settings-moregames-button:hover:not(:disabled) {
@@ -766,9 +788,10 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 .settings-changelog-button {
-  background: linear-gradient(135deg, rgba(95, 214, 255, 0.16), rgba(143, 122, 255, 0.18));
-  border-color: rgba(149, 193, 255, 0.34);
-  color: #dceeff;
+  background: linear-gradient(135deg, rgba(72, 198, 255, 0.88), rgba(110, 134, 255, 0.86));
+  border-color: rgba(187, 225, 255, 0.5);
+  color: #f7fbff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 12px 28px rgba(106, 176, 255, 0.18);
 }
 
 .settings-changelog-button:hover:not(:disabled) {
@@ -1346,30 +1369,30 @@ body.mode-game .site-topbar { display: flex; }
 .speedrun-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
-  gap: 1.1rem;
+  gap: 1.15rem;
   align-items: start;
 }
 .speedrun-card-primary {
   min-height: 100%;
-  padding: 1.1rem 1.15rem 1rem;
+  padding: 1.15rem 1.2rem 1.05rem;
 }
 
 .speedrun-bubble-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  gap: 0.9rem;
   margin-top: 0.9rem;
 }
 
 .speedrun-bubble {
-  min-height: 5rem;
+  min-height: 5.25rem;
   display: grid;
   place-items: center;
   text-align: center;
-  padding: 0.85rem 0.8rem;
+  padding: 0.95rem 0.9rem;
   border-radius: 22px;
   line-height: 1.12;
-  font-size: 0.98rem;
+  font-size: 1rem;
 }
 
 .speedrun-mode-bubble {
@@ -1393,10 +1416,10 @@ body.mode-game .site-topbar { display: flex; }
 
 .speedrun-bubble small {
   display: block;
-  margin-top: 0.22rem;
+  margin-top: 0.3rem;
   color: var(--muted);
-  font-size: 0.72rem;
-  line-height: 1.22;
+  font-size: 0.76rem;
+  line-height: 1.28;
 }
 .speedrun-status-line {
   margin-top: 0.2rem;
@@ -1405,8 +1428,13 @@ body.mode-game .site-topbar { display: flex; }
 .speedrun-specials-card {
   display: grid;
   gap: 0.8rem;
-  padding: 1rem 1.05rem;
+  padding: 1.05rem 1.1rem;
   align-content: start;
+}
+
+.speedrun-card-primary,
+.speedrun-specials-card {
+  min-height: 100%;
 }
 
 .speedrun-grid > .speedrun-specials-card:last-child {
@@ -1422,6 +1450,7 @@ body.mode-game .site-topbar { display: flex; }
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.75rem;
+  align-items: stretch;
 }
 
 .special-placeholder-card {
@@ -1544,6 +1573,14 @@ body.mode-game .site-topbar { display: flex; }
   justify-items: center;
   gap: 0.45rem;
   padding: 0.6rem 0 0;
+  position: relative;
+}
+
+.version-line::before {
+  content: "";
+  width: min(760px, 100%);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-mid), transparent);
 }
 
 .version-label {
@@ -1582,13 +1619,27 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 .settings-links-row {
-  width: min(720px, 100%);
+  width: min(940px, 100%);
   justify-content: center;
   flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.8rem;
 }
 
 .settings-links-row > button {
-  min-width: 180px;
+  min-width: 220px;
+  flex: 1 1 220px;
+}
+
+.settings-header-actions {
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.settings-reset-button {
+  min-width: 168px;
 }
 
 /* ============================================================
@@ -1819,14 +1870,33 @@ body.easter-starsburst #hudStarsText {
 body[data-route-variant="mirror"] .menu-shell,
 body[data-route-variant="mirror"] .modal-card {
   border-color: rgba(108, 182, 255, 0.34);
+  box-shadow: 0 0 0 1px rgba(110, 176, 255, 0.14) inset, 0 24px 48px rgba(26, 67, 126, 0.18);
 }
 
 body[data-route-variant="upside"] .menu-shell,
 body[data-route-variant="upside"] .modal-card {
   border-color: rgba(255, 184, 118, 0.34);
+  box-shadow: 0 0 0 1px rgba(255, 179, 102, 0.14) inset, 0 24px 48px rgba(118, 61, 12, 0.18);
 }
 
 .asset-loading { opacity: 0; }
+.scene-loading-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  padding: 0.65rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-mid);
+  background: rgba(7, 12, 20, 0.82);
+  color: var(--text-bright);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.22);
+  pointer-events: none;
+}
 .hitbox-overlay { position: absolute; inset: 0; pointer-events: none; }
 .hitbox-shape {
   position: absolute;
@@ -1905,7 +1975,7 @@ body[data-route-variant="upside"] .modal-card {
   pointer-events: none;
   overflow: hidden;
   background-repeat: no-repeat;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(var(--magnifier-scale-x, 1), var(--magnifier-scale-y, 1));
   transition: opacity 120ms ease, width 180ms ease, height 180ms ease;
 }
 

@@ -15,6 +15,7 @@ const DEFAULT_SAVE = {
     magnifierShape: "circle",
     magnifierSize: "normal",
     magnifierZoomSpeed: "normal",
+    renderAhead: "3",
   },
   meta: {
     advancedMultiSeen: false,

@@ -235,7 +235,7 @@ export function updateHomeDebug(game, event, config) {
     ? `${game.getHomeEditorExportKey?.(game.homeButtonEditorSelection) ?? game.homeButtonEditorSelection}: { x1: ${Math.round(selectedSource.x1)}, y1: ${Math.round(selectedSource.y1)}, x2: ${Math.round(selectedSource.x2)}, y2: ${Math.round(selectedSource.y2)} }`
     : "selected source: unavailable";
   const editor = game.homeButtonEditorEnabled
-    ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box to move, drag the corner to resize.\nUse 1 2 3 for the main buttons, [ ] to cycle, arrows to move, Shift plus arrows to resize.\nUse Q and E to rotate, Shift plus Q or E for fine rotation.\nUse B for boxes, K for lock, Z for zoom, Esc to close.`
+    ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box to move, drag the corner to resize.\nUse 1 2 3 for the main buttons, 4 title, 5 glass, 6 faces, 7 balloon, 8 blimp, 9 wheel, 0 stand. Use [ ] to cycle, arrows to move, Shift plus arrows to resize.\nUse Q and E to rotate, Shift plus Q or E for fine rotation.\nUse B for boxes, K for lock, Z for zoom, Esc to close.`
     : "Editor: off (press H in testing mode)";
   game.elements.homeDebugReadout.textContent = `${pointer}\n${editor}\nselected: ${formatZone(selected)}\n${copyLine}`;
   game.refreshHomeEditorUi?.();
@@ -500,6 +500,9 @@ function getHomeElement(game, key) {
     cloud1: game.elements.cloud1Layer,
     cloud2: game.elements.cloud2Layer,
     cloud3: game.elements.cloud3Layer,
+    cloudTiny1: game.elements.cloudTiny1Layer,
+    cloudTiny2: game.elements.cloudTiny2Layer,
+    cloudTiny3: game.elements.cloudTiny3Layer,
     blimp: game.elements.blimpLayer,
     airball: game.elements.airballLayer,
     wheelStand: game.elements.wheelStandLayer,
