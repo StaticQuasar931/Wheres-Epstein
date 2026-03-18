@@ -13,7 +13,7 @@ const LINK_DISCORD_PATH = ["HUQA4za2Wj"];
 const LINK_DECOY_A = ["moc.elpmaxe", "kcabllaf", "etonod"];
 const LINK_DECOY_B = ["gg.drocsid", "yekaf", "zzzz"];
 const MIN_SCALE = 0.6;
-const MAX_SCALE = 24;
+const MAX_SCALE = 32;
 const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
@@ -22,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.3.8";
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.4.0";
 const HOME_BUTTON_STAGGER_MS = 400;
 const HOME_BUTTON_ANIMATION_MS = 1960;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -42,12 +42,12 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "The start screen intro now stays tied to first boot so it does not replay every time you return home.",
-  "Home clouds, wheel, banner, glass, and balloon motion were smoothed out and staggered more cleanly.",
-  "Page Three now separates speedrun routes from special levels more clearly.",
-  "Magnifier size presets were rebalanced around Small, Normal, Big, and a much larger Huge mode.",
-  "Home button hover and press feedback was tightened up again so the three main buttons read more clearly.",
-  "Reduced motion now keeps the home screen calmer and more consistent.",
+  "Home button hover and press feedback was rebuilt again so the three main buttons react more clearly.",
+  "Start screen decorative interactions now respond more reliably on the live art layers.",
+  "The home editor now respects its own keyboard controls instead of letting the menu shortcuts steal them.",
+  "Escape now backs out of the home editor first before leaving the screen.",
+  "The ferris wheel reaction was sharpened up and home motion was smoothed again for consistency.",
+  "In-level zoom range was expanded again for closer inspection.",
 ];
 
 const ADVANCED_MAIN_LEVELS = ADVANCED_LEVELS.filter((level) => !level.isAdvancedBonus);
@@ -699,6 +699,9 @@ export class HiddenObjectGame {
     bind(this.elements.cloud1Layer, "click", () => this.triggerHomeSkyDrift());
     bind(this.elements.cloud2Layer, "click", () => this.triggerHomeSkyDrift());
     bind(this.elements.cloud3Layer, "click", () => this.triggerHomeSkyDrift());
+    bind(this.elements.hudScoreText, "dblclick", () => this.triggerScoreSpark());
+    bind(this.elements.hudTimerText, "dblclick", () => this.triggerTimeRipple());
+    bind(this.elements.hudStarsText, "dblclick", () => this.triggerStarsBurst());
     this.elements.levelSelectPrevPageButton.addEventListener("click", () => this.changeLevelSelectPage(-1));
     this.elements.levelSelectNextPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
     this.elements.levelSelectThirdPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
@@ -1953,47 +1956,6 @@ export class HiddenObjectGame {
       this.toggleHomeButtonEditor();
       return;
     }
-    if (this.elements.screens.home.classList.contains("screen-active")) {
-      if (event.code === "Space") {
-        event.preventDefault();
-        if (!this.elements.homeBootOverlay.classList.contains("hidden") || this.homeIntroInProgress) {
-          this.skipHomeIntroSequence();
-        } else {
-          this.elements.startGameButton.click();
-        }
-        return;
-      }
-      if (key === "enter") {
-        event.preventDefault();
-        this.elements.startGameButton.click();
-        return;
-      }
-      if (key === "1") {
-        event.preventDefault();
-        this.elements.startGameButton.click();
-        return;
-      }
-      if (key === "2") {
-        event.preventDefault();
-        this.elements.openSettingsButton.click();
-        return;
-      }
-      if (key === "3") {
-        event.preventDefault();
-        this.elements.moreGamesButton.click();
-        return;
-      }
-      if (key === "s") {
-        event.preventDefault();
-        this.elements.openSettingsButton.click();
-        return;
-      }
-      if (key === "m") {
-        event.preventDefault();
-        this.elements.moreGamesButton.click();
-        return;
-      }
-    }
     if (this.homeButtonEditorEnabled && this.elements.screens.home.classList.contains("screen-active")) {
       if (["1", "2", "3"].includes(key)) {
         event.preventDefault();
@@ -2034,6 +1996,47 @@ export class HiddenObjectGame {
       if (key === "q" || key === "e") {
         event.preventDefault();
         this.rotateHomeEditorZone(key === "e" ? 1 : -1, event.shiftKey ? 0.25 : 1);
+        return;
+      }
+    }
+    if (this.elements.screens.home.classList.contains("screen-active") && !this.homeButtonEditorEnabled) {
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (!this.elements.homeBootOverlay.classList.contains("hidden") || this.homeIntroInProgress) {
+          this.skipHomeIntroSequence();
+        } else {
+          this.elements.startGameButton.click();
+        }
+        return;
+      }
+      if (key === "enter") {
+        event.preventDefault();
+        this.elements.startGameButton.click();
+        return;
+      }
+      if (key === "1") {
+        event.preventDefault();
+        this.elements.startGameButton.click();
+        return;
+      }
+      if (key === "2") {
+        event.preventDefault();
+        this.elements.openSettingsButton.click();
+        return;
+      }
+      if (key === "3") {
+        event.preventDefault();
+        this.elements.moreGamesButton.click();
+        return;
+      }
+      if (key === "s") {
+        event.preventDefault();
+        this.elements.openSettingsButton.click();
+        return;
+      }
+      if (key === "m") {
+        event.preventDefault();
+        this.elements.moreGamesButton.click();
         return;
       }
     }
@@ -2143,6 +2146,10 @@ export class HiddenObjectGame {
       this.hideMagnifier();
       return;
     }
+    if (this.elements.screens.home.classList.contains("screen-active") && this.homeButtonEditorEnabled) {
+      this.toggleHomeButtonEditor();
+      return;
+    }
     if (!this.elements.changelogOverlay.classList.contains("hidden")) {
       this.closeChangelog();
       return;
@@ -2194,7 +2201,7 @@ export class HiddenObjectGame {
     this.layoutHomeButtons();
     this.refreshHomeEditorUi();
     this.showMenuToast(this.homeButtonEditorEnabled
-      ? "Home editor on. Drag boxes to move, drag the corner to resize, use [ ] to cycle, arrows to move, Shift plus arrows to resize, and Q or E to rotate layers."
+      ? "Home editor on. Drag boxes to move, drag the corner to resize, use 1 2 3 or [ ] to switch, arrows to move, Shift plus arrows to resize, Q or E to rotate, and Esc to close."
       : "Home button editor off.");
   }
 
@@ -2834,6 +2841,39 @@ export class HiddenObjectGame {
     this.homeSkyTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-skydrift");
     }, 2200);
+  }
+
+  triggerScoreSpark() {
+    document.body.classList.remove("easter-scorespark");
+    void document.body.offsetWidth;
+    document.body.classList.add("easter-scorespark");
+    this.showMenuToast("Score spark.");
+    window.clearTimeout(this.scoreSparkTimerId);
+    this.scoreSparkTimerId = window.setTimeout(() => {
+      document.body.classList.remove("easter-scorespark");
+    }, 1800);
+  }
+
+  triggerTimeRipple() {
+    document.body.classList.remove("easter-timeripple");
+    void document.body.offsetWidth;
+    document.body.classList.add("easter-timeripple");
+    this.showMenuToast("Time ripple.");
+    window.clearTimeout(this.timeRippleTimerId);
+    this.timeRippleTimerId = window.setTimeout(() => {
+      document.body.classList.remove("easter-timeripple");
+    }, 1800);
+  }
+
+  triggerStarsBurst() {
+    document.body.classList.remove("easter-starsburst");
+    void document.body.offsetWidth;
+    document.body.classList.add("easter-starsburst");
+    this.showMenuToast("Stars burst.");
+    window.clearTimeout(this.starsBurstTimerId);
+    this.starsBurstTimerId = window.setTimeout(() => {
+      document.body.classList.remove("easter-starsburst");
+    }, 1800);
   }
 
   updateDebugReadout() {

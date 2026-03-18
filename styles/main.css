@@ -717,6 +717,7 @@ body.mode-game .site-topbar { display: flex; }
 
 .home-decor-clickable {
   pointer-events: auto;
+  cursor: pointer;
 }
 
 .home-button-overlay {
@@ -1572,7 +1573,7 @@ body.easter-glass .home-viewport::after {
 }
 
 .home-viewport.easter-banner #titleBannerLayer {
-  filter: drop-shadow(0 0 18px rgba(255, 216, 78, 0.34)) brightness(1.08);
+  filter: drop-shadow(0 0 22px rgba(255, 216, 78, 0.42)) brightness(1.12) saturate(1.12);
 }
 
 .home-viewport.easter-focus #magnifierDecorLayer,
@@ -1583,11 +1584,12 @@ body.easter-glass .home-viewport::after {
 .home-viewport.easter-skydrift #cloud1Layer,
 .home-viewport.easter-skydrift #cloud2Layer,
 .home-viewport.easter-skydrift #cloud3Layer {
-  filter: brightness(1.06) saturate(1.08);
+  filter: brightness(1.08) saturate(1.12);
 }
 
 .home-viewport.easter-wheelrush #wheelLayer {
-  animation-duration: 8s !important;
+  animation-duration: 4.2s !important;
+  filter: saturate(1.18) brightness(1.08);
 }
 
 .home-viewport.easter-airmail #airballLayer {
@@ -1596,6 +1598,24 @@ body.easter-glass .home-viewport::after {
 
 .home-viewport.easter-photo #magnifierFacesLayer {
   filter: saturate(1.18) brightness(1.08) sepia(0.12);
+}
+
+body.easter-scorespark #hudScoreText {
+  color: var(--accent);
+  text-shadow: 0 0 18px rgba(255, 216, 78, 0.42);
+  transform: scale(1.08);
+}
+
+body.easter-timeripple #hudTimeText {
+  color: #7ad7ff;
+  text-shadow: 0 0 16px rgba(122, 215, 255, 0.36);
+  transform: scale(1.08);
+}
+
+body.easter-starsburst #hudStarsText {
+  color: #ffe07a;
+  text-shadow: 0 0 20px rgba(255, 224, 122, 0.48);
+  transform: scale(1.12);
 }
 
 /* ============================================================

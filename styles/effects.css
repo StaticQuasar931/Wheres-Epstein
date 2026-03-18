@@ -41,14 +41,15 @@
 
 /* Hovered — lift + gold glow */
 .home-button-art.is-hovered,
+.image-button:hover + .home-button-art,
 .image-button:focus-visible + .home-button-art {
   animation: none;
   filter:
     drop-shadow(0 18px 30px rgba(0, 0, 0, 0.30))
-    drop-shadow(0 0 18px rgba(255, 216, 78, 0.22))
-    brightness(1.06)
-    saturate(1.08);
-  transform: translateY(0) scale(1.035);
+    drop-shadow(0 0 22px rgba(255, 216, 78, 0.28))
+    brightness(1.08)
+    saturate(1.12);
+  transform: translateY(0) scale(1.055);
   transition: filter 220ms ease, transform 220ms ease;
 }
 
@@ -231,6 +232,20 @@
 .home-viewport.home-editor-active #homeNameButton,
 .home-viewport.home-editor-active .home-debug-box {
   animation: none !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #titleBannerLayer,
+body[data-motion="reduced"] .home-viewport.home-animating #homeNameButton,
+body[data-motion="reduced"] .home-viewport.home-animating #magnifierDecorLayer,
+body[data-motion="reduced"] .home-viewport.home-animating #magnifierFacesLayer,
+body[data-motion="reduced"] .home-viewport.home-animating #airballLayer,
+body[data-motion="reduced"] .home-viewport.home-live #titleBannerLayer,
+body[data-motion="reduced"] .home-viewport.home-live #homeNameButton,
+body[data-motion="reduced"] .home-viewport.home-live #magnifierDecorLayer,
+body[data-motion="reduced"] .home-viewport.home-live #magnifierFacesLayer,
+body[data-motion="reduced"] .home-viewport.home-live #airballLayer {
+  animation: none !important;
+  transform: rotate(var(--home-layer-rotate, 0deg));
 }
 
 /* ============================================================
