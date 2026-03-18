@@ -39,6 +39,28 @@ export function layoutHomeButtons(game, config) {
   image.style.width = `${drawWidth}px`;
   image.style.height = `${drawHeight}px`;
 
+  if (game.elements.homeBackgroundFill) {
+    const src = image.currentSrc || image.src;
+    const applyFill = (element, left, top, width, height, position) => {
+      if (!element) {
+        return;
+      }
+      element.style.left = `${left}px`;
+      element.style.top = `${top}px`;
+      element.style.width = `${Math.max(0, width)}px`;
+      element.style.height = `${Math.max(0, height)}px`;
+      element.style.backgroundImage = `url("${src}")`;
+      element.style.backgroundSize = `${drawWidth}px ${drawHeight}px`;
+      element.style.backgroundPosition = position;
+      element.style.opacity = width > 0 || height > 0 ? "0.96" : "0";
+    };
+
+    applyFill(game.elements.homeFillLeft, 0, offsetY, offsetX, drawHeight, "left center");
+    applyFill(game.elements.homeFillRight, offsetX + drawWidth, offsetY, Math.max(0, rect.width - (offsetX + drawWidth)), drawHeight, "right center");
+    applyFill(game.elements.homeFillTop, offsetX, 0, drawWidth, offsetY, "center top");
+    applyFill(game.elements.homeFillBottom, offsetX, offsetY + drawHeight, drawWidth, Math.max(0, rect.height - (offsetY + drawHeight)), "center bottom");
+  }
+
   overlay.style.left = `${offsetX}px`;
   overlay.style.top = `${offsetY}px`;
   overlay.style.width = `${drawWidth}px`;

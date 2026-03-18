@@ -41,6 +41,13 @@
           </div>
         </div>
 
+        <div id="homeBackgroundFill" class="home-background-fill" aria-hidden="true">
+          <div id="homeFillLeft" class="home-side-fill home-side-fill-left"></div>
+          <div id="homeFillRight" class="home-side-fill home-side-fill-right"></div>
+          <div id="homeFillTop" class="home-side-fill home-side-fill-top"></div>
+          <div id="homeFillBottom" class="home-side-fill home-side-fill-bottom"></div>
+        </div>
+
         <img id="startScreenImage" class="hero-background" src="Assets/ui/backgroundplain.png" alt="Start screen artwork" draggable="false">
 
         <div id="homeLayerOverlay" class="home-layer-overlay" aria-hidden="true">
@@ -52,6 +59,7 @@
           <img id="wheelLayer" class="home-decor-layer" src="Assets/ui/Wheel.png" alt="" aria-hidden="true">
           <img id="titleBannerLayer" class="home-decor-layer" src="Assets/ui/titlebanner.png" alt="" aria-hidden="true">
           <img id="magnifierDecorLayer" class="home-decor-layer" src="Assets/ui/mglassempty.png" alt="" aria-hidden="true">
+          <img id="magnifierFacesLayer" class="home-decor-layer" src="Assets/ui/startscreenfaces.png" alt="" aria-hidden="true">
         </div>
 
         <!-- Invisible button overlay positioned by home-ui.js -->
@@ -170,25 +178,52 @@
             <div class="menu-card-header">
               <div>
                 <p class="eyebrow">Page Three</p>
-                <h3>Random Level Speedrun</h3>
+                <h3>Extras</h3>
               </div>
             </div>
-            <div class="speedrun-card">
-              <p class="subtle-text">Pulls from all level pools. Repeats are possible but nudged to feel less common.</p>
-              <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Start Random Speedrun</button>
-              <div class="stat-grid speedrun-stats">
-                <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
-                <div class="stat-card"><span>Avg Score</span><strong id="speedrunAverageScoreText">0</strong></div>
-                <div class="stat-card"><span>Avg Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
-                <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
-              </div>
-              <div class="speedrun-recent-block">
-                <p class="eyebrow">Recently Played</p>
-                <div id="speedrunRecentStrip" class="speedrun-recent-strip">
-                  <span class="speedrun-recent-empty">No recent speedrun picks yet.</span>
+            <div class="speedrun-grid">
+              <div class="speedrun-card speedrun-card-primary">
+                <p class="subtle-text">Pulls from all authored level pools. Repeats are possible but nudged to feel less common.</p>
+                <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Start Random Speedrun</button>
+                <div class="stat-grid speedrun-stats">
+                  <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
+                  <div class="stat-card"><span>Avg Score</span><strong id="speedrunAverageScoreText">0</strong></div>
+                  <div class="stat-card"><span>Avg Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
+                  <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
                 </div>
+                <div class="speedrun-recent-block">
+                  <p class="eyebrow">Recently Played</p>
+                  <div id="speedrunRecentStrip" class="speedrun-recent-strip">
+                    <span class="speedrun-recent-empty">No recent speedrun picks yet.</span>
+                  </div>
+                </div>
+                <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
               </div>
-              <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
+              <div class="speedrun-sidecards">
+                <section class="menu-card speedrun-mini-card">
+                  <div class="menu-card-header">
+                    <div>
+                      <p class="eyebrow">Special Levels</p>
+                      <h4>Alternate Target Pool</h4>
+                    </div>
+                  </div>
+                  <p class="subtle-text">Framework is ready for `sl1`, `sl2`, and future special routes once that art pool is authored.</p>
+                  <p id="specialLevelsStatusText" class="subtle-text">No special levels authored yet.</p>
+                </section>
+                <section class="menu-card speedrun-mini-card">
+                  <div class="menu-card-header">
+                    <div>
+                      <p class="eyebrow">Other Extras</p>
+                      <h4>Challenge Room</h4>
+                    </div>
+                  </div>
+                  <ul class="control-list compact-list">
+                    <li>Main-only random runs are planned next.</li>
+                    <li>Advanced-only random runs fit this page well too.</li>
+                    <li>Special levels will plug into this page once authored.</li>
+                  </ul>
+                </section>
+              </div>
             </div>
           </section>
 
@@ -232,6 +267,8 @@
             <select id="themeSelect">
               <option value="dark">Dark</option>
               <option value="light">Light</option>
+              <option value="ocean">Ocean</option>
+              <option value="sunset">Sunset</option>
             </select>
           </label>
           <label class="setting-card">
@@ -363,7 +400,7 @@
           </section>
 
           <div class="version-line">
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.0</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.3</p>
             <div class="button-row settings-links-row">
               <button id="settingsDiscordButton" class="secondary-button" type="button">Join Discord</button>
               <button id="settingsMoreGamesButton" class="ghost-button" type="button">More Games</button>
@@ -607,15 +644,11 @@
   <div id="changelogOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card changelog-card">
       <p class="eyebrow">Patch Notes</p>
-      <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.0</h2>
+      <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.3</h2>
       <div class="changelog-columns">
         <section>
-          <h3>Public Notes</h3>
+          <h3>Changelog</h3>
           <ul id="changelogPublicList" class="control-list compact-list"></ul>
-        </section>
-        <section id="changelogPrivateSection" class="hidden">
-          <h3>Private Notes</h3>
-          <ul id="changelogPrivateList" class="control-list compact-list"></ul>
         </section>
       </div>
       <div class="button-row">

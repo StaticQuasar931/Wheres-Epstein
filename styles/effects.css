@@ -108,7 +108,7 @@
 }
 
 .home-button-sheen.is-hovered::before,
-.home-button-art.is-settled + .home-button-sheen::before {
+.home-button-sheen.is-glinting::before {
   animation: home-shimmer 7s ease-in-out infinite;
 }
 
@@ -122,43 +122,56 @@
 .home-viewport.home-animating #wheelLayer,
 .home-viewport.home-animating #titleBannerLayer,
 .home-viewport.home-animating #magnifierDecorLayer,
+.home-viewport.home-animating #magnifierFacesLayer,
 .home-viewport.home-animating #airballLayer,
 .home-viewport.home-animating #homeNameButton {
   will-change: transform, opacity;
 }
 
 .home-viewport.home-animating #cloud1Layer {
-  animation: cloud-fade-in 820ms ease 120ms both, cloud-drift-1 32s linear infinite;
+  animation: layer-fade-in 920ms ease 1120ms both, cloud-drift-1 34s linear infinite;
+  animation-delay: 1120ms, -4s;
 }
 
 .home-viewport.home-animating #cloud2Layer {
-  animation: cloud-fade-in 940ms ease 180ms both, cloud-drift-2 40s linear infinite;
+  animation: layer-fade-in 980ms ease 1200ms both, cloud-drift-2 42s linear infinite;
+  animation-delay: 1200ms, -19s;
 }
 
 .home-viewport.home-animating #cloud3Layer {
-  animation: cloud-fade-in 1040ms ease 240ms both, cloud-drift-3 48s linear infinite;
+  animation: layer-fade-in 1040ms ease 1280ms both, cloud-drift-3 50s linear infinite;
+  animation-delay: 1280ms, -31s;
 }
 
 .home-viewport.home-animating #wheelLayer {
   transform-origin: center center;
-  animation: ferris-spin 24s linear infinite;
+  animation: layer-fade-in 840ms ease 900ms both, ferris-spin 24s linear infinite;
+  animation-delay: 900ms, 900ms;
 }
 
 .home-viewport.home-animating #titleBannerLayer,
 .home-viewport.home-animating #homeNameButton,
 .home-viewport.home-animating .home-debug-box[data-editor-key="titleBanner"],
 .home-viewport.home-animating .home-debug-box[data-editor-key="nameLink"] {
-  animation: title-float 6.8s ease-in-out infinite;
+  animation: layer-fade-in 700ms ease 180ms both, title-float 6.8s ease-in-out infinite;
+  animation-delay: 180ms, 880ms;
 }
 
 .home-viewport.home-animating #magnifierDecorLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="magnifierDecor"] {
-  animation: magnifier-float 7.6s ease-in-out infinite;
+  animation: layer-fade-in 720ms ease 380ms both, magnifier-float 7.6s ease-in-out infinite;
+  animation-delay: 380ms, 1100ms;
+}
+
+.home-viewport.home-animating #magnifierFacesLayer {
+  animation: layer-fade-in 880ms ease 620ms both, faces-glow 9.6s ease-in-out infinite;
+  animation-delay: 620ms, 1500ms;
 }
 
 .home-viewport.home-animating #airballLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="airball"] {
-  animation: airball-float 8.4s ease-in-out infinite;
+  animation: layer-fade-in 820ms ease 820ms both, airball-float 8.4s ease-in-out infinite;
+  animation-delay: 820ms, 1680ms;
 }
 
 .home-viewport.home-editor-active #cloud1Layer,
@@ -167,6 +180,7 @@
 .home-viewport.home-editor-active #wheelLayer,
 .home-viewport.home-editor-active #titleBannerLayer,
 .home-viewport.home-editor-active #magnifierDecorLayer,
+.home-viewport.home-editor-active #magnifierFacesLayer,
 .home-viewport.home-editor-active #airballLayer,
 .home-viewport.home-editor-active #homeNameButton,
 .home-viewport.home-editor-active .home-debug-box {
@@ -294,24 +308,36 @@ body.easter-arcade .result-star--filled {
   100%     { transform: translateX(370%) skewX(-24deg); opacity: 0; }
 }
 
-@keyframes cloud-fade-in {
+@keyframes layer-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes cloud-drift-1 {
-  from { transform: translateX(-8%); }
-  to { transform: translateX(118%); }
+  0% { transform: translateX(-22%); opacity: 0; }
+  8% { opacity: 0.88; }
+  22% { opacity: 1; }
+  78% { opacity: 1; }
+  94% { opacity: 0.7; }
+  100% { transform: translateX(120%); opacity: 0; }
 }
 
 @keyframes cloud-drift-2 {
-  from { transform: translateX(-12%); }
-  to { transform: translateX(112%); }
+  0% { transform: translateX(-24%); opacity: 0; }
+  10% { opacity: 0.82; }
+  24% { opacity: 1; }
+  80% { opacity: 1; }
+  96% { opacity: 0.68; }
+  100% { transform: translateX(118%); opacity: 0; }
 }
 
 @keyframes cloud-drift-3 {
-  from { transform: translateX(-10%); }
-  to { transform: translateX(114%); }
+  0% { transform: translateX(-26%); opacity: 0; }
+  12% { opacity: 0.78; }
+  26% { opacity: 1; }
+  82% { opacity: 1; }
+  98% { opacity: 0.62; }
+  100% { transform: translateX(116%); opacity: 0; }
 }
 
 @keyframes ferris-spin {
@@ -327,6 +353,11 @@ body.easter-arcade .result-star--filled {
 @keyframes magnifier-float {
   0%, 100% { transform: translate(0, 0) rotate(-1.2deg); }
   50% { transform: translate(8px, -6px) rotate(1deg); }
+}
+
+@keyframes faces-glow {
+  0%, 100% { opacity: 0.82; transform: translate(0, 0); }
+  50% { opacity: 1; transform: translate(2px, -2px); }
 }
 
 @keyframes airball-float {

@@ -390,6 +390,48 @@ body.mode-game .site-topbar { display: flex; }
   background-size: 200px 200px;
 }
 
+.home-background-fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.home-viewport.home-background-ready .home-background-fill {
+  opacity: 1;
+}
+
+.home-side-fill {
+  position: absolute;
+  background-repeat: no-repeat;
+  filter: blur(18px) brightness(0.62) saturate(0.92);
+  opacity: 0.96;
+  transform-origin: center center;
+}
+
+.home-side-fill-left {
+  left: 0;
+  transform: scaleX(-1.05);
+}
+
+.home-side-fill-right {
+  right: 0;
+  transform: scaleX(1.05);
+}
+
+.home-side-fill-top {
+  top: 0;
+  transform: scaleY(-1.03);
+}
+
+.home-side-fill-bottom {
+  bottom: 0;
+  transform: scaleY(1.03);
+}
+
 /* Ambient orbs */
 .home-ambient { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .home-ambient::before {
@@ -431,6 +473,7 @@ body.mode-game .site-topbar { display: flex; }
 }
 
 .home-viewport:not(.home-background-ready) .hero-background,
+.home-viewport:not(.home-background-ready) .home-background-fill,
 .home-viewport:not(.home-background-ready) .home-button-overlay,
 .home-viewport:not(.home-background-ready) .home-debug-overlay,
 .home-viewport:not(.home-background-ready) .home-debug-readout,
