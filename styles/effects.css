@@ -49,7 +49,7 @@
     drop-shadow(0 0 22px rgba(255, 216, 78, 0.28))
     brightness(1.08)
     saturate(1.12);
-  transform: translateY(0) scale(1.055);
+  transform: translateY(0) scale(1.07);
   transition: filter 220ms ease, transform 220ms ease;
 }
 
@@ -158,7 +158,7 @@
 
 .home-viewport.home-animating #wheelLayer {
   transform-origin: center center;
-  animation: layer-fade-in 1260ms ease 1860ms both, ferris-spin 42s linear infinite;
+  animation: layer-fade-in 1260ms ease 1860ms both, ferris-spin calc(42s / var(--home-wheel-boost, 1)) linear infinite;
   animation-delay: 1860ms, 1860ms;
 }
 
@@ -198,7 +198,7 @@
 
 .home-viewport.home-live #wheelLayer {
   transform-origin: center center;
-  animation: ferris-spin 42s linear infinite;
+  animation: ferris-spin calc(42s / var(--home-wheel-boost, 1)) linear infinite;
 }
 
 .home-viewport.home-live #airballLayer {
@@ -407,8 +407,11 @@ body.easter-arcade .result-star--filled {
 }
 
 @keyframes title-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(0, -2px, 0); }
+  50% { transform: translate3d(0, -4px, 0); }
+  75% { transform: translate3d(0, -2px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 @keyframes magnifier-float {

@@ -17,6 +17,8 @@ const DEFAULT_SAVE = {
   },
   meta: {
     advancedMultiSeen: false,
+    advancedPageSeen: false,
+    speedrunPageSeen: false,
   },
   legit: {
     bestScore: 0,

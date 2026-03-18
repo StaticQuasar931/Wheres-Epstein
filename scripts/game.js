@@ -13,7 +13,7 @@ const LINK_DISCORD_PATH = ["HUQA4za2Wj"];
 const LINK_DECOY_A = ["moc.elpmaxe", "kcabllaf", "etonod"];
 const LINK_DECOY_B = ["gg.drocsid", "yekaf", "zzzz"];
 const MIN_SCALE = 0.6;
-const MAX_SCALE = 32;
+const MAX_SCALE = 40;
 const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
@@ -22,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.4.2";
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.4.3";
 const HOME_BUTTON_STAGGER_MS = 520;
 const HOME_BUTTON_ANIMATION_MS = 2550;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -45,8 +45,8 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 const CHANGELOG_PUBLIC_NOTES = [
   "The title, magnifying glass, wheel, and faces layers were retimed so the start screen reveals more smoothly.",
   "Clouds now wait until the rest of the scene is established before they appear and drift in.",
-  "Page Three was tightened up with cleaner labels and a simpler extras layout.",
-  "The home editor still keeps the start screen aligned, and the faces layer position was updated again.",
+  "Page Three now groups extras more cleanly, including a mirror route and a clearer special-level preview area.",
+  "The faces layer position and rotation were updated again for the start screen editor.",
   "In-level zoom range was expanded again for closer inspection.",
 ];
 
@@ -168,6 +168,8 @@ export class HiddenObjectGame {
     this.homeButtonZones = new Map();
     this.homeRenderedRects = new Map();
     this.preloadedAssets = new Map();
+    this.homeWheelBoost = 1;
+    this.homeWheelDecayTimerId = null;
     this.homeIntroPlayed = false;
     this.homeAssetsReady = false;
     this.homeBootStarted = false;
@@ -197,6 +199,8 @@ export class HiddenObjectGame {
       levelSelectPage: 1,
       totalScore: 0,
       runMode: "standard",
+      mirrorSelectArmed: false,
+      mirrorActive: false,
       elapsedMs: 0,
       elapsedTimerId: null,
       runActive: false,
@@ -538,6 +542,7 @@ export class HiddenObjectGame {
       startMainSpeedrunButton: document.getElementById("startMainSpeedrunButton"),
       startAdvancedSpeedrunButton: document.getElementById("startAdvancedSpeedrunButton"),
       startBonusSpeedrunButton: document.getElementById("startBonusSpeedrunButton"),
+      startMirrorModeButton: document.getElementById("startMirrorModeButton"),
       startSpecialLevelsButton: document.getElementById("startSpecialLevelsButton"),
       speedrunRoundsText: document.getElementById("speedrunRoundsText"),
       speedrunAverageScoreText: document.getElementById("speedrunAverageScoreText"),
@@ -570,6 +575,7 @@ export class HiddenObjectGame {
       settingsDiscordButton: document.getElementById("settingsDiscordButton"),
       settingsMoreGamesButton: document.getElementById("settingsMoreGamesButton"),
       settingsLevelSelectButton: document.getElementById("settingsLevelSelectButton"),
+      settingsChangelogButton: document.getElementById("settingsChangelogButton"),
       settingsLinkHint: document.getElementById("settingsLinkHint"),
       settingsMainClearsText: document.getElementById("settingsMainClearsText"),
       settingsAdvancedClearsText: document.getElementById("settingsAdvancedClearsText"),
@@ -691,10 +697,9 @@ export class HiddenObjectGame {
     this.elements.settingsDiscordButton.addEventListener("click", () => this.openExternalLink(DISCORD_URL, "Add your Discord invite URL in scripts/game.js to enable this button."));
     this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
+    this.elements.settingsChangelogButton?.addEventListener("click", () => this.openChangelog());
     bind(this.elements.wheelLayer, "click", () => this.triggerHomeWheelRush());
     bind(this.elements.magnifierFacesLayer, "click", () => this.triggerHomeFacesFlash());
-    bind(this.elements.titleBannerLayer, "click", () => this.triggerHomeBannerPulse());
-    bind(this.elements.magnifierDecorLayer, "dblclick", () => this.triggerHomeFocusBloom());
     bind(this.elements.hudScoreText, "dblclick", () => this.triggerScoreSpark());
     bind(this.elements.hudTimerText, "dblclick", () => this.triggerTimeRipple());
     bind(this.elements.hudStarsText, "dblclick", () => this.triggerStarsBurst());
@@ -706,6 +711,7 @@ export class HiddenObjectGame {
     this.elements.startMainSpeedrunButton?.addEventListener("click", () => this.startRandomSpeedrun("main"));
     this.elements.startAdvancedSpeedrunButton?.addEventListener("click", () => this.startRandomSpeedrun("advanced"));
     this.elements.startBonusSpeedrunButton?.addEventListener("click", () => this.startRandomSpeedrun("bonus"));
+    this.elements.startMirrorModeButton?.addEventListener("click", () => this.armMirrorMode());
     this.elements.startSpecialLevelsButton?.addEventListener("click", () => this.startRandomSpeedrun("special"));
     this.elements.versionTapTarget.addEventListener("click", (event) => this.handleVersionTap(event));
     this.elements.unlockDiagnosticButton.addEventListener("click", (event) => this.unlockDiagnostics(event));
@@ -1093,11 +1099,14 @@ export class HiddenObjectGame {
       const scoreMarkup = bestScoreValue !== firstScoreValue
         ? `<div class="level-meta level-best-score"><span>Best ${bestScore}</span><span>First ${firstScore}</span></div>`
         : `<div class="level-meta level-best-score"><span>First ${firstScore}</span></div>`;
+      const mirrorMarkup = this.state.mirrorSelectArmed && unlocked
+        ? '<p class="level-setup-note">Mirror ready</p>'
+        : "";
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}`;
       button.disabled = !unlocked;
       button.innerHTML = unlocked
-        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div>${setupMarkup}${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`
+        ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div>${setupMarkup}${mirrorMarkup}${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`
         : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p>${setupMarkup}${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`;
       button.addEventListener("click", () => this.startSelectedLevel(level.id));
       container.appendChild(button);
@@ -1208,6 +1217,14 @@ export class HiddenObjectGame {
       return;
     }
     this.state.levelSelectPage = nextPage;
+    if (nextPage === 2 && this.isAdvancedUnlocked() && !this.save.meta.advancedPageSeen) {
+      this.save = saveMeta({ advancedPageSeen: true });
+      this.showMenuToast("Page Two unlocked: Advanced Levels now hold the tougher multi-target route.");
+    }
+    if (nextPage === 3 && this.isSpeedrunUnlocked() && !this.save.meta.speedrunPageSeen) {
+      this.save = saveMeta({ speedrunPageSeen: true });
+      this.showMenuToast("Page Three unlocked: Extras holds speedrun routes, mirror mode, and future special levels.");
+    }
     this.syncLevelSelectPage();
   }
 
@@ -1216,9 +1233,11 @@ export class HiddenObjectGame {
     const page = this.state.levelSelectPage;
     const onAdvancedPage = page === 2 && this.isAdvancedUnlocked();
     const onSpeedrunPage = page === 3 && this.isSpeedrunUnlocked();
-    this.elements.levelSelectPageLabel.textContent = onSpeedrunPage
-      ? "Level Select: Speedrun Levels"
-      : onAdvancedPage
+    this.elements.levelSelectPageLabel.textContent = this.state.mirrorSelectArmed
+      ? "Level Select: Mirror Mode"
+      : onSpeedrunPage
+        ? "Level Select: Extras"
+        : onAdvancedPage
         ? "Advanced Levels"
         : "Main Levels";
     this.elements.mainRouteSection.classList.toggle("hidden", page !== 1);
@@ -1237,7 +1256,7 @@ export class HiddenObjectGame {
     if (this.elements.specialLevelsStatusText) {
       this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
         ? `${SPECIAL_LEVELS.length} special levels are currently authored.`
-        : "No special levels authored yet.";
+        : "Ten special slots are reserved here. Current entries still need setup.";
     }
   }
 
@@ -1250,9 +1269,18 @@ export class HiddenObjectGame {
   startSelectedLevel(levelId) {
     const index = LEVELS.findIndex((level) => level.id === levelId);
     if (index >= 0 && (this.sessionTestingUnlocked || this.isLevelUnlocked(LEVELS[index], LEVELS[index].isAdvancedBonus ? "advancedBonus" : LEVELS[index].isAdvanced ? "advanced" : LEVELS[index].isBonus ? "bonus" : "main"))) {
-      this.state.runMode = "standard";
+      this.state.runMode = this.state.mirrorSelectArmed ? "mirror" : "standard";
+      this.state.mirrorSelectArmed = false;
       this.startCampaignFromLevel(index);
     }
+  }
+
+  armMirrorMode() {
+    this.state.mirrorSelectArmed = true;
+    this.state.levelSelectPage = 1;
+    this.renderLevelSelect();
+    this.showScreen("levelSelect");
+    this.showMenuToast("Mirror Mode armed. Pick any unlocked level.");
   }
 
   getSpeedrunPool(pool = "all") {
@@ -1272,6 +1300,7 @@ export class HiddenObjectGame {
   }
 
   startRandomSpeedrun(pool = "all") {
+    this.state.mirrorSelectArmed = false;
     const level = this.pickRandomSpeedrunLevel(pool);
     if (!level) {
       const message = pool === "special"
@@ -1337,10 +1366,12 @@ export class HiddenObjectGame {
 
   startCampaignFromLevel(index) {
     this.closeAllOverlays();
+    this.state.mirrorSelectArmed = false;
     this.state.levelIndex = index;
     this.state.totalScore = 0;
     this.state.runCheated = this.sessionTestingUnlocked;
     this.state.paused = false;
+    this.state.mirrorActive = this.state.runMode === "mirror";
     this.showScreen("game");
     if (this.save.settings.showLevelIntro === "on") {
       this.openLevelIntro();
@@ -1358,16 +1389,17 @@ export class HiddenObjectGame {
   }
 
   getCurrentLevelLabel(level = this.getCurrentLevel()) {
+    let base;
     if (level.isAdvancedBonus) {
-      return `AB ${ADVANCED_BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+      base = `AB ${ADVANCED_BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+    } else if (level.isAdvanced) {
+      base = `AL ${ADVANCED_MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+    } else if (level.isBonus) {
+      base = `Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+    } else {
+      base = `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     }
-    if (level.isAdvanced) {
-      return `AL ${ADVANCED_MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
-    }
-    if (level.isBonus) {
-      return `Bonus ${BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
-    }
-    return `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+    return this.state.runMode === "mirror" ? `${base} Mirror` : base;
   }
 
   getDisplayLabelForLevelId(levelId) {
@@ -1411,6 +1443,7 @@ export class HiddenObjectGame {
     const level = this.getCurrentLevel();
     this.elements.levelIntroOverlay.classList.add("hidden");
     this.hideMagnifier();
+    this.state.mirrorActive = this.state.runMode === "mirror";
     this.state.elapsedMs = 0;
     this.state.wrongClicks = 0;
     this.state.pointerImage = null;
@@ -1912,7 +1945,9 @@ export class HiddenObjectGame {
       return;
     }
     if (!this.state.drag.moved) {
-      const point = this.clientToImage(event.clientX, event.clientY);
+      const clickX = this.state.magnifier.active ? this.state.magnifier.pointerX : event.clientX;
+      const clickY = this.state.magnifier.active ? this.state.magnifier.pointerY : event.clientY;
+      const point = this.clientToImage(clickX, clickY);
       if (point) {
         this.handleSceneSelection(point);
       }
@@ -2575,7 +2610,7 @@ export class HiddenObjectGame {
 
     if (!wasSpeedrun && !level.isBonus && !level.isAdvanced && mainIndex === MAIN_LEVELS.length - 1 && !this.sessionTestingUnlocked) {
       this.elements.completionBody.textContent = this.isAdvancedUnlocked()
-        ? "You cleared the main route and unlocked Advanced Levels."
+        ? "You cleared the main route and unlocked Page Two: Advanced Levels. That page holds the tougher multi-target route."
         : this.getAdvancedUnlockText();
       this.elements.completionScore.textContent = formatScore(this.save.legit.bestScore);
       this.elements.completionStars.textContent = String(getTotalStars(this.save.legit));
@@ -2585,7 +2620,7 @@ export class HiddenObjectGame {
 
     if (!wasSpeedrun && authoredAdvancedIndex === AUTHORED_ADVANCED_MAIN_LEVELS.length - 1 && !this.sessionTestingUnlocked) {
       this.elements.completionBody.textContent = this.isSpeedrunUnlocked()
-        ? "You cleared the Advanced route and unlocked Speedrun Levels on page three."
+        ? "You cleared the Advanced route and unlocked Page Three: Extras. That page holds speedrun routes, mirror mode, and special-level slots."
         : "You cleared the Advanced route.";
       this.elements.completionScore.textContent = formatScore(this.save.legit.bestScore);
       this.elements.completionStars.textContent = String(getTotalStars(this.save.legit));
@@ -2709,6 +2744,7 @@ export class HiddenObjectGame {
   applyTransform() {
     const { x, y, scale } = this.state.transform;
     this.elements.sceneContent.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    this.elements.sceneContent.classList.toggle("scene-mirrored", this.state.mirrorActive);
     if (this.state.magnifier.active) {
       this.updateMagnifier(this.state.magnifier.pointerX, this.state.magnifier.pointerY);
     }
@@ -2718,7 +2754,8 @@ export class HiddenObjectGame {
     const rect = this.elements.sceneViewport.getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
-    const imageX = (localX - this.state.transform.x) / this.state.transform.scale;
+    const baseImageX = (localX - this.state.transform.x) / this.state.transform.scale;
+    const imageX = this.state.mirrorActive ? this.state.naturalWidth - baseImageX : baseImageX;
     const imageY = (localY - this.state.transform.y) / this.state.transform.scale;
     if (imageX < 0 || imageY < 0 || imageX > this.state.naturalWidth || imageY > this.state.naturalHeight) {
       return null;
@@ -2730,7 +2767,8 @@ export class HiddenObjectGame {
     const rect = this.elements.sceneViewport.getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
-    const imageX = (localX - this.state.transform.x) / this.state.transform.scale;
+    const baseImageX = (localX - this.state.transform.x) / this.state.transform.scale;
+    const imageX = this.state.mirrorActive ? this.state.naturalWidth - baseImageX : baseImageX;
     const imageY = (localY - this.state.transform.y) / this.state.transform.scale;
     if (imageX < 0 || imageY < 0 || imageX > this.state.naturalWidth || imageY > this.state.naturalHeight) {
       return null;
@@ -2780,13 +2818,19 @@ export class HiddenObjectGame {
   }
 
   triggerHomeWheelRush() {
-    this.elements.homeViewport.classList.remove("easter-wheelrush");
-    void this.elements.homeViewport.offsetWidth;
-    this.elements.homeViewport.classList.add("easter-wheelrush");
-    window.clearTimeout(this.homeWheelRushTimerId);
-    this.homeWheelRushTimerId = window.setTimeout(() => {
-      this.elements.homeViewport.classList.remove("easter-wheelrush");
-    }, 9000);
+    this.homeWheelBoost += 0.65;
+    this.elements.homeViewport.style.setProperty("--home-wheel-boost", String(this.homeWheelBoost));
+    window.clearTimeout(this.homeWheelDecayTimerId);
+    this.homeWheelDecayTimerId = window.setTimeout(() => {
+      const decay = () => {
+        this.homeWheelBoost = Math.max(1, this.homeWheelBoost - 0.18);
+        this.elements.homeViewport.style.setProperty("--home-wheel-boost", String(this.homeWheelBoost));
+        if (this.homeWheelBoost > 1.001) {
+          this.homeWheelDecayTimerId = window.setTimeout(decay, 320);
+        }
+      };
+      decay();
+    }, 1200);
   }
 
   triggerHomeAirballBoost() {

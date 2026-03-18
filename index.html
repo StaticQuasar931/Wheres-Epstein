@@ -34,7 +34,8 @@
             </div>
             <p class="eyebrow">Initializing</p>
             <h2>Where's Epstein?</h2>
-            <p id="homeBootStatus" class="subtle-text">Loading menu art and button assets.</p>
+      <p id="homeBootStatus" class="subtle-text">Loading menu art and button assets.</p>
+      <p class="subtle-text">Start screen UI help by Cheese_Cat.</p>
             <div class="boot-progress-bar" aria-hidden="true">
               <div class="boot-progress-fill"></div>
             </div>
@@ -201,6 +202,10 @@
                     Bonus Blitz
                     <small>Bonus pools only</small>
                   </button>
+                  <button id="startMirrorModeButton" class="secondary-button speedrun-bubble" type="button">
+                    Mirror Mode
+                    <small>Pick any unlocked level</small>
+                  </button>
                   <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble" type="button">
                     Special Levels
                     <small>Authored special route</small>
@@ -221,6 +226,27 @@
                 <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
                 <p id="specialLevelsStatusText" class="subtle-text speedrun-status-line">No special levels authored yet.</p>
               </div>
+              <section class="menu-card speedrun-specials-card">
+                <div class="menu-card-header">
+                  <div>
+                    <p class="eyebrow">Special Levels</p>
+                    <h4>Coming Soon</h4>
+                  </div>
+                </div>
+                <p class="subtle-text">Reserved for alternate target pools and one-off authored challenge scenes.</p>
+                <div class="special-placeholder-grid">
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 1</h4><span class="level-number">SL 1</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 2</h4><span class="level-number">SL 2</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 3</h4><span class="level-number">SL 3</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 4</h4><span class="level-number">SL 4</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 5</h4><span class="level-number">SL 5</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 6</h4><span class="level-number">SL 6</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 7</h4><span class="level-number">SL 7</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 8</h4><span class="level-number">SL 8</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 9</h4><span class="level-number">SL 9</span></div><p class="level-lock">Needs setup</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 10</h4><span class="level-number">SL 10</span></div><p class="level-lock">Needs setup</p></button>
+                </div>
+              </section>
             </div>
           </section>
 
@@ -267,6 +293,8 @@
               <option value="light">Light</option>
               <option value="ocean">Ocean</option>
               <option value="sunset">Sunset</option>
+              <option value="forest">Forest</option>
+              <option value="dusk">Dusk</option>
             </select>
           </label>
           <label class="setting-card">
@@ -352,7 +380,9 @@
             <ul class="control-list">
               <li>Mouse wheel or <kbd>+</kbd> / <kbd>-</kbd> buttons to zoom</li>
               <li>Drag, <kbd>WASD</kbd>, or arrow keys to pan</li>
+              <li>Hold <kbd>Shift</kbd> to pan slower and <kbd>Ctrl</kbd> to pan faster</li>
               <li><kbd>Space</kbd> pauses and resumes</li>
+              <li><kbd>Esc</kbd> backs out of menus and prompts</li>
               <li><kbd>N</kbd> starts the level intro or next level</li>
               <li><kbd>Enter</kbd> confirms main actions on popups</li>
               <li><kbd>R</kbd> retries when available</li>
@@ -365,24 +395,15 @@
 
           <section class="menu-card">
             <div class="menu-card-header">
-              <div><p class="eyebrow">Scoring</p><h3>Fast is Better</h3></div>
+              <div><p class="eyebrow">Scoring &amp; Content</p><h3>How This Build Works</h3></div>
             </div>
             <ul class="control-list">
               <li>No fail timer. Search as long as you need.</li>
               <li>Faster clears earn more score and stars.</li>
-              <li>Wrong clicks reduce score but don't reveal the target.</li>
-              <li>Bonuses open after level 5 or 10 total stars.</li>
-            </ul>
-          </section>
-
-          <section class="menu-card">
-            <div class="menu-card-header">
-              <div><p class="eyebrow">Content Note</p><h3>About the Assets</h3></div>
-            </div>
-            <ul class="control-list">
+              <li>Wrong clicks reduce score but never reveal the target.</li>
               <li>Most visuals were made with AI assistance.</li>
-              <li>This game is for entertainment only.</li>
-              <li>Not intended to make light of victims or real harm.</li>
+              <li>This game is not meant to make fun of anyone, victims, or included people. It is for fun and entertainment only.</li>
+              <li>Bonuses open after level 5 or 10 total stars.</li>
             </ul>
           </section>
 
@@ -401,13 +422,14 @@
           </section>
 
           <div class="version-line">
-<p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.4.2</p>
             <div class="button-row settings-links-row">
-              <button id="settingsDiscordButton" class="secondary-button" type="button">Join Discord</button>
-              <button id="settingsMoreGamesButton" class="ghost-button" type="button">More Games</button>
+              <button id="settingsDiscordButton" class="secondary-button" type="button" title="Opens in a new tab">Join Discord</button>
+              <button id="settingsMoreGamesButton" class="ghost-button" type="button" title="Opens in a new tab">More Games</button>
               <button id="settingsLevelSelectButton" class="ghost-button" type="button">Level Select</button>
+              <button id="settingsChangelogButton" class="ghost-button" type="button">Changelog</button>
             </div>
-            <p id="settingsLinkHint" class="subtle-text">Community links open in a new tab when configured.</p>
+            <p id="settingsLinkHint" class="subtle-text">Suggestions, bug reports, and feedback can be sent in Discord.</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.4.3</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -645,7 +667,7 @@
   <div id="changelogOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card changelog-card">
       <p class="eyebrow">Patch Notes</p>
-<h2 id="changelogTitle">Alpha Version 0.0.0.1.2.4.2</h2>
+<h2 id="changelogTitle">Alpha Version 0.0.0.1.2.4.3</h2>
       <div class="changelog-columns">
         <section>
           <h3>Changelog</h3>

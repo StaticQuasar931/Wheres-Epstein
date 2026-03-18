@@ -102,7 +102,7 @@ export const START_SCREEN_LAYERS = {
   wheelStand: { x1: 1055, y1: 171, x2: 1189, y2: 271, color: "orange", src: "Assets/ui/WheelStand.png" },
   wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
   magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, rotation: -6, color: "red", src: "Assets/ui/mglassempty.png" },
-  magnifierFaces: { x1: 574, y1: 342, x2: 931, y2: 589, rotation: -6, color: "gold", src: "Assets/ui/startscreenfaces.png" },
+  magnifierFaces: { x1: 574, y1: 342, x2: 931, y2: 589, rotation: -1, color: "gold", src: "Assets/ui/startscreenfaces.png" },
 };
 // uh783kjs9tya8tji3chq8ugajskaere9h3v198jk
 
@@ -307,6 +307,27 @@ const ADVANCED_LEVELS_RAW = [
     name: "Chessoff",
     needsSetup: false,
   }),
+  makeAdvancedLevel(18, [
+    makeTarget("advanced-18-a", "tru6", { type: "rect", x1: 424, y1: 43, x2: 411, y2: 30 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-18-b", "ep12", { type: "rect", x1: 1428, y1: 578, x2: 1445, y2: 537 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Goodbye Party",
+    needsSetup: false,
+  }),
+  makeAdvancedLevel(19, [
+    makeTarget("advanced-19-a", "di3", { type: "rect", x1: 1048, y1: 37, x2: 1036, y2: 15 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-19-b", "ep10", { type: "rect", x1: 1044, y1: 266, x2: 1063, y2: 297 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Bright Crafts",
+    needsSetup: false,
+  }),
+  makeAdvancedLevel(20, [
+    makeTarget("advanced-20-a", "tru7", { type: "rect", x1: 642, y1: 161, x2: 653, y2: 179 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-20-b", "di5", { type: "rect", x1: 303, y1: 285, x2: 284, y2: 257 }, "Assets/Waldos/advanced"),
+  ], {
+    name: "Music Festival",
+    needsSetup: false,
+  }),
   makeAdvancedBonusLevel(1, [                  
     makeTarget("advanced-bonus-01-a", "di3", { type: "rect", x1: 1281, y1: 198, x2: 1265, y2: 189 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-bonus-01-b", "ep12", { type: "rect", x1: 282, y1: 716, x2: 304, y2: 743 }, "Assets/Waldos/advanced"),
@@ -336,15 +357,15 @@ const ADVANCED_LEVELS_RAW = [
     needsSetup: true,
   }),
   makeAdvancedBonusLevel(5, [
-    makeTarget("advanced-bonus-05-a", "di6", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-05-b", "tru4", { type: "rect", x1: 470, y1: 300, x2: 550, y2: 410 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-05-a", "di6", { type: "rect", x1: 31, y1: 220, x2: 39, y2: 228 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-05-b", "tru4", { type: "rect", x1: 1447, y1: 64, x2: 1454, y2: 70 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Boardwalk Clash",
-    needsSetup: true,
+    name: "Wizzards and Creeps",
+    needsSetup: false,
   }),
 ];
 
-for (let number = 18; number <= 20; number += 1) {
+for (let number = 21; number <= 20; number += 1) {
   ADVANCED_LEVELS_RAW.push(
     makeAdvancedLevel(number, [
       makePlaceholderTarget(`advanced-${String(number).padStart(2, "0")}-a`),

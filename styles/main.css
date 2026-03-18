@@ -1346,6 +1346,21 @@ body.mode-game .site-topbar { display: flex; }
   margin-top: 0.2rem;
   font-size: 0.83rem;
 }
+.speedrun-specials-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem 1.05rem;
+}
+
+.special-placeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.special-placeholder-card {
+  min-height: 7.2rem;
+}
 .speedrun-mini-card h4 {
   margin: 0;
   font-family: var(--font-display);
@@ -1357,7 +1372,7 @@ body.mode-game .site-topbar { display: flex; }
    SETTINGS
    ============================================================ */
 .settings-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 0.45rem;
   gap: 0.65rem;
 }
@@ -1456,8 +1471,8 @@ body.mode-game .site-topbar { display: flex; }
   grid-column: 1 / -1;
   display: grid;
   justify-items: center;
-  gap: 0.55rem;
-  padding: 0.35rem 0 0;
+  gap: 0.45rem;
+  padding: 0.6rem 0 0;
 }
 
 .version-label {
@@ -1532,6 +1547,32 @@ body[data-theme="sunset"] {
   --accent-2: #ffd166;
   --line-mid: rgba(255, 177, 112, 0.24);
   --line-hi: rgba(255, 177, 112, 0.42);
+}
+
+body[data-theme="forest"] {
+  --panel: rgba(10, 25, 18, 0.88);
+  --panel-strong: rgba(8, 20, 15, 0.94);
+  --text: #eef7ee;
+  --text-bright: #ffffff;
+  --muted: #9fbea5;
+  --muted-hi: #c9dfcd;
+  --accent: #84d16d;
+  --accent-2: #bfe67a;
+  --line-mid: rgba(158, 222, 149, 0.24);
+  --line-hi: rgba(158, 222, 149, 0.42);
+}
+
+body[data-theme="dusk"] {
+  --panel: rgba(28, 21, 47, 0.88);
+  --panel-strong: rgba(20, 14, 35, 0.94);
+  --text: #f3edff;
+  --text-bright: #ffffff;
+  --muted: #b7abd8;
+  --muted-hi: #d9d0f0;
+  --accent: #b993ff;
+  --accent-2: #f0b3ff;
+  --line-mid: rgba(198, 167, 255, 0.24);
+  --line-hi: rgba(198, 167, 255, 0.42);
 }
 
 body[data-theme="dark"] .setting-card select,
@@ -1684,6 +1725,12 @@ body.easter-starsburst #hudStarsText {
   width: 100%;
   height: auto;
   pointer-events: none;
+}
+
+.scene-content.scene-mirrored .level-image,
+.scene-content.scene-mirrored .hitbox-overlay {
+  transform: scaleX(-1);
+  transform-origin: center center;
 }
 
 .asset-loading { opacity: 0; }
@@ -2144,6 +2191,7 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   #advancedBonusLevelGrid,
   .speedrun-stats        { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .speedrun-grid         { grid-template-columns: 1fr; }
+  .special-placeholder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .target-card           { width: min(260px, 60vw); }
 }
 
@@ -2178,7 +2226,8 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
   #settingsScreen    .level-select-groups,
   .speedrun-stats    { grid-template-columns: 1fr; }
 
-  .speedrun-bubble-grid { grid-template-columns: 1fr; }
+  .speedrun-bubble-grid,
+  .special-placeholder-grid { grid-template-columns: 1fr; }
 
   .settings-stats-grid { grid-template-columns: 1fr; }
 
