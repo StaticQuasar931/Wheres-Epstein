@@ -45,10 +45,10 @@
   animation: none;
   filter:
     drop-shadow(0 18px 30px rgba(0, 0, 0, 0.30))
-    drop-shadow(0 0 16px rgba(255, 216, 78, 0.16))
-    brightness(1.03)
-    saturate(1.05);
-  transform: translateY(0) scale(1.02);
+    drop-shadow(0 0 18px rgba(255, 216, 78, 0.22))
+    brightness(1.06)
+    saturate(1.08);
+  transform: translateY(0) scale(1.035);
   transition: filter 220ms ease, transform 220ms ease;
 }
 
@@ -131,55 +131,92 @@
   will-change: transform, opacity;
 }
 
-.home-viewport.home-animating #cloud1Layer {
-  animation: layer-fade-in 1200ms cubic-bezier(0.18, 0.82, 0.2, 1) 1180ms both, cloud-drift-1 40s linear infinite;
-  animation-delay: 1180ms, -6s;
-}
-
-.home-viewport.home-animating #cloud2Layer {
-  animation: layer-fade-in 1280ms cubic-bezier(0.18, 0.82, 0.2, 1) 1180ms both, cloud-drift-2 54s linear infinite;
-  animation-delay: 1180ms, -24s;
-}
-
-.home-viewport.home-animating #cloud3Layer {
-  animation: layer-fade-in 1340ms cubic-bezier(0.18, 0.82, 0.2, 1) 1180ms both, cloud-drift-3 66s linear infinite;
-  animation-delay: 1180ms, -36s;
-}
-
-.home-viewport.home-animating #wheelLayer {
-  transform-origin: center center;
-  animation: layer-fade-in 980ms ease 860ms both, ferris-spin 28s linear infinite;
-  animation-delay: 860ms, 860ms;
-}
-
-.home-viewport.home-animating #wheelStandLayer {
-  animation: layer-fade-in 900ms ease 820ms both;
-}
-
 .home-viewport.home-animating #titleBannerLayer,
 .home-viewport.home-animating #homeNameButton,
 .home-viewport.home-animating .home-debug-box[data-editor-key="titleBanner"],
 .home-viewport.home-animating .home-debug-box[data-editor-key="nameLink"] {
-  animation: layer-fade-in 900ms ease 180ms both, title-float 7.6s ease-in-out infinite;
-  animation-delay: 180ms, 1180ms;
+  animation: layer-fade-in 980ms cubic-bezier(0.18, 0.82, 0.2, 1) 180ms both, title-float 9.6s ease-in-out infinite;
+  animation-delay: 180ms, 1600ms;
 }
 
 .home-viewport.home-animating #magnifierDecorLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="magnifierDecor"] {
-  animation: layer-fade-in 980ms ease 420ms both, magnifier-float 9.2s ease-in-out infinite;
-  animation-delay: 420ms, 1260ms;
+  animation: layer-fade-in 1040ms cubic-bezier(0.18, 0.82, 0.2, 1) 640ms both, magnifier-float 10.2s ease-in-out infinite;
+  animation-delay: 640ms, 1720ms;
 }
 
 .home-viewport.home-animating #magnifierFacesLayer {
   transform-origin: center center;
-  animation: faces-fade-in 1120ms cubic-bezier(0.18, 0.82, 0.2, 1) 1180ms both, magnifier-float-faces 9.2s ease-in-out infinite;
-  animation-delay: 1180ms, 1260ms;
+  animation: faces-fade-in 980ms cubic-bezier(0.18, 0.82, 0.2, 1) 1040ms both, magnifier-float-faces 10.2s ease-in-out infinite;
+  animation-delay: 1040ms, 1720ms;
+}
+
+.home-viewport.home-animating #wheelStandLayer {
+  animation: layer-fade-in 960ms ease 1320ms both;
+}
+
+.home-viewport.home-animating #wheelLayer {
+  transform-origin: center center;
+  animation: layer-fade-in 980ms ease 1380ms both, ferris-spin 32s linear infinite;
+  animation-delay: 1380ms, 1380ms;
 }
 
 .home-viewport.home-animating #airballLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="airball"] {
-  animation: layer-fade-in 980ms ease 780ms both, airball-float 11.4s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
-  animation-delay: 780ms, 1820ms;
+  animation: layer-fade-in 980ms ease 1260ms both, airball-float 13.4s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
+  animation-delay: 1260ms, 2140ms;
+}
+
+.home-viewport.home-animating #cloud1Layer {
+  animation: layer-fade-in 1320ms cubic-bezier(0.18, 0.82, 0.2, 1) 2620ms both, cloud-drift-1 44s linear infinite;
+  animation-delay: 2620ms, -8s;
+}
+
+.home-viewport.home-animating #cloud2Layer {
+  animation: layer-fade-in 1380ms cubic-bezier(0.18, 0.82, 0.2, 1) 2740ms both, cloud-drift-2 59s linear infinite;
+  animation-delay: 2740ms, -22s;
+}
+
+.home-viewport.home-animating #cloud3Layer {
+  animation: layer-fade-in 1460ms cubic-bezier(0.18, 0.82, 0.2, 1) 2860ms both, cloud-drift-3 73s linear infinite;
+  animation-delay: 2860ms, -34s;
+}
+
+.home-viewport.home-live #titleBannerLayer,
+.home-viewport.home-live #homeNameButton {
+  animation: title-float 9.6s ease-in-out infinite;
+}
+
+.home-viewport.home-live #magnifierDecorLayer {
+  animation: magnifier-float 10.2s ease-in-out infinite;
+}
+
+.home-viewport.home-live #magnifierFacesLayer {
+  animation: magnifier-float-faces 10.2s ease-in-out infinite;
+}
+
+.home-viewport.home-live #wheelLayer {
+  transform-origin: center center;
+  animation: ferris-spin 32s linear infinite;
+}
+
+.home-viewport.home-live #airballLayer {
+  animation: airball-float 13.4s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
+}
+
+.home-viewport.home-live #cloud1Layer {
+  animation: cloud-drift-1 44s linear infinite;
+  animation-delay: -8s;
+}
+
+.home-viewport.home-live #cloud2Layer {
+  animation: cloud-drift-2 59s linear infinite;
+  animation-delay: -22s;
+}
+
+.home-viewport.home-live #cloud3Layer {
+  animation: cloud-drift-3 73s linear infinite;
+  animation-delay: -34s;
 }
 
 .home-viewport.home-editor-active #cloud1Layer,
@@ -356,12 +393,12 @@ body.easter-arcade .result-star--filled {
 
 @keyframes title-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-6px); }
 }
 
 @keyframes magnifier-float {
-  0%, 100% { transform: translate(0, 0) rotate(-1.2deg); }
-  50% { transform: translate(8px, -6px) rotate(1deg); }
+  0%, 100% { transform: translate(0, 0) rotate(var(--home-layer-rotate, -6deg)); }
+  50% { transform: translate(7px, -5px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.1deg)); }
 }
 
 @keyframes faces-glow {
@@ -370,13 +407,13 @@ body.easter-arcade .result-star--filled {
 }
 
 @keyframes faces-fade-in {
-  from { opacity: 0; transform: rotate(-6deg) scale(0.985); }
-  to { opacity: 1; transform: rotate(-6deg) scale(1); }
+  from { opacity: 0; transform: rotate(var(--home-layer-rotate, -6deg)) scale(0.985); }
+  to { opacity: 1; transform: rotate(var(--home-layer-rotate, -6deg)) scale(1); }
 }
 
 @keyframes magnifier-float-faces {
-  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
-  50% { transform: translate(8px, -6px) rotate(-4.8deg); }
+  0%, 100% { transform: translate(0, 0) rotate(var(--home-layer-rotate, -6deg)); }
+  50% { transform: translate(7px, -5px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.1deg)); }
 }
 
 @keyframes airball-float {
@@ -387,32 +424,42 @@ body.easter-arcade .result-star--filled {
   84% { transform: translate(2px, -8px) rotate(0.1deg); }
 }
 
-body[data-motion="reduced"] .home-viewport.home-animating #cloud1Layer {
-  animation: layer-fade-in 520ms ease 980ms both !important;
-}
-
-body[data-motion="reduced"] .home-viewport.home-animating #cloud2Layer {
-  animation: layer-fade-in 520ms ease 980ms both !important;
-}
-
-body[data-motion="reduced"] .home-viewport.home-animating #cloud3Layer {
-  animation: layer-fade-in 520ms ease 980ms both !important;
-}
-
-body[data-motion="reduced"] .home-viewport.home-animating #wheelLayer {
-  animation: layer-fade-in 420ms ease 760ms both !important;
-}
-
-body[data-motion="reduced"] .home-viewport.home-animating #wheelStandLayer,
 body[data-motion="reduced"] .home-viewport.home-animating #titleBannerLayer,
-body[data-motion="reduced"] .home-viewport.home-animating #magnifierDecorLayer,
-body[data-motion="reduced"] .home-viewport.home-animating #airballLayer,
 body[data-motion="reduced"] .home-viewport.home-animating #homeNameButton {
-  animation-duration: 360ms !important;
+  animation: layer-fade-in 420ms ease 160ms both !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #magnifierDecorLayer {
+  animation: layer-fade-in 420ms ease 520ms both !important;
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #magnifierFacesLayer {
-  animation: faces-fade-in 360ms ease 980ms both !important;
+  animation: faces-fade-in 420ms ease 880ms both !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #airballLayer,
+body[data-motion="reduced"] .home-viewport.home-animating #wheelStandLayer,
+body[data-motion="reduced"] .home-viewport.home-animating #wheelLayer {
+  animation: layer-fade-in 420ms ease 1180ms both !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-animating #cloud1Layer,
+body[data-motion="reduced"] .home-viewport.home-animating #cloud2Layer,
+body[data-motion="reduced"] .home-viewport.home-animating #cloud3Layer {
+  animation: layer-fade-in 420ms ease 2360ms both !important;
+}
+
+body[data-motion="reduced"] .home-viewport.home-live #cloud1Layer,
+body[data-motion="reduced"] .home-viewport.home-live #cloud2Layer,
+body[data-motion="reduced"] .home-viewport.home-live #cloud3Layer,
+body[data-motion="reduced"] .home-viewport.home-live #wheelLayer,
+body[data-motion="reduced"] .home-viewport.home-live #wheelStandLayer,
+body[data-motion="reduced"] .home-viewport.home-live #titleBannerLayer,
+body[data-motion="reduced"] .home-viewport.home-live #magnifierDecorLayer,
+body[data-motion="reduced"] .home-viewport.home-live #magnifierFacesLayer,
+body[data-motion="reduced"] .home-viewport.home-live #airballLayer,
+body[data-motion="reduced"] .home-viewport.home-live #homeNameButton {
+  animation: none !important;
 }
 
 body[data-motion="reduced"] .home-button-art.is-settled {

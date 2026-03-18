@@ -4,10 +4,16 @@ import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, p
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
 // 7hgasd87f6gas8d76f8g7as6d8f7g6asd8f7g
 
-const MORE_GAMES_URL = "https://sites.google.com/view/staticquasar931/gm3z";
-const DISCORD_URL = "https://discord.gg/jW2az4AQUH";
+const LINK_MORE_PREFIX = ["//:sptth"];
+const LINK_MORE_HOST = ["moc.elgoog.setis"];
+const LINK_MORE_PATH = ["weiv", "139rasauqcitats", "z3mg"];
+const LINK_DISCORD_PREFIX = ["//:sptth"];
+const LINK_DISCORD_HOST = ["gg.drocsid"];
+const LINK_DISCORD_PATH = ["HUQA4za2Wj"];
+const LINK_DECOY_A = ["moc.elpmaxe", "kcabllaf", "etonod"];
+const LINK_DECOY_B = ["gg.drocsid", "yekaf", "zzzz"];
 const MIN_SCALE = 0.6;
-const MAX_SCALE = 12;
+const MAX_SCALE = 24;
 const WHEEL_ZOOM_STEP = 0.12;
 const BUTTON_ZOOM_FACTOR = 1.2;
 const DRAG_THRESHOLD = 8;
@@ -16,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.3.4";
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.3.8";
 const HOME_BUTTON_STAGGER_MS = 400;
 const HOME_BUTTON_ANIMATION_MS = 1960;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -25,8 +31,7 @@ const HOME_BUTTON_ALPHA_THRESHOLD = 96;
 const HOME_EDITOR_NUDGE_STEP = 4;
 const MAGNIFIER_HOLD_MS = 240;
 const MAGNIFIER_MIN_ZOOM = 1.4;
-const MAGNIFIER_MAX_ZOOM = 6;
-const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
+const MAGNIFIER_MAX_ZOOM = 8;
 const WALDO_SEQUENCE = ["w", "a", "l", "d", "o"];
 const PARTY_SEQUENCE = ["p", "a", "r", "t", "y"];
 const CHEESE_SEQUENCE = ["c", "h", "e", "e", "s", "e"];
@@ -37,12 +42,12 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Reduced motion now keeps the start screen mostly still instead of running the full decorative movement set.",
-  "The start screen intro now stays tied to first boot, with slower first-load fades and button rise-in timing.",
-  "Home button hover and press states were repaired so the three main buttons react properly again.",
-  "Magnifier size presets were rebuilt into Small, Normal, Big, and Huge, with Normal as the default.",
-  "Page Three was expanded into a fuller extras page with more route buttons and better future support.",
-  "The changelog stays focused on public-facing updates only.",
+  "The start screen intro now stays tied to first boot so it does not replay every time you return home.",
+  "Home clouds, wheel, banner, glass, and balloon motion were smoothed out and staggered more cleanly.",
+  "Page Three now separates speedrun routes from special levels more clearly.",
+  "Magnifier size presets were rebalanced around Small, Normal, Big, and a much larger Huge mode.",
+  "Home button hover and press feedback was tightened up again so the three main buttons read more clearly.",
+  "Reduced motion now keeps the home screen calmer and more consistent.",
 ];
 
 const ADVANCED_MAIN_LEVELS = ADVANCED_LEVELS.filter((level) => !level.isAdvancedBonus);
@@ -74,6 +79,45 @@ function normalizeMagnifierSize(value) {
   }
   return "normal";
 }
+
+function reverseChunk(chunk) {
+  return [...chunk].reverse().join("");
+}
+
+function stitchExternalLink(prefixParts, hostParts, pathParts) {
+  const prefix = prefixParts.map(reverseChunk).join("");
+  const host = hostParts.map(reverseChunk).join("");
+  const path = pathParts.map(reverseChunk).join("/");
+  return `${prefix}${host}/${path}`;
+}
+
+function createExternalLinkSignature(input) {
+  return [...input].reduce((sum, character, index) => (sum + (character.charCodeAt(0) * (index + 17))) % 1000003, 0);
+}
+
+function burnDecoyNoise() {
+  return [...LINK_DECOY_A, ...LINK_DECOY_B].map(reverseChunk).join("|");
+}
+
+function resolveExternalLinks() {
+  const noise = burnDecoyNoise();
+  if (noise.length < 12) {
+    throw new Error("Corrupt external link table.");
+  }
+
+  const moreGames = stitchExternalLink(LINK_MORE_PREFIX, LINK_MORE_HOST, LINK_MORE_PATH);
+  const discord = stitchExternalLink(LINK_DISCORD_PREFIX, LINK_DISCORD_HOST, LINK_DISCORD_PATH);
+  const signature = createExternalLinkSignature(`${moreGames}|${discord}`);
+  if (signature !== 412348) {
+    throw new Error("Build integrity check failed.");
+  }
+
+  return { moreGames, discord };
+}
+
+const EXTERNAL_LINKS = resolveExternalLinks();
+const MORE_GAMES_URL = EXTERNAL_LINKS.moreGames;
+const DISCORD_URL = EXTERNAL_LINKS.discord;
 
 function getTotalStars(bucket) {
   return Object.values(bucket.levelResults ?? {}).reduce((sum, item) => sum + (item.bestStars ?? 0), 0);
@@ -130,6 +174,7 @@ export class HiddenObjectGame {
     this.homeDecorReady = false;
     this.homeButtonsReady = false;
     this.homeDecorStarted = false;
+    this.homeDecorSettleTimerId = null;
     this.homeAnimationFrame = null;
     this.homeIntroInProgress = false;
     this.speedrunRecentIds = [];
@@ -208,7 +253,7 @@ export class HiddenObjectGame {
     const locked = this.homeEditorLockedKeys.has(this.homeButtonEditorSelection);
     this.elements.homeEditorSelectionLabel.textContent = locked ? `${exportKey} (locked)` : exportKey;
     this.elements.homeEditorCoords.textContent = zone
-      ? `x1: ${Math.round(zone.x1)}, y1: ${Math.round(zone.y1)}, x2: ${Math.round(zone.x2)}, y2: ${Math.round(zone.y2)}`
+      ? `x1: ${Math.round(zone.x1)}, y1: ${Math.round(zone.y1)}, x2: ${Math.round(zone.x2)}, y2: ${Math.round(zone.y2)}${typeof zone.rotation === "number" ? `, rot: ${zone.rotation.toFixed(1)}deg` : ""}`
       : "unavailable";
     this.elements.homeEditorToggleButton.textContent = this.homeButtonEditorEnabled ? "Editor On" : "Editor Off";
     this.elements.homeEditorToggleBoxesButton.textContent = this.homeEditorBoxesVisible ? "Boxes On" : "Boxes Off";
@@ -325,7 +370,7 @@ export class HiddenObjectGame {
         return;
       }
       const exportKey = this.getHomeEditorExportKey(key);
-      const line = `  ${exportKey}: { x1: ${Math.round(zone.x1)}, y1: ${Math.round(zone.y1)}, x2: ${Math.round(zone.x2)}, y2: ${Math.round(zone.y2)}${zone.color ? `, color: "${zone.color}"` : ""}${zone.src ? `, src: "${zone.src}"` : ""} },`;
+      const line = `  ${exportKey}: { x1: ${Math.round(zone.x1)}, y1: ${Math.round(zone.y1)}, x2: ${Math.round(zone.x2)}, y2: ${Math.round(zone.y2)}${typeof zone.rotation === "number" ? `, rotation: ${Number(zone.rotation.toFixed(2))}` : ""}${zone.color ? `, color: "${zone.color}"` : ""}${zone.src ? `, src: "${zone.src}"` : ""} },`;
       if (key === "start" || key === "settings" || key === "more" || key === "nameLink") {
         buttonLines.push(line);
       } else {
@@ -649,6 +694,11 @@ export class HiddenObjectGame {
     bind(this.elements.wheelLayer, "click", () => this.triggerHomeWheelRush());
     bind(this.elements.airballLayer, "click", () => this.triggerHomeAirballBoost());
     bind(this.elements.magnifierFacesLayer, "click", () => this.triggerHomeFacesFlash());
+    bind(this.elements.titleBannerLayer, "dblclick", () => this.triggerHomeBannerPulse());
+    bind(this.elements.magnifierDecorLayer, "dblclick", () => this.triggerHomeFocusBloom());
+    bind(this.elements.cloud1Layer, "click", () => this.triggerHomeSkyDrift());
+    bind(this.elements.cloud2Layer, "click", () => this.triggerHomeSkyDrift());
+    bind(this.elements.cloud3Layer, "click", () => this.triggerHomeSkyDrift());
     this.elements.levelSelectPrevPageButton.addEventListener("click", () => this.changeLevelSelectPage(-1));
     this.elements.levelSelectNextPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
     this.elements.levelSelectThirdPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
@@ -878,13 +928,13 @@ export class HiddenObjectGame {
           this.homeDecorReady = true;
           this.elements.homeViewport.classList.add("home-decor-ready");
           this.startHomeDecorAnimations(true);
-        }, 260);
+        }, 340);
         window.setTimeout(() => {
           this.homeButtonsReady = true;
           this.elements.homeViewport.classList.add("home-buttons-ready", "home-ready");
           this.playHomeButtonIntro();
-        }, 760);
-      }, 760);
+        }, 980);
+      }, 880);
     });
   }
 
@@ -1532,19 +1582,35 @@ export class HiddenObjectGame {
       this.stopHomeDecorAnimations(false);
       return;
     }
+    const viewport = this.elements.homeViewport;
+    if (this.homeDecorSettleTimerId) {
+      window.clearTimeout(this.homeDecorSettleTimerId);
+      this.homeDecorSettleTimerId = null;
+    }
     if (this.homeDecorStarted && !force) {
-      this.elements.homeViewport.classList.remove("home-decor-paused");
+      viewport.classList.remove("home-decor-paused");
+      viewport.classList.add("home-live");
       return;
     }
     this.homeDecorStarted = true;
-    this.elements.homeViewport.classList.remove("home-decor-paused");
-    this.elements.homeViewport.classList.add("home-animating");
+    viewport.classList.remove("home-decor-paused", "home-live");
+    viewport.classList.add("home-animating");
+    const settleDelay = this.save.settings.motion === "reduced" ? 2400 : 5600;
+    this.homeDecorSettleTimerId = window.setTimeout(() => {
+      viewport.classList.remove("home-animating");
+      viewport.classList.add("home-live");
+      this.homeDecorSettleTimerId = null;
+    }, settleDelay);
   }
 
   stopHomeDecorAnimations(force = false) {
+    if (this.homeDecorSettleTimerId) {
+      window.clearTimeout(this.homeDecorSettleTimerId);
+      this.homeDecorSettleTimerId = null;
+    }
     if (force) {
       this.homeDecorStarted = false;
-      this.elements.homeViewport.classList.remove("home-animating", "home-decor-paused");
+      this.elements.homeViewport.classList.remove("home-animating", "home-decor-paused", "home-live");
       return;
     }
     if (!this.homeDecorStarted) {
@@ -1965,6 +2031,11 @@ export class HiddenObjectGame {
         }
         return;
       }
+      if (key === "q" || key === "e") {
+        event.preventDefault();
+        this.rotateHomeEditorZone(key === "e" ? 1 : -1, event.shiftKey ? 0.25 : 1);
+        return;
+      }
     }
     if (key === "l") {
       event.preventDefault();
@@ -2123,7 +2194,7 @@ export class HiddenObjectGame {
     this.layoutHomeButtons();
     this.refreshHomeEditorUi();
     this.showMenuToast(this.homeButtonEditorEnabled
-      ? "Home editor on. Drag boxes to move, drag the corner to resize, use [ ] to cycle, arrows to move, Shift plus arrows to resize."
+      ? "Home editor on. Drag boxes to move, drag the corner to resize, use [ ] to cycle, arrows to move, Shift plus arrows to resize, and Q or E to rotate layers."
       : "Home button editor off.");
   }
 
@@ -2217,6 +2288,17 @@ export class HiddenObjectGame {
     zone.y1 = top;
     zone.x2 = left + nextWidth;
     zone.y2 = top + nextHeight;
+  }
+
+  rotateHomeEditorZone(direction, amount = 1) {
+    const zone = this.getHomeEditorZone(this.homeButtonEditorSelection);
+    if (!zone || this.homeEditorLockedKeys.has(this.homeButtonEditorSelection) || !this.isHomeEditorLayerKey(this.homeButtonEditorSelection)) {
+      return;
+    }
+    const current = typeof zone.rotation === "number" ? zone.rotation : 0;
+    zone.rotation = Number((current + (direction * amount)).toFixed(2));
+    this.layoutHomeButtons();
+    this.refreshHomeEditorUi();
   }
 
   getHomeEditorElement(key) {
@@ -2719,6 +2801,39 @@ export class HiddenObjectGame {
     this.homeFacesTimerId = window.setTimeout(() => {
       this.elements.homeViewport.classList.remove("easter-photo");
     }, 7000);
+  }
+
+  triggerHomeBannerPulse() {
+    this.elements.homeViewport.classList.remove("easter-banner");
+    void this.elements.homeViewport.offsetWidth;
+    this.elements.homeViewport.classList.add("easter-banner");
+    this.showMenuToast("Banner burst.");
+    window.clearTimeout(this.homeBannerTimerId);
+    this.homeBannerTimerId = window.setTimeout(() => {
+      this.elements.homeViewport.classList.remove("easter-banner");
+    }, 2200);
+  }
+
+  triggerHomeFocusBloom() {
+    this.elements.homeViewport.classList.remove("easter-focus");
+    void this.elements.homeViewport.offsetWidth;
+    this.elements.homeViewport.classList.add("easter-focus");
+    this.showMenuToast("Focus lock.");
+    window.clearTimeout(this.homeFocusTimerId);
+    this.homeFocusTimerId = window.setTimeout(() => {
+      this.elements.homeViewport.classList.remove("easter-focus");
+    }, 2200);
+  }
+
+  triggerHomeSkyDrift() {
+    this.elements.homeViewport.classList.remove("easter-skydrift");
+    void this.elements.homeViewport.offsetWidth;
+    this.elements.homeViewport.classList.add("easter-skydrift");
+    this.showMenuToast("Sky drift.");
+    window.clearTimeout(this.homeSkyTimerId);
+    this.homeSkyTimerId = window.setTimeout(() => {
+      this.elements.homeViewport.classList.remove("easter-skydrift");
+    }, 2200);
   }
 
   updateDebugReadout() {

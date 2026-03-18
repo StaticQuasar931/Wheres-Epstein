@@ -117,10 +117,17 @@ export function bindHomeButtonHoverEffects(game) {
       sheen.classList.remove("is-pressed");
     };
     button.addEventListener("pointerenter", activate);
+    button.addEventListener("pointermove", activate);
     button.addEventListener("pointerleave", deactivate);
-    button.addEventListener("pointerdown", press);
+    button.addEventListener("pointerdown", () => {
+      activate();
+      press();
+    });
     button.addEventListener("pointerup", release);
-    button.addEventListener("pointercancel", release);
+    button.addEventListener("pointercancel", () => {
+      release();
+      deactivate();
+    });
     button.addEventListener("focus", activate);
     button.addEventListener("blur", deactivate);
   });
@@ -228,7 +235,7 @@ export function updateHomeDebug(game, event, config) {
     ? `${game.getHomeEditorExportKey?.(game.homeButtonEditorSelection) ?? game.homeButtonEditorSelection}: { x1: ${Math.round(selectedSource.x1)}, y1: ${Math.round(selectedSource.y1)}, x2: ${Math.round(selectedSource.x2)}, y2: ${Math.round(selectedSource.y2)} }`
     : "selected source: unavailable";
   const editor = game.homeButtonEditorEnabled
-    ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box to move, drag the corner to resize.\nUse [ ] to cycle, arrows to move, Shift plus arrows to resize.\nUse B for boxes, K for lock, Z for zoom.`
+    ? `Editor: on (${game.homeButtonEditorSelection})\nDrag a box to move, drag the corner to resize.\nUse [ ] to cycle, arrows to move, Shift plus arrows to resize.\nUse Q and E to rotate, Shift plus Q or E for fine rotation.\nUse B for boxes, K for lock, Z for zoom.`
     : "Editor: off (press H in testing mode)";
   game.elements.homeDebugReadout.textContent = `${pointer}\n${editor}\nselected: ${formatZone(selected)}\n${copyLine}`;
   game.refreshHomeEditorUi?.();
@@ -440,8 +447,10 @@ function renderHomeDebugOverlay(game, drawWidth, drawHeight, naturalWidth, natur
       node.style.width = `${buttonRect.width}px`;
       node.style.height = `${buttonRect.height}px`;
     }
+    const sourceZone = game.getHomeEditorZone?.(label);
+    const rotationText = typeof sourceZone?.rotation === "number" ? ` rot ${sourceZone.rotation.toFixed(1)}deg` : "";
     tag.textContent = actual
-      ? `${label}${game.homeEditorLockedKeys?.has(label) ? " [locked]" : ""}: ${Math.min(actual.x1, actual.x2)},${Math.min(actual.y1, actual.y2)} -> ${Math.max(actual.x1, actual.x2)},${Math.max(actual.y1, actual.y2)}`
+      ? `${label}${game.homeEditorLockedKeys?.has(label) ? " [locked]" : ""}: ${Math.min(actual.x1, actual.x2)},${Math.min(actual.y1, actual.y2)} -> ${Math.max(actual.x1, actual.x2)},${Math.max(actual.y1, actual.y2)}${rotationText}`
       : `${label}: unavailable`;
     const handle = document.createElement("span");
     handle.className = "home-debug-handle";
@@ -468,6 +477,7 @@ function placeHomeLayer(game, key, element, zone, drawWidth, drawHeight, natural
   element.style.top = `${targetTop}px`;
   element.style.width = `${targetWidth}px`;
   element.style.height = `${targetHeight}px`;
+  element.style.setProperty("--home-layer-rotate", `${zone.rotation ?? 0}deg`);
   game.homeRenderedRects.set(key, {
     left: targetLeft,
     top: targetTop,

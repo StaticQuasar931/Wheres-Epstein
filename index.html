@@ -183,8 +183,25 @@
             </div>
             <div class="speedrun-grid">
               <div class="speedrun-card speedrun-card-primary">
-                <p class="subtle-text">Pulls from all authored level pools. Repeats are possible but nudged to feel less common.</p>
-                <button id="startSpeedrunButton" class="primary-button speedrun-button" type="button">Start Random Speedrun</button>
+                <p class="subtle-text">Speedrun routes stay grouped here. Repeats are possible but nudged to feel less common.</p>
+                <div class="speedrun-bubble-grid speedrun-bubble-grid-wide">
+                  <button id="startSpeedrunButton" class="primary-button speedrun-bubble speedrun-bubble-primary" type="button">
+                    All Pools Random
+                    <small>Main, bonus, advanced, and special when authored</small>
+                  </button>
+                  <button id="startMainSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
+                    Main Route Random
+                    <small>Story levels only</small>
+                  </button>
+                  <button id="startAdvancedSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
+                    Advanced Random
+                    <small>Advanced main levels only</small>
+                  </button>
+                  <button id="startBonusSpeedrunButton" class="ghost-button speedrun-bubble" type="button">
+                    Bonus Blitz
+                    <small>Bonus and advanced bonus</small>
+                  </button>
+                </div>
                 <div class="stat-grid speedrun-stats">
                   <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
                   <div class="stat-card"><span>Avg Score</span><strong id="speedrunAverageScoreText">0</strong></div>
@@ -209,36 +226,15 @@
                   </div>
                   <p class="subtle-text">Framework is ready for `sl1`, `sl2`, and future special routes once that art pool is authored.</p>
                   <p id="specialLevelsStatusText" class="subtle-text">No special levels authored yet.</p>
-                </section>
-                <section class="menu-card speedrun-mini-card">
-                  <div class="menu-card-header">
-                    <div>
-                      <p class="eyebrow">Other Extras</p>
-                      <h4>Challenge Room</h4>
-                    </div>
-                  </div>
-                  <div class="speedrun-bubble-grid">
-                    <button id="startMainSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
-                      Main Route Random
-                      <small>Story levels only</small>
-                    </button>
-                    <button id="startAdvancedSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
-                      Advanced Random
-                      <small>Advanced main levels only</small>
-                    </button>
-                    <button id="startBonusSpeedrunButton" class="ghost-button speedrun-bubble" type="button">
-                      Bonus Blitz
-                      <small>Bonus and advanced bonus</small>
-                    </button>
-                    <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble" type="button">
-                      Special Levels
-                      <small>Reserved for the special route</small>
-                    </button>
-                  </div>
+                  <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble" type="button">
+                    Special Levels
+                    <small>Reserved for the authored special route</small>
+                  </button>
                 </section>
               </div>
             </div>
           </section>
+
 
           <section id="progressRouteSection" class="menu-card">
             <div class="menu-card-header">
@@ -416,7 +412,7 @@
           </section>
 
           <div class="version-line">
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.3.4</p>
+            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.3.8</p>
             <div class="button-row settings-links-row">
               <button id="settingsDiscordButton" class="secondary-button" type="button">Join Discord</button>
               <button id="settingsMoreGamesButton" class="ghost-button" type="button">More Games</button>

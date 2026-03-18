@@ -1571,6 +1571,21 @@ body.easter-glass .home-viewport::after {
   backdrop-filter: blur(2px);
 }
 
+.home-viewport.easter-banner #titleBannerLayer {
+  filter: drop-shadow(0 0 18px rgba(255, 216, 78, 0.34)) brightness(1.08);
+}
+
+.home-viewport.easter-focus #magnifierDecorLayer,
+.home-viewport.easter-focus #magnifierFacesLayer {
+  filter: saturate(1.14) brightness(1.08);
+}
+
+.home-viewport.easter-skydrift #cloud1Layer,
+.home-viewport.easter-skydrift #cloud2Layer,
+.home-viewport.easter-skydrift #cloud3Layer {
+  filter: brightness(1.06) saturate(1.08);
+}
+
 .home-viewport.easter-wheelrush #wheelLayer {
   animation-duration: 8s !important;
 }
@@ -1719,9 +1734,9 @@ body.easter-glass .home-viewport::after {
 
 body[data-magnifier="square"] .magnifier-lens { border-radius: 18px; }
 body[data-magnifier-size="small"] .magnifier-lens { width: 180px; height: 180px; }
-body[data-magnifier-size="normal"] .magnifier-lens { width: 250px; height: 250px; }
-body[data-magnifier-size="big"] .magnifier-lens { width: 340px; height: 340px; }
-body[data-magnifier-size="huge"] .magnifier-lens { width: 500px; height: 500px; }
+body[data-magnifier-size="normal"] .magnifier-lens { width: 260px; height: 260px; }
+body[data-magnifier-size="big"] .magnifier-lens { width: 380px; height: 380px; }
+body[data-magnifier-size="huge"] .magnifier-lens { width: 700px; height: 700px; }
 
 /* Level badge clickable hint */
 .hud-level-badge {
