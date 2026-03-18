@@ -58,6 +58,17 @@ function makeAdvancedBonusLevel(number, targets, overrides = {}) {
   };
 }
 
+function makeSpecialLevel(number, targets, overrides = {}) {
+  return {
+    id: `special-${String(number).padStart(2, "0")}`,
+    name: `Special ${number}`,
+    background: `Assets/Bakgrounds/Special/sl${number}.png`,
+    targets,
+    isSpecial: true,
+    ...overrides,
+  };
+}
+
 function makePlaceholderTarget(id) {
   return makeTarget(id, "", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced");
 }
@@ -91,6 +102,7 @@ export const START_SCREEN_LAYERS = {
   wheelStand: { x1: 1055, y1: 171, x2: 1189, y2: 271, color: "orange", src: "Assets/ui/WheelStand.png" },
   wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
   magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, color: "red", src: "Assets/ui/mglassempty.png" },
+  magnifierFaces: { x1: 560, y1: 361, x2: 958, y2: 647, color: "gold", src: "Assets/ui/startscreenfaces.png" },
 };
 // uh783kjs9tya8tji3chq8ugajskaere9h3v198jk
 
@@ -347,8 +359,9 @@ for (let number = 18; number <= 20; number += 1) {
 export const MAIN_LEVELS = MAIN_LEVELS_RAW.map(normalizeLevel);
 export const BONUS_LEVELS = BONUS_LEVELS_RAW.map(normalizeLevel);
 export const ADVANCED_LEVELS = ADVANCED_LEVELS_RAW.map(normalizeLevel);
+export const SPECIAL_LEVELS = [];
 
-export const LEVELS = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_LEVELS];
+export const LEVELS = [...MAIN_LEVELS, ...BONUS_LEVELS, ...ADVANCED_LEVELS, ...SPECIAL_LEVELS];
 
 export const DEFAULT_SETTINGS = {
   correctClickPoints: 1200,

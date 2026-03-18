@@ -457,6 +457,7 @@ function getHomeElement(game, key) {
     wheelStand: game.elements.wheelStandLayer,
     wheel: game.elements.wheelLayer,
     magnifierDecor: game.elements.magnifierDecorLayer,
+    magnifierFaces: game.elements.magnifierFacesLayer,
   };
   return map[key] ?? null;
 }

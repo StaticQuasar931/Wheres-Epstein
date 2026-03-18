@@ -1,4 +1,4 @@
-import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS, START_SCREEN_LAYERS } from "./levels.js";
+import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, SPECIAL_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS, START_SCREEN_LAYERS } from "./levels.js";
 import { loadSave, recordLevelResult, recordLevelView, recordSpeedrunResult, saveSettings, saveMeta } from "./storage.js";
 import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
@@ -16,9 +16,9 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.0";
-const HOME_BUTTON_STAGGER_MS = 260;
-const HOME_BUTTON_ANIMATION_MS = 1320;
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.3.2";
+const HOME_BUTTON_STAGGER_MS = 320;
+const HOME_BUTTON_ANIMATION_MS = 1680;
 const HOME_BUTTON_X_OFFSET = 0;
 const HOME_BUTTON_Y_OFFSET = 0;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
@@ -37,17 +37,11 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Start screen now loads the background first, then decorative art, then the menu buttons.",
-  "Cloud layers drift across the menu, the ferris wheel spins, and the title and magnifying glass float lightly.",
-  "The version label now opens a proper changelog window.",
-  "The hidden title link follows the title banner motion so it stays paired correctly.",
-  "Cheat tools now open behind a stricter Alt-click flow instead of exposing everything immediately.",
-];
-
-const CHANGELOG_PRIVATE_NOTES = [
-  "Home editor now supports layered decorative art including the airball placeholder.",
-  "Cheat tools can be enabled individually for level hitboxes, start hitboxes, editor mode, and run cheats.",
-  "Alt-clicking the confirm button while entering the diagnostic code enables every cheat toggle at once.",
+  "Start screen visuals are now staged more cleanly, with the background appearing first and the decorative layers following in sequence.",
+  "Cloud motion, ferris wheel spin, balloon drift, and menu fades were polished to feel smoother and more alive.",
+  "The magnifying glass face layer is now supported as part of the start screen stack.",
+  "The version label opens a larger changelog window with cleaner public notes.",
+  "The home scene now uses softened edge fills so the menu art blends better into widescreen layouts.",
 ];
 
 const ADVANCED_MAIN_LEVELS = ADVANCED_LEVELS.filter((level) => !level.isAdvancedBonus);
@@ -124,6 +118,7 @@ export class HiddenObjectGame {
     this.homeBootStarted = false;
     this.homeDecorReady = false;
     this.homeButtonsReady = false;
+    this.homeDecorStarted = false;
     this.homeAnimationFrame = null;
     this.speedrunRecentIds = [];
     this.homeButtonEditorEnabled = false;
@@ -294,12 +289,6 @@ export class HiddenObjectGame {
     if (this.elements.changelogPublicList) {
       this.elements.changelogPublicList.innerHTML = CHANGELOG_PUBLIC_NOTES.map((item) => `<li>${item}</li>`).join("");
     }
-    if (this.elements.changelogPrivateList) {
-      this.elements.changelogPrivateList.innerHTML = CHANGELOG_PRIVATE_NOTES.map((item) => `<li>${item}</li>`).join("");
-    }
-    if (this.elements.changelogPrivateSection) {
-      this.elements.changelogPrivateSection.classList.toggle("hidden", !this.sessionTestingUnlocked);
-    }
   }
 
   openChangelog() {
@@ -454,6 +443,7 @@ export class HiddenObjectGame {
       wheelStandLayer: document.getElementById("wheelStandLayer"),
       wheelLayer: document.getElementById("wheelLayer"),
       magnifierDecorLayer: document.getElementById("magnifierDecorLayer"),
+      magnifierFacesLayer: document.getElementById("magnifierFacesLayer"),
       homeEditorPanel: document.getElementById("homeEditorPanel"),
       homeEditorSelectionLabel: document.getElementById("homeEditorSelectionLabel"),
       homeEditorCoords: document.getElementById("homeEditorCoords"),
@@ -494,6 +484,7 @@ export class HiddenObjectGame {
       speedrunFastestText: document.getElementById("speedrunFastestText"),
       speedrunLastPickText: document.getElementById("speedrunLastPickText"),
       speedrunRecentStrip: document.getElementById("speedrunRecentStrip"),
+      specialLevelsStatusText: document.getElementById("specialLevelsStatusText"),
       levelSelectPageLabel: document.getElementById("levelSelectPageLabel"),
       levelSelectPrevPageButton: document.getElementById("levelSelectPrevPageButton"),
       levelSelectNextPageButton: document.getElementById("levelSelectNextPageButton"),
@@ -599,8 +590,6 @@ export class HiddenObjectGame {
       changelogOverlay: document.getElementById("changelogOverlay"),
       changelogTitle: document.getElementById("changelogTitle"),
       changelogPublicList: document.getElementById("changelogPublicList"),
-      changelogPrivateSection: document.getElementById("changelogPrivateSection"),
-      changelogPrivateList: document.getElementById("changelogPrivateList"),
       closeChangelogButton: document.getElementById("closeChangelogButton"),
       menuToast: document.getElementById("menuToast"),
     };
@@ -641,6 +630,9 @@ export class HiddenObjectGame {
     this.elements.settingsDiscordButton.addEventListener("click", () => this.openExternalLink(DISCORD_URL, "Add your Discord invite URL in scripts/game.js to enable this button."));
     this.elements.settingsMoreGamesButton.addEventListener("click", () => this.openExternalLink(MORE_GAMES_URL, "More Games link is not configured yet."));
     this.elements.settingsLevelSelectButton.addEventListener("click", () => this.showScreen("levelSelect"));
+    bind(this.elements.wheelLayer, "click", () => this.triggerHomeWheelRush());
+    bind(this.elements.airballLayer, "click", () => this.triggerHomeAirballBoost());
+    bind(this.elements.magnifierFacesLayer, "click", () => this.triggerHomeFacesFlash());
     this.elements.levelSelectPrevPageButton.addEventListener("click", () => this.changeLevelSelectPage(-1));
     this.elements.levelSelectNextPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
     this.elements.levelSelectThirdPageButton.addEventListener("click", () => this.changeLevelSelectPage(1));
@@ -803,8 +795,6 @@ export class HiddenObjectGame {
     if (name === "home" && this.homeAssetsReady && this.elements.startScreenImage.naturalWidth > 0) {
       this.playHomeButtonIntro();
       this.startHomeDecorAnimations();
-    } else if (name !== "home") {
-      this.stopHomeDecorAnimations();
     }
   }
 
@@ -823,6 +813,7 @@ export class HiddenObjectGame {
       ["wheelStand", this.elements.wheelStandLayer, START_SCREEN_LAYERS.wheelStand.src],
       ["wheel", this.elements.wheelLayer, START_SCREEN_LAYERS.wheel.src],
       ["magnifierDecor", this.elements.magnifierDecorLayer, START_SCREEN_LAYERS.magnifierDecor.src],
+      ["magnifierFaces", this.elements.magnifierFacesLayer, START_SCREEN_LAYERS.magnifierFaces.src],
       ["start", this.elements.startButtonArt, "Assets/ui/startbutton.png"],
       ["settings", this.elements.settingsButtonArt, "Assets/ui/settingsbutton.png"],
       ["moreGames", this.elements.moreGamesButtonArt, "Assets/ui/moregbutton.png"],
@@ -830,6 +821,7 @@ export class HiddenObjectGame {
     this.homeAssetsReady = false;
     this.homeDecorReady = false;
     this.homeButtonsReady = false;
+    this.homeDecorStarted = false;
     this.stopHomeDecorAnimations();
     this.elements.homeViewport.classList.remove("home-background-ready", "home-decor-ready", "home-buttons-ready", "home-animating", "home-ready");
     this.elements.homeBootOverlay.classList.remove("hidden", "is-exiting");
@@ -948,6 +940,11 @@ export class HiddenObjectGame {
       ? `Last random pick: ${this.getDisplayLabelForLevelId(speedrun.lastLevelId)}`
       : "Last random pick: none yet.";
     this.renderSpeedrunRecentStrip(speedrun.recentLevelIds ?? []);
+    if (this.elements.specialLevelsStatusText) {
+      this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
+        ? `${SPECIAL_LEVELS.length} special levels are currently authored.`
+        : "No special levels authored yet.";
+    }
     this.elements.settingsMainClearsText.textContent = `${mainCleared} / ${MAIN_LEVELS.length}`;
     this.elements.settingsAdvancedClearsText.textContent = `${advancedCleared} / ${AUTHORED_ADVANCED_MAIN_LEVELS.length}`;
     this.elements.settingsTotalViewsText.textContent = String(totalViews);
@@ -1470,15 +1467,18 @@ export class HiddenObjectGame {
   }
 
   startHomeDecorAnimations() {
-    if (!this.homeDecorReady || this.homeButtonEditorEnabled || this.elements.body.dataset.motion === "reduced") {
+    if (this.homeDecorStarted || !this.homeDecorReady || this.homeButtonEditorEnabled) {
       this.stopHomeDecorAnimations();
       return;
     }
+    this.homeDecorStarted = true;
     this.elements.homeViewport.classList.add("home-animating");
   }
 
   stopHomeDecorAnimations() {
-    this.elements.homeViewport.classList.remove("home-animating");
+    if (!this.homeDecorStarted) {
+      this.elements.homeViewport.classList.remove("home-animating");
+    }
   }
 
   playHomeButtonIntro() {
@@ -2088,6 +2088,7 @@ export class HiddenObjectGame {
       wheelStand: this.elements.wheelStandLayer,
       wheel: this.elements.wheelLayer,
       magnifierDecor: this.elements.magnifierDecorLayer,
+      magnifierFaces: this.elements.magnifierFacesLayer,
     };
     return map[key] ?? null;
   }
@@ -2529,7 +2530,7 @@ export class HiddenObjectGame {
       this.elements.magnifierLens.style.visibility = "hidden";
       return;
     }
-    const { localX, localY } = precisePoint;
+    const { localX, localY, x, y } = precisePoint;
     const lensWidth = this.elements.magnifierLens.offsetWidth || 240;
     const lensHeight = this.elements.magnifierLens.offsetHeight || 240;
     const zoom = this.state.magnifier.zoom;
@@ -2541,7 +2542,40 @@ export class HiddenObjectGame {
     this.elements.magnifierLens.style.top = `${localY}px`;
     this.elements.magnifierLens.style.backgroundImage = `url("${this.elements.levelImage.currentSrc || this.elements.levelImage.src}")`;
     this.elements.magnifierLens.style.backgroundSize = `${this.state.naturalWidth * bgScale}px ${this.state.naturalHeight * bgScale}px`;
-    this.elements.magnifierLens.style.backgroundPosition = `${(lensWidth / 2) - (localX * zoom)}px ${(lensHeight / 2) - (localY * zoom)}px`;
+    this.elements.magnifierLens.style.backgroundPosition = `${(lensWidth / 2) - (x * bgScale)}px ${(lensHeight / 2) - (y * bgScale)}px`;
+  }
+
+  triggerHomeWheelRush() {
+    this.elements.homeViewport.classList.remove("easter-wheelrush");
+    void this.elements.homeViewport.offsetWidth;
+    this.elements.homeViewport.classList.add("easter-wheelrush");
+    this.showMenuToast("Wheel rush.");
+    window.clearTimeout(this.homeWheelRushTimerId);
+    this.homeWheelRushTimerId = window.setTimeout(() => {
+      this.elements.homeViewport.classList.remove("easter-wheelrush");
+    }, 9000);
+  }
+
+  triggerHomeAirballBoost() {
+    this.elements.homeViewport.classList.remove("easter-airmail");
+    void this.elements.homeViewport.offsetWidth;
+    this.elements.homeViewport.classList.add("easter-airmail");
+    this.showMenuToast("Air mail.");
+    window.clearTimeout(this.homeAirballTimerId);
+    this.homeAirballTimerId = window.setTimeout(() => {
+      this.elements.homeViewport.classList.remove("easter-airmail");
+    }, 9000);
+  }
+
+  triggerHomeFacesFlash() {
+    this.elements.homeViewport.classList.remove("easter-photo");
+    void this.elements.homeViewport.offsetWidth;
+    this.elements.homeViewport.classList.add("easter-photo");
+    this.showMenuToast("Photo plate.");
+    window.clearTimeout(this.homeFacesTimerId);
+    this.homeFacesTimerId = window.setTimeout(() => {
+      this.elements.homeViewport.classList.remove("easter-photo");
+    }, 7000);
   }
 
   updateDebugReadout() {

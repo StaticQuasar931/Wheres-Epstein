@@ -87,8 +87,9 @@ body[data-density="compact"] { --shell-padding: 0.65rem; }
 body[data-motion="reduced"] *,
 body[data-motion="reduced"] *::before,
 body[data-motion="reduced"] *::after {
-  animation: none !important;
-  transition-duration: 1ms !important;
+  animation-duration: 1.8s !important;
+  animation-timing-function: ease-out !important;
+  transition-duration: 140ms !important;
 }
 
 /* ============================================================
@@ -699,6 +700,14 @@ body.mode-game .site-topbar { display: flex; }
   z-index: 6;
 }
 
+#magnifierFacesLayer {
+  z-index: 7;
+}
+
+.home-decor-clickable {
+  pointer-events: auto;
+}
+
 .home-button-overlay {
   pointer-events: none;
   overflow: visible;
@@ -1266,6 +1275,25 @@ body.mode-game .site-topbar { display: flex; }
 .speedrun-card   { display: grid; gap: 1rem; }
 .speedrun-button { justify-self: start; }
 .speedrun-stats  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.speedrun-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+  gap: 1rem;
+  align-items: start;
+}
+.speedrun-card-primary {
+  min-height: 100%;
+}
+.speedrun-sidecards {
+  display: grid;
+  gap: 1rem;
+}
+.speedrun-mini-card h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.24rem;
+  letter-spacing: 0.04em;
+}
 
 /* ============================================================
    SETTINGS
@@ -1390,6 +1418,32 @@ body[data-theme="dark"] .setting-card,
 body[data-theme="dark"] .stat-card,
 body[data-theme="dark"] .level-card  { border-color: rgba(255,255,255,0.12); }
 
+body[data-theme="ocean"] {
+  --panel: rgba(8, 26, 42, 0.88);
+  --panel-strong: rgba(6, 18, 30, 0.94);
+  --text: #e9f7ff;
+  --text-bright: #ffffff;
+  --muted: #8dbfd8;
+  --muted-hi: #bfdbe9;
+  --accent: #67d4ff;
+  --accent-2: #59b8ff;
+  --line-mid: rgba(137, 208, 255, 0.24);
+  --line-hi: rgba(137, 208, 255, 0.42);
+}
+
+body[data-theme="sunset"] {
+  --panel: rgba(42, 18, 16, 0.88);
+  --panel-strong: rgba(32, 10, 12, 0.94);
+  --text: #fff2eb;
+  --text-bright: #ffffff;
+  --muted: #e0ae97;
+  --muted-hi: #f3c8b3;
+  --accent: #ff9b53;
+  --accent-2: #ffd166;
+  --line-mid: rgba(255, 177, 112, 0.24);
+  --line-hi: rgba(255, 177, 112, 0.42);
+}
+
 body[data-theme="dark"] .setting-card select,
 body[data-theme="dark"] .diagnostic-row input { background: rgba(255,255,255,0.10); color: #f2f9ff; }
 
@@ -1445,6 +1499,18 @@ body.easter-glass .home-viewport::after {
   backdrop-filter: blur(2px);
 }
 
+.home-viewport.easter-wheelrush #wheelLayer {
+  animation-duration: 8s !important;
+}
+
+.home-viewport.easter-airmail #airballLayer {
+  animation-duration: 5.8s !important;
+}
+
+.home-viewport.easter-photo #magnifierFacesLayer {
+  filter: saturate(1.18) brightness(1.08) sepia(0.12);
+}
+
 /* ============================================================
    GAMEPLAY SCREEN
    ============================================================ */
@@ -1457,7 +1523,7 @@ body.easter-glass .home-viewport::after {
 
 .changelog-columns {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   text-align: left;
 }
@@ -1465,7 +1531,12 @@ body.easter-glass .home-viewport::after {
 .changelog-columns h3 {
   margin: 0 0 0.4rem;
   font-family: var(--font-display, inherit);
-  font-size: 1.1rem;
+  font-size: 1.5rem;
+}
+
+.changelog-card .control-list {
+  font-size: 0.98rem;
+  line-height: 1.62;
 }
 
 .scene-viewport {
