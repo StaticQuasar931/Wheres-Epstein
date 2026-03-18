@@ -739,7 +739,7 @@ body.mode-game .site-topbar { display: flex; }
   appearance: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  z-index: 3;
+  z-index: 4;
   transition: box-shadow 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 .image-button:focus-visible {
@@ -1718,9 +1718,10 @@ body.easter-glass .home-viewport::after {
 }
 
 body[data-magnifier="square"] .magnifier-lens { border-radius: 18px; }
-body[data-magnifier-size="normal"] .magnifier-lens { width: 220px; height: 220px; }
-body[data-magnifier-size="large"] .magnifier-lens { width: 270px; height: 270px; }
-body[data-magnifier-size="huge"] .magnifier-lens { width: 340px; height: 340px; }
+body[data-magnifier-size="small"] .magnifier-lens { width: 180px; height: 180px; }
+body[data-magnifier-size="normal"] .magnifier-lens { width: 250px; height: 250px; }
+body[data-magnifier-size="big"] .magnifier-lens { width: 340px; height: 340px; }
+body[data-magnifier-size="huge"] .magnifier-lens { width: 500px; height: 500px; }
 
 /* Level badge clickable hint */
 .hud-level-badge {

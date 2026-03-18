@@ -42,6 +42,7 @@
 /* Hovered — lift + gold glow */
 .home-button-art.is-hovered,
 .image-button:focus-visible + .home-button-art {
+  animation: none;
   filter:
     drop-shadow(0 18px 30px rgba(0, 0, 0, 0.30))
     drop-shadow(0 0 16px rgba(255, 216, 78, 0.16))
@@ -71,6 +72,7 @@
 }
 
 .home-button-art.is-pressed {
+  animation: none;
   transform: translateY(2px) scale(0.985);
   filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.34));
 }
@@ -386,23 +388,19 @@ body.easter-arcade .result-star--filled {
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #cloud1Layer {
-  animation: layer-fade-in 420ms ease 980ms both, cloud-drift-1 74s linear infinite !important;
-  animation-delay: 980ms, -8s !important;
+  animation: layer-fade-in 520ms ease 980ms both !important;
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #cloud2Layer {
-  animation: layer-fade-in 420ms ease 980ms both, cloud-drift-2 88s linear infinite !important;
-  animation-delay: 980ms, -28s !important;
+  animation: layer-fade-in 520ms ease 980ms both !important;
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #cloud3Layer {
-  animation: layer-fade-in 420ms ease 980ms both, cloud-drift-3 102s linear infinite !important;
-  animation-delay: 980ms, -42s !important;
+  animation: layer-fade-in 520ms ease 980ms both !important;
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #wheelLayer {
-  animation: layer-fade-in 340ms ease 760ms both, ferris-spin 96s linear infinite !important;
-  animation-delay: 760ms, 760ms !important;
+  animation: layer-fade-in 420ms ease 760ms both !important;
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #wheelStandLayer,

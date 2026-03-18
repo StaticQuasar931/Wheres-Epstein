@@ -1,6 +1,6 @@
 import { LEVELS, MAIN_LEVELS, BONUS_LEVELS, ADVANCED_LEVELS, SPECIAL_LEVELS, DEFAULT_SETTINGS, START_SCREEN_BUTTONS, START_SCREEN_LAYERS } from "./levels.js";
 import { loadSave, recordLevelResult, recordLevelView, recordSpeedrunResult, saveSettings, saveMeta } from "./storage.js";
-import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
+import { layoutHomeButtons as layoutHomeButtonsUi, bindHomeButtonHoverEffects, playHomeButtonIntro as playHomeButtonIntroUi, settleHomeButtonIntro as settleHomeButtonIntroUi, updateHomeDebug as updateHomeDebugUi } from "./home-ui.js";
 import { showMenuToast as showMenuToastUi, renderPreviewList as renderPreviewListUi, syncFoundPreviewState as syncFoundPreviewStateUi, renderHitboxes as renderHitboxesUi } from "./game-renderer.js";
 // 7hgasd87f6gas8d76f8g7as6d8f7g6asd8f7g
 
@@ -17,8 +17,8 @@ const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
 const VERSION_LABEL = "Alpha Version 0.0.0.1.2.3.4";
-const HOME_BUTTON_STAGGER_MS = 320;
-const HOME_BUTTON_ANIMATION_MS = 1680;
+const HOME_BUTTON_STAGGER_MS = 400;
+const HOME_BUTTON_ANIMATION_MS = 1960;
 const HOME_BUTTON_X_OFFSET = 0;
 const HOME_BUTTON_Y_OFFSET = 0;
 const HOME_BUTTON_ALPHA_THRESHOLD = 96;
@@ -37,9 +37,10 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Reduced motion now trims back decorative motion instead of replaying every animation at full strength.",
-  "The start screen now keeps its big intro to the first boot instead of replaying it every time you return home.",
-  "Cloud motion, ferris wheel spin, balloon drift, and the magnifying-glass face layer were smoothed out again.",
+  "Reduced motion now keeps the start screen mostly still instead of running the full decorative movement set.",
+  "The start screen intro now stays tied to first boot, with slower first-load fades and button rise-in timing.",
+  "Home button hover and press states were repaired so the three main buttons react properly again.",
+  "Magnifier size presets were rebuilt into Small, Normal, Big, and Huge, with Normal as the default.",
   "Page Three was expanded into a fuller extras page with more route buttons and better future support.",
   "The changelog stays focused on public-facing updates only.",
 ];
@@ -62,6 +63,16 @@ function formatTime(ms) {
 
 function averageOrZero(total, count) {
   return count > 0 ? total / count : 0;
+}
+
+function normalizeMagnifierSize(value) {
+  if (value === "large") {
+    return "big";
+  }
+  if (["small", "normal", "big", "huge"].includes(value)) {
+    return value;
+  }
+  return "normal";
 }
 
 function getTotalStars(bucket) {
@@ -120,6 +131,7 @@ export class HiddenObjectGame {
     this.homeButtonsReady = false;
     this.homeDecorStarted = false;
     this.homeAnimationFrame = null;
+    this.homeIntroInProgress = false;
     this.speedrunRecentIds = [];
     this.homeButtonEditorEnabled = false;
     this.homeButtonEditorSelection = "start";
@@ -664,7 +676,7 @@ export class HiddenObjectGame {
     [this.elements.startButtonArt, this.elements.settingsButtonArt, this.elements.moreGamesButtonArt].forEach((image) => {
       image.addEventListener("load", () => {
         this.layoutHomeButtons();
-        if (this.homeAssetsReady) {
+        if (this.homeAssetsReady && !this.homeIntroPlayed) {
           this.playHomeButtonIntro();
         }
       });
@@ -735,14 +747,15 @@ export class HiddenObjectGame {
     if (this.elements.previewDefaultSelect) this.elements.previewDefaultSelect.value = this.save.settings.previewDefault;
     if (this.elements.foundFxSelect) this.elements.foundFxSelect.value = this.save.settings.foundFx;
     if (this.elements.magnifierShapeSelect) this.elements.magnifierShapeSelect.value = this.save.settings.magnifierShape ?? "circle";
-    if (this.elements.magnifierSizeSelect) this.elements.magnifierSizeSelect.value = this.save.settings.magnifierSize ?? "large";
+    const magnifierSize = normalizeMagnifierSize(this.save.settings.magnifierSize);
+    if (this.elements.magnifierSizeSelect) this.elements.magnifierSizeSelect.value = magnifierSize;
     this.elements.body.dataset.theme = this.save.settings.theme;
     this.elements.body.dataset.density = this.save.settings.density;
     this.elements.body.dataset.motion = this.save.settings.motion;
     this.elements.body.dataset.preview = this.save.settings.previewSize;
     this.elements.body.dataset.foundfx = this.save.settings.foundFx;
     this.elements.body.dataset.magnifier = this.save.settings.magnifierShape ?? "circle";
-    this.elements.body.dataset.magnifierSize = this.save.settings.magnifierSize ?? "large";
+    this.elements.body.dataset.magnifierSize = magnifierSize;
     this.elements.panTipText.classList.toggle("hidden", this.save.settings.showPanTip === "off");
     this.elements.skipLevelButton.classList.toggle("hidden", !this.isRunCheatEnabled());
     this.elements.settingsDiscordButton.disabled = !DISCORD_URL;
@@ -768,7 +781,7 @@ export class HiddenObjectGame {
       previewDefault: this.elements.previewDefaultSelect?.value ?? this.save.settings.previewDefault,
       foundFx: this.elements.foundFxSelect?.value ?? this.save.settings.foundFx,
       magnifierShape: this.elements.magnifierShapeSelect?.value ?? (this.save.settings.magnifierShape ?? "circle"),
-      magnifierSize: this.elements.magnifierSizeSelect?.value ?? (this.save.settings.magnifierSize ?? "large"),
+      magnifierSize: normalizeMagnifierSize(this.elements.magnifierSizeSelect?.value ?? this.save.settings.magnifierSize),
     });
     this.applySettings();
   }
@@ -865,13 +878,13 @@ export class HiddenObjectGame {
           this.homeDecorReady = true;
           this.elements.homeViewport.classList.add("home-decor-ready");
           this.startHomeDecorAnimations(true);
-        }, 180);
+        }, 260);
         window.setTimeout(() => {
           this.homeButtonsReady = true;
           this.elements.homeViewport.classList.add("home-buttons-ready", "home-ready");
           this.playHomeButtonIntro();
-        }, 520);
-      }, 620);
+        }, 760);
+      }, 760);
     });
   }
 
@@ -1547,6 +1560,19 @@ export class HiddenObjectGame {
     playHomeButtonIntroUi(this, HOME_BUTTON_ANIMATION_MS, HOME_BUTTON_STAGGER_MS);
   }
 
+  skipHomeIntroSequence() {
+    if (!this.homeAssetsReady) {
+      return;
+    }
+    this.elements.homeBootOverlay.classList.add("hidden");
+    this.elements.homeBootOverlay.classList.remove("is-exiting");
+    this.elements.homeViewport.classList.add("home-background-ready", "home-decor-ready", "home-buttons-ready", "home-ready");
+    this.homeDecorReady = true;
+    this.homeButtonsReady = true;
+    this.startHomeDecorAnimations(true);
+    settleHomeButtonIntroUi(this);
+  }
+
   isUiEventTarget(target) {
     return Boolean(target?.closest?.("button, select, input, .play-topbar, .target-card, .play-stats, .modal-card"));
   }
@@ -1860,6 +1886,47 @@ export class HiddenObjectGame {
       event.preventDefault();
       this.toggleHomeButtonEditor();
       return;
+    }
+    if (this.elements.screens.home.classList.contains("screen-active")) {
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (!this.elements.homeBootOverlay.classList.contains("hidden") || this.homeIntroInProgress) {
+          this.skipHomeIntroSequence();
+        } else {
+          this.elements.startGameButton.click();
+        }
+        return;
+      }
+      if (key === "enter") {
+        event.preventDefault();
+        this.elements.startGameButton.click();
+        return;
+      }
+      if (key === "1") {
+        event.preventDefault();
+        this.elements.startGameButton.click();
+        return;
+      }
+      if (key === "2") {
+        event.preventDefault();
+        this.elements.openSettingsButton.click();
+        return;
+      }
+      if (key === "3") {
+        event.preventDefault();
+        this.elements.moreGamesButton.click();
+        return;
+      }
+      if (key === "s") {
+        event.preventDefault();
+        this.elements.openSettingsButton.click();
+        return;
+      }
+      if (key === "m") {
+        event.preventDefault();
+        this.elements.moreGamesButton.click();
+        return;
+      }
     }
     if (this.homeButtonEditorEnabled && this.elements.screens.home.classList.contains("screen-active")) {
       if (["1", "2", "3"].includes(key)) {
@@ -2585,6 +2652,7 @@ export class HiddenObjectGame {
     this.state.magnifier.persistent = persistent;
     this.elements.magnifierLens.classList.remove("hidden");
     this.elements.magnifierLens.style.visibility = "visible";
+    this.elements.magnifierLens.style.willChange = "left, top, background-position, background-size";
     this.updateMagnifier(clientX, clientY);
   }
 
@@ -2617,6 +2685,7 @@ export class HiddenObjectGame {
     this.elements.magnifierLens.style.backgroundImage = `url("${this.elements.levelImage.currentSrc || this.elements.levelImage.src}")`;
     this.elements.magnifierLens.style.backgroundSize = `${this.state.naturalWidth * bgScale}px ${this.state.naturalHeight * bgScale}px`;
     this.elements.magnifierLens.style.backgroundPosition = `${(lensWidth / 2) - (x * bgScale)}px ${(lensHeight / 2) - (y * bgScale)}px`;
+    this.elements.magnifierLens.style.backgroundRepeat = "no-repeat";
   }
 
   triggerHomeWheelRush() {

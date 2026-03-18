@@ -147,6 +147,7 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
   }
 
   if (game.homeIntroPlayed) {
+    game.homeIntroInProgress = false;
     artLayers.forEach((layer) => {
       layer.classList.remove("is-prepping", "is-entering");
       layer.classList.add("is-settled");
@@ -181,7 +182,38 @@ export function playHomeButtonIntro(game, animationMs, staggerMs) {
     game.homeAnimationTimers.push(timerId);
   });
   scheduleIntroSheenSequence(game, sheenLayers, introAnimationMs, introStaggerMs);
+  game.homeIntroInProgress = true;
+  const finishId = window.setTimeout(() => {
+    game.homeIntroInProgress = false;
+  }, ((artLayers.length - 1) * introStaggerMs) + introAnimationMs + 40);
+  game.homeAnimationTimers.push(finishId);
   game.homeIntroPlayed = true;
+}
+
+export function settleHomeButtonIntro(game) {
+  clearHomeAnimationTimers(game);
+  const artLayers = [
+    game.elements.startButtonArt,
+    game.elements.settingsButtonArt,
+    game.elements.moreGamesButtonArt,
+  ];
+  const sheenLayers = [
+    game.elements.startButtonSheen,
+    game.elements.settingsButtonSheen,
+    game.elements.moreGamesButtonSheen,
+  ];
+
+  artLayers.forEach((layer) => {
+    layer.classList.remove("is-prepping", "is-entering", "is-pressed");
+    layer.classList.add("is-settled");
+  });
+  sheenLayers.forEach((layer) => {
+    layer.classList.remove("is-pressed", "is-glinting");
+    layer.classList.add("is-settled");
+  });
+  game.homeIntroPlayed = true;
+  game.homeIntroInProgress = false;
+  scheduleLoopingSheenSequence(game, sheenLayers, 0);
 }
 
 export function updateHomeDebug(game, event, config) {
