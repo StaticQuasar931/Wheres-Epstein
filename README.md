@@ -1,6 +1,6 @@
 # Where's Epstein?
 
-Where's Epstein? is a browser hidden-object game built with plain HTML, CSS, and JavaScript. The game includes a cinematic start screen, main levels, bonus levels, advanced multi-target levels, mirrored runs, upsideown runs, speedrun routes, and special-level slots for future event content.
+Where's Epstein? is a browser hidden-object game built with plain HTML, CSS, and JavaScript. The game includes a cinematic start screen, main levels, bonus levels, advanced multi-target levels, mirrored runs, Upside Down runs, speedrun routes, and special-level slots for future event content.
 
 ## What the game includes
 
@@ -8,7 +8,7 @@ Where's Epstein? is a browser hidden-object game built with plain HTML, CSS, and
 - Bonus levels with separate unlock logic
 - Advanced levels with two-target scenes
 - Advanced bonus levels
-- Extras page with speedrun routes, mirror mode, upsideown mode, and special-level slots
+- Extras page with speedrun routes, mirror mode, Upside Down mode, and special-level slots
 - In-level magnifier tool
 - Local save data for score, stars, progress, and settings
 - Theme, motion, magnifier, and preload settings
@@ -101,7 +101,7 @@ When cheat tools are enabled, the home editor can:
 
 ## Important gameplay notes
 
-- Mirror and upsideown variants do not overwrite standard progress
+- Mirror and Upside Down variants do not overwrite standard progress
 - Level Clearance is an unlock-only cheat mode intended for authored-level testing
 - Full cheat tools still separate cheated runs from normal runs
 - Missing art produces readable fallback messages instead of silently failing

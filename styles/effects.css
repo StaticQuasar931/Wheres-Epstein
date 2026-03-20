@@ -41,7 +41,7 @@
   transform-origin: center center;
   animation: home-idle-glow 3s ease-in-out infinite;
   animation-play-state: paused;
-  transition: transform 220ms cubic-bezier(0.2, 0.72, 0.18, 1), filter 220ms ease;
+  transition: transform 260ms cubic-bezier(0.18, 0.8, 0.2, 1), filter 240ms ease;
 }
 
 /* Hovered — lift + gold glow */
@@ -51,10 +51,10 @@
   animation: none;
   filter:
     drop-shadow(0 18px 30px rgba(0, 0, 0, 0.30))
-    drop-shadow(0 0 22px rgba(255, 216, 78, 0.28))
+    drop-shadow(0 0 24px rgba(255, 216, 78, 0.28))
     brightness(1.08)
     saturate(1.12);
-  transform: translateY(0) scale(1.05);
+  transform: translateY(-2px) scale(1.045);
 }
 
 .home-button-art.is-prepping {
@@ -79,13 +79,13 @@
 .home-button-art.is-settled.is-hovered,
 .image-button:hover + .home-button-art.is-settled,
 .image-button:focus-visible + .home-button-art.is-settled {
-  transform: translateY(0) scale(1.05);
+  transform: translateY(-2px) scale(1.045);
 }
 
 .home-button-art.is-pressed {
   animation: none;
-  transform: translateY(2px) scale(0.985);
-  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.34));
+  transform: translateY(1px) scale(0.988);
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.34)) brightness(0.98);
 }
 
 /* ============================================================
@@ -100,7 +100,7 @@
   border-radius: 24px;
   opacity: 0;
   transform: translateY(var(--home-enter-offset, 140%));
-  transition: opacity 240ms ease, transform 240ms ease;
+  transition: opacity 260ms ease, transform 260ms ease;
 }
 
 .home-button-sheen::before {
@@ -150,20 +150,20 @@
 .home-viewport.home-animating #homeNameButton,
 .home-viewport.home-animating .home-debug-box[data-editor-key="titleBanner"],
 .home-viewport.home-animating .home-debug-box[data-editor-key="nameLink"] {
-  animation: layer-fade-in 1880ms cubic-bezier(0.18, 0.82, 0.2, 1) 360ms both, title-float 18.5s cubic-bezier(0.28, 0.1, 0.22, 1) infinite;
-  animation-delay: 360ms, 2850ms;
+  animation: layer-fade-in 2020ms cubic-bezier(0.18, 0.82, 0.2, 1) 420ms both, title-float 20.8s cubic-bezier(0.28, 0.1, 0.22, 1) infinite;
+  animation-delay: 420ms, 3200ms;
 }
 
 .home-viewport.home-animating #magnifierDecorLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="magnifierDecor"] {
-  animation: layer-fade-in 1320ms cubic-bezier(0.18, 0.82, 0.2, 1) 900ms both, magnifier-float 13.2s ease-in-out infinite;
-  animation-delay: 900ms, 2500ms;
+  animation: layer-fade-in 1480ms cubic-bezier(0.18, 0.82, 0.2, 1) 1080ms both, magnifier-float 14.8s ease-in-out infinite;
+  animation-delay: 1080ms, 2860ms;
 }
 
 .home-viewport.home-animating #magnifierFacesLayer {
   transform-origin: center center;
-  animation: faces-fade-in 1240ms cubic-bezier(0.18, 0.82, 0.2, 1) 1460ms both, magnifier-float-faces 13.2s ease-in-out infinite;
-  animation-delay: 1460ms, 2500ms;
+  animation: faces-fade-in 1380ms cubic-bezier(0.18, 0.82, 0.2, 1) 1680ms both, magnifier-float-faces 14.8s ease-in-out infinite;
+  animation-delay: 1680ms, 2860ms;
 }
 
 .home-viewport.home-animating #wheelStandLayer {
@@ -177,14 +177,14 @@
 
 .home-viewport.home-animating #blimpLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="blimp"] {
-  animation: layer-fade-in 1560ms ease 2220ms both, blimp-float 33s cubic-bezier(0.28, 0.08, 0.22, 1) infinite alternate;
-  animation-delay: 2220ms, 3860ms;
+  animation: layer-fade-in 1680ms ease 2340ms both, blimp-float 36s cubic-bezier(0.28, 0.08, 0.22, 1) infinite alternate;
+  animation-delay: 2340ms, 4100ms;
 }
 
 .home-viewport.home-animating #airballLayer,
 .home-viewport.home-animating .home-debug-box[data-editor-key="airball"] {
-  animation: layer-fade-in 1360ms ease 1740ms both, airball-float 20.8s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
-  animation-delay: 1740ms, 2960ms;
+  animation: layer-fade-in 1500ms ease 1880ms both, airball-float 22.6s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
+  animation-delay: 1880ms, 3160ms;
 }
 
 .home-viewport.home-animating #cloud1Layer {
@@ -224,15 +224,15 @@
 
 .home-viewport.home-live #titleBannerLayer,
 .home-viewport.home-live #homeNameButton {
-  animation: title-float 18.5s cubic-bezier(0.28, 0.1, 0.22, 1) infinite;
+  animation: title-float 20.8s cubic-bezier(0.28, 0.1, 0.22, 1) infinite;
 }
 
 .home-viewport.home-live #magnifierDecorLayer {
-  animation: magnifier-float 13.2s ease-in-out infinite;
+  animation: magnifier-float 14.8s ease-in-out infinite;
 }
 
 .home-viewport.home-live #magnifierFacesLayer {
-  animation: magnifier-float-faces 13.2s ease-in-out infinite;
+  animation: magnifier-float-faces 14.8s ease-in-out infinite;
 }
 
 .home-viewport.home-live #wheelLayer {
@@ -241,11 +241,11 @@
 }
 
 .home-viewport.home-live #blimpLayer {
-  animation: blimp-float 33s cubic-bezier(0.28, 0.08, 0.22, 1) infinite alternate;
+  animation: blimp-float 36s cubic-bezier(0.28, 0.08, 0.22, 1) infinite alternate;
 }
 
 .home-viewport.home-live #airballLayer {
-  animation: airball-float 20.8s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
+  animation: airball-float 22.6s cubic-bezier(0.2, 0.66, 0.22, 1) infinite;
 }
 
 .home-viewport.home-live #cloud1Layer {
@@ -443,30 +443,33 @@ body.easter-arcade .result-star--filled {
 }
 
 @keyframes cloud-drift-1 {
-  0% { transform: translateX(-40%); opacity: 0; }
+  0% { transform: translate3d(-40%, 0, 0) scale(0.98); opacity: 0; }
   10% { opacity: 0.82; }
   24% { opacity: 0.96; }
+  58% { transform: translate3d(38%, -3px, 0) scale(1); opacity: 0.98; }
   78% { opacity: 0.96; }
   92% { opacity: 0.62; }
-  100% { transform: translateX(122%); opacity: 0; }
+  100% { transform: translate3d(122%, 0, 0) scale(1.01); opacity: 0; }
 }
 
 @keyframes cloud-drift-2 {
-  0% { transform: translateX(-46%); opacity: 0; }
+  0% { transform: translate3d(-46%, 0, 0) scale(0.94); opacity: 0; }
   12% { opacity: 0.72; }
   26% { opacity: 0.9; }
+  56% { transform: translate3d(36%, 2px, 0) scale(0.97); opacity: 0.9; }
   82% { opacity: 0.9; }
   96% { opacity: 0.54; }
-  100% { transform: translateX(124%); opacity: 0; }
+  100% { transform: translate3d(124%, 0, 0) scale(0.99); opacity: 0; }
 }
 
 @keyframes cloud-drift-3 {
-  0% { transform: translateX(-52%); opacity: 0; }
+  0% { transform: translate3d(-52%, 0, 0) scale(0.9); opacity: 0; }
   14% { opacity: 0.6; }
   28% { opacity: 0.8; }
+  54% { transform: translate3d(34%, -2px, 0) scale(0.93); opacity: 0.82; }
   84% { opacity: 0.8; }
   97% { opacity: 0.48; }
-  100% { transform: translateX(126%); opacity: 0; }
+  100% { transform: translate3d(126%, 0, 0) scale(0.95); opacity: 0; }
 }
 
 @keyframes ferris-spin {
@@ -476,16 +479,16 @@ body.easter-arcade .result-star--filled {
 
 @keyframes title-float {
   0% { transform: translate3d(0, 0, 0); }
-  20% { transform: translate3d(4px, -6px, 0); }
-  42% { transform: translate3d(7px, -16px, 0); }
-  66% { transform: translate3d(-4px, -12px, 0); }
-  84% { transform: translate3d(-2px, -5px, 0); }
+  18% { transform: translate3d(5px, -7px, 0); }
+  40% { transform: translate3d(8px, -16px, 0); }
+  63% { transform: translate3d(-5px, -13px, 0); }
+  82% { transform: translate3d(-3px, -5px, 0); }
   100% { transform: translate3d(0, 0, 0); }
 }
 
 @keyframes magnifier-float {
   0%, 100% { transform: translate(0, 0) rotate(var(--home-layer-rotate, -6deg)); }
-  50% { transform: translate(8px, -6px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.15deg)); }
+  50% { transform: translate(10px, -7px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.15deg)); }
 }
 
 @keyframes faces-glow {
@@ -500,23 +503,23 @@ body.easter-arcade .result-star--filled {
 
 @keyframes magnifier-float-faces {
   0%, 100% { transform: translate(0, 0) rotate(var(--home-layer-rotate, -6deg)); }
-  50% { transform: translate(8px, -6px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.15deg)); }
+  50% { transform: translate(10px, -7px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.15deg)); }
 }
 
 @keyframes airball-float {
   0%, 100% { transform: translate(0, 0) rotate(-0.4deg); }
-  18% { transform: translate(5px, -13px) rotate(-0.1deg); }
-  42% { transform: translate(9px, -25px) rotate(0.35deg); }
-  68% { transform: translate(7px, -34px) rotate(0.75deg); }
-  84% { transform: translate(3px, -18px) rotate(0.16deg); }
+  18% { transform: translate(6px, -15px) rotate(-0.1deg); }
+  42% { transform: translate(10px, -27px) rotate(0.35deg); }
+  68% { transform: translate(8px, -36px) rotate(0.75deg); }
+  84% { transform: translate(4px, -19px) rotate(0.16deg); }
 }
 
 @keyframes blimp-float {
   0% { transform: translate3d(0, 0, 0) rotate(-1deg); }
-  18% { transform: translate3d(9px, -2px, 0) rotate(-0.8deg); }
-  44% { transform: translate3d(23px, 1px, 0) rotate(-0.65deg); }
-  72% { transform: translate3d(37px, -3px, 0) rotate(-0.9deg); }
-  100% { transform: translate3d(52px, 0, 0) rotate(-1deg); }
+  18% { transform: translate3d(10px, -2px, 0) rotate(-0.85deg); }
+  44% { transform: translate3d(26px, 1px, 0) rotate(-0.65deg); }
+  72% { transform: translate3d(41px, -3px, 0) rotate(-0.92deg); }
+  100% { transform: translate3d(58px, 0, 0) rotate(-1deg); }
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #titleBannerLayer,

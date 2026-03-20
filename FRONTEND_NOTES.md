@@ -157,12 +157,12 @@ The settings menu now includes:
 - density
 - target card size
 
-Mirror and upsideown routes
+Mirror and Upside Down routes
 
 - These are separate route variants
 - They do not save over standard clear results
 - The body gets a route-variant dataset flag so the frontend can tint those routes differently
-- Returning to level select from a mirror or upsideown run preserves the route context
+- Returning to level select from a mirror or Upside Down run preserves the route context
 
 Special levels
 
@@ -175,7 +175,7 @@ Magnifier notes
 
 - In-level magnifier state lives in `game.js`
 - Lens size is controlled by settings and CSS
-- The lens now uses scale variables so mirrored and upsideown routes can visually match the variant orientation
+- The lens now uses scale variables so mirrored and Upside Down routes can visually match the variant orientation
 - Click detection still uses image-space coordinates from `clientToImage()` and `clientToImagePrecise()`
 
 Good future frontend targets
@@ -183,5 +183,5 @@ Good future frontend targets
 - Make page 3 feel more distinct with stronger visual grouping between speedrun, variants, and specials
 - Add richer loading text or rotating tips while a scene image is still warming
 - Replace some of the current typed easter eggs with more interactive visual secrets
-- Add per-route art accents for mirror, upsideown, and future special categories
+- Add per-route art accents for mirror, Upside Down, and future special categories
 - Give the settings screen even better density without making it feel crowded

@@ -22,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.5.0";
+const VERSION_LABEL = "Alpha Version 0.0.0.1.2.5.0.5";
 const HOME_BUTTON_STAGGER_MS = 520;
 const HOME_BUTTON_ANIMATION_MS = 2550;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -43,12 +43,12 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "The start screen now uses the blimp, deeper cloud layering, smoother home motion, and cleaner one-time intro timing.",
-  "Level select pages now have clearer page-specific theming, better route separation, and keyboard page shortcuts.",
-  "Bonuses now follow the later unlock pacing, and authored special slots are shown more clearly on page three.",
-  "Scene loading warms art earlier, shows clearer loading feedback, and keeps the next levels ready more often.",
-  "Magnifier clicking, mirrored routes, and upsideown routes have cleaner support across level flow and HUD updates.",
-  "Settings now include clearer reset wording, preload controls, magnifier zoom speed, and cleaner action buttons.",
+  "Start screen polish now feels more layered, with smoother staging, better cloud depth, and cleaner one-time intro timing.",
+  "Level select pages now read more clearly, with stronger page identity, cleaner route grouping, and smoother page navigation.",
+  "Page three has a tighter extras layout, clearer variant routes, and a more intentional special-level section.",
+  "Settings spacing, button hierarchy, and info panels were polished to feel more like a proper game control room.",
+  "Magnifier presentation, route labeling, and UI text were cleaned up so variant runs and level cards read more clearly.",
+  "Transitions, hover states, and menu polish were refined across the frontend without changing the core game rules.",
 ];
 
 const UI_DEFAULT_SETTINGS = {
@@ -1298,11 +1298,15 @@ export class HiddenObjectGame {
       const mirrorMarkup = this.state.mirrorSelectArmed && unlocked
         ? '<p class="level-setup-note">Mirror ready</p>'
         : this.state.upsideDownSelectArmed && unlocked
-          ? '<p class="level-setup-note">Upsideown ready</p>'
+          ? '<p class="level-setup-note">Upside Down ready</p>'
           : "";
       button.type = "button";
       button.className = `level-card${unlocked ? "" : " locked"}${result ? " is-played" : " is-unplayed"}`;
       button.disabled = !unlocked;
+      const tooltip = this.getLevelCardTooltip(level, options.kind, result, unlocked);
+      button.title = tooltip;
+      button.dataset.tooltip = tooltip;
+      button.setAttribute("aria-label", tooltip);
       button.innerHTML = unlocked
         ? `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div>${setupMarkup}${mirrorMarkup}${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`
         : `<div class="level-card-top"><h4>${level.name}</h4><span class="level-number">${cardLabel}</span></div><p class="level-lock"><span class="lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7Zm2 0h6V8a3 3 0 1 0-6 0v2Z" fill="currentColor"/></svg></span>Locked</p>${setupMarkup}${scoreMarkup}<p class="level-meta level-stars">${bestStars}</p>`;
@@ -1322,6 +1326,33 @@ export class HiddenObjectGame {
       return `AB ${ADVANCED_BONUS_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
     }
     return `Level ${MAIN_LEVELS.findIndex((item) => item.id === level.id) + 1}`;
+  }
+
+  getLevelCardTooltip(level, kind, result, unlocked) {
+    const label = this.getLevelCardLabel(level, kind);
+    const status = unlocked ? (result ? "Attempted" : "Unplayed") : "Locked";
+    const targetCount = level.targets?.length ?? 1;
+    const targetText = targetCount === 1 ? "1 target" : `${targetCount} targets`;
+    const firstScoreValue = result?.firstScore ?? result?.bestScore ?? 0;
+    const bestScoreValue = result?.bestScore ?? 0;
+    const bestStars = result?.bestStars ?? 0;
+    const lines = [`${label} • ${level.name}`, `${status} • ${targetText}`];
+
+    if (result) {
+      lines.push(`First ${formatScore(firstScoreValue)}`);
+      if (bestScoreValue !== firstScoreValue) {
+        lines.push(`Best ${formatScore(bestScoreValue)}`);
+      }
+      lines.push(`${bestStars}/3 stars`);
+    } else if (unlocked) {
+      lines.push("Ready to play");
+    }
+
+    if (level.needsSetup) {
+      lines.push("Needs setup");
+    }
+
+    return lines.join(" | ");
   }
 
   isLevelUnlocked(level, kind) {
@@ -1450,7 +1481,7 @@ export class HiddenObjectGame {
     this.elements.levelSelectPageLabel.textContent = this.state.mirrorSelectArmed
       ? "Level Select: Mirror Mode"
       : this.state.upsideDownSelectArmed
-        ? "Level Select: Upsideown Levels"
+        ? "Level Select: Upside Down"
       : onSpeedrunPage
         ? "Level Select: Extras"
         : onAdvancedPage
@@ -1472,7 +1503,7 @@ export class HiddenObjectGame {
     if (this.elements.specialLevelsStatusText) {
       const playableSpecials = SPECIAL_LEVELS.filter((level) => !level.needsSetup).length;
       this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
-        ? `${playableSpecials}/${SPECIAL_LEVELS.length} special slots are ready.`
+        ? `${playableSpecials}/${SPECIAL_LEVELS.length} special slots ready.`
         : "Ten special slots are reserved here. Current entries still need setup.";
     }
     if (this.elements.startSpecialLevelsButton && SPECIAL_LEVELS.some((level) => !level.needsSetup)) {
@@ -1516,7 +1547,7 @@ export class HiddenObjectGame {
     this.state.levelSelectPage = 1;
     this.renderLevelSelect();
     this.showScreen("levelSelect");
-    this.showMenuToast("Upsideown Levels armed. Pick any unlocked level.");
+    this.showMenuToast("Upside Down armed. Pick any unlocked level.");
   }
 
   startSpecialLevelsRoute() {
@@ -1661,7 +1692,7 @@ export class HiddenObjectGame {
       return `${base} Mirror`;
     }
     if (this.state.runMode === "upside") {
-      return `${base} Upsideown`;
+      return `${base} Upside Down`;
     }
     return base;
   }
@@ -2993,7 +3024,7 @@ export class HiddenObjectGame {
       : isVariantRun
         ? this.state.runMode === "mirror"
           ? "Mirror Clear"
-          : "Upsideown Clear"
+          : "Upside Down Clear"
       : level.isAdvancedBonus
         ? "Advanced Bonus Cleared"
         : level.isAdvanced
