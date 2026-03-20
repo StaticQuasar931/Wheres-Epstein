@@ -1,0 +1,160 @@
+<!-- =====================================================
+       PAGE NAVIGATION ARROWS
+       Fixed to viewport edges — outside main to avoid transform containment
+       game.js controls visibility via .hidden class on IDs
+       ===================================================== -->
+  <button id="levelSelectPrevPageButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to main levels">
+    <span class="page-arrow-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M20 12H7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M11.5 7.25L6.75 12l4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="page-arrow-text">
+      <strong>Previous</strong>
+      <span>Page One</span>
+    </span>
+  </button>
+
+  <button id="levelSelectNextPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open advanced levels">
+    <span class="page-arrow-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M4 12h12.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M12.5 7.25L17.25 12l-4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="page-arrow-text">
+      <strong>Page Two</strong>
+      <span>Advanced</span>
+    </span>
+  </button>
+
+  <button id="levelSelectThirdPageButton" class="page-arrow page-arrow-right hidden" type="button" aria-label="Open speedrun levels">
+    <span class="page-arrow-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M4 12h12.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M12.5 7.25L17.25 12l-4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="page-arrow-text">
+      <strong>Page Three</strong>
+      <span>Speedrun</span>
+    </span>
+  </button>
+
+  <button id="levelSelectBackFromSpeedrunButton" class="page-arrow page-arrow-left hidden" type="button" aria-label="Back to advanced levels">
+    <span class="page-arrow-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M20 12H7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M11.5 7.25L6.75 12l4.75 4.75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="page-arrow-text">
+      <strong>Previous</strong>
+      <span>Page Two</span>
+    </span>
+  </button>
+
+  <!-- =====================================================
+       MODALS / OVERLAYS
+       ===================================================== -->
+
+  <div id="levelIntroOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card intro-card">
+      <p class="eyebrow">Level Start</p>
+      <h2 id="introLevelLabel">Level 1</h2>
+      <h3 id="introLevelName">Welcome Party</h3>
+      <p id="introPreviewHint">Find the target in the crowd scene as fast as you can.</p>
+      <div id="introPreviewList" class="target-preview-list intro-preview-list"></div>
+      <p id="introPreviewErrorText" class="asset-error hidden"></p>
+      <button id="startLevelButton" class="primary-button" type="button">Begin Level</button>
+    </div>
+  </div>
+
+  <div id="advancedInfoOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Advanced Tip</p>
+      <h2 id="advancedInfoTitle">Things just got more exciting</h2>
+      <p id="advancedInfoBody">From here on, some advanced levels hide two people. Find both before the level clears.</p>
+      <div class="button-row">
+        <button id="advancedInfoButton" class="primary-button" type="button">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pauseOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Paused</p>
+      <h2>Take your time. The clock is frozen.</h2>
+      <div class="button-row">
+        <button id="resumeButton"    class="primary-button" type="button">Resume</button>
+        <button id="pauseQuitButton" class="ghost-button"   type="button">Quit Run</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="quitConfirmOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Leave Level</p>
+      <h2>Return to level select?</h2>
+      <p class="subtle-text">Your current attempt will be closed.</p>
+      <div class="button-row">
+        <button id="confirmQuitButton" class="primary-button danger-button" type="button">Leave</button>
+        <button id="cancelQuitButton"  class="ghost-button"                  type="button">Stay Here</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p id="resultEyebrow" class="eyebrow">Level Cleared</p>
+      <h2 id="resultTitle">Target Found</h2>
+      <!-- resultStarsText content is set by game.js; result-stars.js then animates it -->
+      <div class="result-stars" id="resultStarsText" aria-label="Stars earned">&#9734;&#9734;&#9734;</div>
+      <p id="resultBody">Fast clears earn more stars and score.</p>
+      <div class="result-stats">
+        <div><span>Level Score</span><strong id="resultScore">0</strong></div>
+        <div><span>Clear Time</span><strong id="resultTimeText">0.0s</strong></div>
+      </div>
+      <div class="button-row">
+        <button id="resultPrimaryButton"   class="primary-button"   type="button">Next Level</button>
+        <button id="resultRetryButton"     class="secondary-button" type="button">Retry</button>
+        <button id="resultSecondaryButton" class="ghost-button"     type="button">Level Select</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="completionOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <p class="eyebrow">Campaign Complete</p>
+      <h2>You cleared the main route.</h2>
+      <p id="completionBody">Bonus levels are now unlocked.</p>
+      <div class="result-stats">
+        <div><span>Total Score</span><strong id="completionScore">0</strong></div>
+        <div><span>Total Stars</span><strong id="completionStars">0</strong></div>
+      </div>
+      <div class="button-row">
+        <button id="playAgainButton"             class="primary-button" type="button">Play Again</button>
+        <button id="completionLevelSelectButton" class="ghost-button"   type="button">Level Select</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="changelogOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card changelog-card">
+      <p class="eyebrow">Patch Notes</p>
+      <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.5.0.5</h2>
+      <div class="changelog-columns">
+        <section>
+          <h3>Changelog</h3>
+          <ul id="changelogPublicList" class="control-list compact-list"></ul>
+        </section>
+      </div>
+      <div class="button-row">
+        <button id="closeChangelogButton" class="primary-button" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="menuToast" class="menu-toast hidden" aria-live="polite"></div>
+

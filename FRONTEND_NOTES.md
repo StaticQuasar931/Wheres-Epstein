@@ -7,11 +7,15 @@ This file is the handoff note for future frontend or animation work. The project
 Core split
 
 - `index.html`
-  Holds all screens, overlays, start-screen layers, buttons, and DOM ids expected by the JavaScript.
+  Holds metadata, SEO tags, the main screen structure, the start-screen shell, and script/style links.
+- `fragments/ui-shell.html`
+  Holds the shared fixed page arrows, modal overlays, changelog overlay, and menu toast that are loaded at boot.
 - `styles/main.css`
   Layout, themes, settings layout, page 3 layout, game HUD, scene viewport, magnifier lens, and responsive rules.
 - `styles/effects.css`
   Start-screen animation timing, hover states, cloud motion, decor motion, sheen timing, result polish, and easter-egg visuals.
+- `scripts/ui-shell.js`
+  Loads the shared frontend shell fragment before the game initializes so the existing DOM ids are still present when `game.js` binds events.
 - `scripts/game.js`
   Main game state, progression, unlocks, score saving, input, magnifier logic, preloading, route variants, changelog rendering, and settings.
 - `scripts/home-ui.js`
@@ -25,7 +29,7 @@ Core split
 
 Start-screen asset flow
 
-`game.js` boots the home screen in a staged order:
+`app.js` now waits for `scripts/ui-shell.js` to inject `fragments/ui-shell.html`, then `game.js` boots the home screen in a staged order:
 
 1. Wait for base home assets during `startHomeBoot()`
 2. Show the background image first
