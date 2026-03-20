@@ -4,16 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Where's Epstein?</title>
-  <meta name="description" content="Where's Epstein? is a browser hidden-object game with animated menus, magnifier tools, advanced routes, mirror and upside-down variants, and hand-tuned hidden targets.">
+  <meta name="description" content="A browser hidden-object game with polished start-screen animation, advanced routes, bonus stages, and challenge variants.">
   <meta name="theme-color" content="#0c1420">
   <meta property="og:title" content="Where's Epstein?">
   <meta property="og:description" content="A browser hidden-object game with polished start-screen animation, advanced routes, bonus stages, and challenge variants.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="Assets/thumb.png">
+  <meta property="og:url" content="https://staticquasar931.github.io/Wheres-Epstein/">
+  <meta property="og:image" content="https://staticquasar931.github.io/Wheres-Epstein/Assets/thumb.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Where's Epstein?">
-  <meta name="twitter:description" content="Find targets across main, bonus, advanced, and challenge routes in a browser hidden-object game.">
-  <meta name="twitter:image" content="Assets/thumb.png">
+  <meta name="twitter:description" content="A browser hidden-object game with polished start-screen animation, advanced routes, bonus stages, and challenge variants.">
+  <meta name="twitter:image" content="https://staticquasar931.github.io/Wheres-Epstein/Assets/thumb.png">
   <link rel="icon" href="Assets/thumb.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,10 +65,11 @@
           <img id="cloud1Layer" class="home-decor-layer" src="Assets/ui/cloud1.png" alt="" aria-hidden="true">
           <img id="cloud2Layer" class="home-decor-layer" src="Assets/ui/cloud2.png" alt="" aria-hidden="true">
           <img id="cloud3Layer" class="home-decor-layer" src="Assets/ui/cloud3.png" alt="" aria-hidden="true">
-          <img id="blimpLayer" class="home-decor-layer" src="Assets/ui/Blimp.png" alt="" aria-hidden="true">
-          <div id="cloudTiny1Layer" class="home-decor-layer home-cloud-sprite" aria-hidden="true"></div>
-          <div id="cloudTiny2Layer" class="home-decor-layer home-cloud-sprite" aria-hidden="true"></div>
-          <div id="cloudTiny3Layer" class="home-decor-layer home-cloud-sprite" aria-hidden="true"></div>
+          <img id="blimpLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/Blimp.png" alt="" aria-hidden="true">
+          <img id="cloudTiny1Layer" class="home-decor-layer" src="Assets/ui/Clouds/stringycloud1.png" alt="" aria-hidden="true">
+          <img id="cloudTiny2Layer" class="home-decor-layer" src="Assets/ui/Clouds/tinycloud1.png" alt="" aria-hidden="true">
+          <img id="cloudTiny3Layer" class="home-decor-layer" src="Assets/ui/Clouds/tinycloud3.png" alt="" aria-hidden="true">
+          <img id="cloudTiny4Layer" class="home-decor-layer" src="Assets/ui/Clouds/tinytiny2.png" alt="" aria-hidden="true">
           <img id="airballLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/airball.png" alt="" aria-hidden="true">
           <img id="wheelStandLayer" class="home-decor-layer" src="Assets/ui/WheelStand.png" alt="" aria-hidden="true">
           <img id="wheelLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/Wheel.png" alt="" aria-hidden="true">
@@ -201,7 +203,7 @@
                 <div class="speedrun-bubble-grid speedrun-bubble-grid-wide">
                   <button id="startSpeedrunButton" class="primary-button speedrun-bubble speedrun-bubble-primary" type="button">
                     Mixed Speedrun
-                    <small>Main, advanced, bonus, and special routes</small>
+                    <small>Every existing level</small>
                   </button>
                   <button id="startMainSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
                     Main Only
@@ -291,7 +293,7 @@
               <div class="stat-card"><span>Best Score</span><strong id="homeBestScore">0</strong></div>
               <div class="stat-card"><span>Total Time</span><strong id="homeTotalTime">0.0s</strong></div>
             </div>
-            <p id="bonusRuleText" class="subtle-text">Bonuses unlock after clearing level 5 or collecting 10 stars.</p>
+            <p id="bonusRuleText" class="subtle-text">Bonuses unlock after clearing level 10 or collecting 20 stars.</p>
             <p id="advancedRevealText" class="subtle-text">Surprise unlock info appears here.</p>
           </section>
 
@@ -310,7 +312,7 @@
             <h2>Look, Feel &amp; Quality of Life</h2>
           </div>
           <div class="button-row settings-header-actions">
-            <button id="resetSettingsButton" class="ghost-button settings-reset-button" type="button">Reset Settings</button>
+            <button id="resetSettingsButton" class="ghost-button settings-reset-button" type="button">Revert to Default Settings</button>
             <button id="closeSettingsButton" class="ghost-button" type="button">Back</button>
           </div>
         </div>
@@ -448,9 +450,12 @@
               <li>No fail timer. Search as long as you need.</li>
               <li>Faster clears earn more score and stars.</li>
               <li>Wrong clicks reduce score but never reveal the target.</li>
+            </ul>
+            <p class="subtle-text"><strong>Content and context</strong></p>
+            <ul class="control-list">
               <li>Most visuals were made with AI assistance.</li>
               <li>This game is not meant to make fun of anyone, victims, or included people. It is for fun and entertainment only.</li>
-              <li>Bonuses open after level 5 or 10 total stars.</li>
+              <li>Bonuses open after level 10 or 20 total stars.</li>
             </ul>
           </section>
 
@@ -475,7 +480,7 @@
               <button id="settingsMoreGamesButton" class="ghost-button settings-moregames-button" type="button" title="Opens in a new tab">Play More Games by StaticQuasar931</button>
             </div>
             <p id="settingsLinkHint" class="subtle-text">Suggestions, bug reports, and feedback can be sent in Discord.</p>
-            <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.4.7</p>
+          <p id="versionTapTarget" class="version-label">Alpha Version 0.0.0.1.2.5.0</p>
             <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
               <div class="diagnostic-row">
                 <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
@@ -715,7 +720,7 @@
   <div id="changelogOverlay" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-card changelog-card">
       <p class="eyebrow">Patch Notes</p>
-        <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.4.7</h2>
+      <h2 id="changelogTitle">Alpha Version 0.0.0.1.2.5.0</h2>
       <div class="changelog-columns">
         <section>
           <h3>Changelog</h3>

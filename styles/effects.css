@@ -135,6 +135,7 @@
 .home-viewport.home-animating #cloudTiny1Layer,
 .home-viewport.home-animating #cloudTiny2Layer,
 .home-viewport.home-animating #cloudTiny3Layer,
+.home-viewport.home-animating #cloudTiny4Layer,
 .home-viewport.home-animating #wheelLayer,
 .home-viewport.home-animating #wheelStandLayer,
 .home-viewport.home-animating #titleBannerLayer,
@@ -216,6 +217,11 @@
   animation-delay: 4780ms, -81s;
 }
 
+.home-viewport.home-animating #cloudTiny4Layer {
+  animation: layer-fade-in 2520ms cubic-bezier(0.18, 0.82, 0.2, 1) 4940ms both, cloud-drift-2 154s linear infinite;
+  animation-delay: 4940ms, -103s;
+}
+
 .home-viewport.home-live #titleBannerLayer,
 .home-viewport.home-live #homeNameButton {
   animation: title-float 18.5s cubic-bezier(0.28, 0.1, 0.22, 1) infinite;
@@ -272,12 +278,18 @@
   animation-delay: -81s;
 }
 
+.home-viewport.home-live #cloudTiny4Layer {
+  animation: cloud-drift-2 154s linear infinite;
+  animation-delay: -103s;
+}
+
 .home-viewport.home-editor-active #cloud1Layer,
 .home-viewport.home-editor-active #cloud2Layer,
 .home-viewport.home-editor-active #cloud3Layer,
 .home-viewport.home-editor-active #cloudTiny1Layer,
 .home-viewport.home-editor-active #cloudTiny2Layer,
 .home-viewport.home-editor-active #cloudTiny3Layer,
+.home-viewport.home-editor-active #cloudTiny4Layer,
 .home-viewport.home-editor-active #blimpLayer,
 .home-viewport.home-editor-active #wheelLayer,
 .home-viewport.home-editor-active #wheelStandLayer,
@@ -464,16 +476,16 @@ body.easter-arcade .result-star--filled {
 
 @keyframes title-float {
   0% { transform: translate3d(0, 0, 0); }
-  18% { transform: translate3d(5px, -3px, 0); }
-  38% { transform: translate3d(2px, -13px, 0); }
-  62% { transform: translate3d(-5px, -11px, 0); }
-  82% { transform: translate3d(-2px, -4px, 0); }
+  20% { transform: translate3d(4px, -6px, 0); }
+  42% { transform: translate3d(7px, -16px, 0); }
+  66% { transform: translate3d(-4px, -12px, 0); }
+  84% { transform: translate3d(-2px, -5px, 0); }
   100% { transform: translate3d(0, 0, 0); }
 }
 
 @keyframes magnifier-float {
   0%, 100% { transform: translate(0, 0) rotate(var(--home-layer-rotate, -6deg)); }
-  50% { transform: translate(7px, -5px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.1deg)); }
+  50% { transform: translate(8px, -6px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.15deg)); }
 }
 
 @keyframes faces-glow {
@@ -488,23 +500,23 @@ body.easter-arcade .result-star--filled {
 
 @keyframes magnifier-float-faces {
   0%, 100% { transform: translate(0, 0) rotate(var(--home-layer-rotate, -6deg)); }
-  50% { transform: translate(7px, -5px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.1deg)); }
+  50% { transform: translate(8px, -6px) rotate(calc(var(--home-layer-rotate, -6deg) + 1.15deg)); }
 }
 
 @keyframes airball-float {
   0%, 100% { transform: translate(0, 0) rotate(-0.4deg); }
-  18% { transform: translate(4px, -11px) rotate(-0.1deg); }
-  42% { transform: translate(8px, -22px) rotate(0.35deg); }
-  68% { transform: translate(6px, -31px) rotate(0.7deg); }
-  84% { transform: translate(3px, -16px) rotate(0.16deg); }
+  18% { transform: translate(5px, -13px) rotate(-0.1deg); }
+  42% { transform: translate(9px, -25px) rotate(0.35deg); }
+  68% { transform: translate(7px, -34px) rotate(0.75deg); }
+  84% { transform: translate(3px, -18px) rotate(0.16deg); }
 }
 
 @keyframes blimp-float {
-  0% { transform: translate3d(0, 0, 0); }
-  18% { transform: translate3d(8px, -1px, 0); }
-  44% { transform: translate3d(20px, 1px, 0); }
-  72% { transform: translate3d(33px, -2px, 0); }
-  100% { transform: translate3d(46px, 0, 0); }
+  0% { transform: translate3d(0, 0, 0) rotate(-1deg); }
+  18% { transform: translate3d(9px, -2px, 0) rotate(-0.8deg); }
+  44% { transform: translate3d(23px, 1px, 0) rotate(-0.65deg); }
+  72% { transform: translate3d(37px, -3px, 0) rotate(-0.9deg); }
+  100% { transform: translate3d(52px, 0, 0) rotate(-1deg); }
 }
 
 body[data-motion="reduced"] .home-viewport.home-animating #titleBannerLayer,
@@ -532,7 +544,8 @@ body[data-motion="reduced"] .home-viewport.home-animating #cloud2Layer,
 body[data-motion="reduced"] .home-viewport.home-animating #cloud3Layer,
 body[data-motion="reduced"] .home-viewport.home-animating #cloudTiny1Layer,
 body[data-motion="reduced"] .home-viewport.home-animating #cloudTiny2Layer,
-body[data-motion="reduced"] .home-viewport.home-animating #cloudTiny3Layer {
+body[data-motion="reduced"] .home-viewport.home-animating #cloudTiny3Layer,
+body[data-motion="reduced"] .home-viewport.home-animating #cloudTiny4Layer {
   animation: layer-fade-in 420ms ease 2360ms both !important;
 }
 
@@ -542,6 +555,7 @@ body[data-motion="reduced"] .home-viewport.home-live #cloud3Layer,
 body[data-motion="reduced"] .home-viewport.home-live #cloudTiny1Layer,
 body[data-motion="reduced"] .home-viewport.home-live #cloudTiny2Layer,
 body[data-motion="reduced"] .home-viewport.home-live #cloudTiny3Layer,
+body[data-motion="reduced"] .home-viewport.home-live #cloudTiny4Layer,
 body[data-motion="reduced"] .home-viewport.home-live #wheelLayer,
 body[data-motion="reduced"] .home-viewport.home-live #wheelStandLayer,
 body[data-motion="reduced"] .home-viewport.home-live #titleBannerLayer,

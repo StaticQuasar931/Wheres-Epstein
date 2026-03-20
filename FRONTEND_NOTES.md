@@ -46,7 +46,10 @@ Important start-screen assets currently used
 - `Assets/ui/cloud1.png`
 - `Assets/ui/cloud2.png`
 - `Assets/ui/cloud3.png`
-- `Assets/ui/CloudChart.png`
+- `Assets/ui/Clouds/stringycloud1.png`
+- `Assets/ui/Clouds/tinycloud1.png`
+- `Assets/ui/Clouds/tinycloud3.png`
+- `Assets/ui/Clouds/tinytiny2.png`
 - `Assets/ui/startbutton.png`
 - `Assets/ui/settingsbutton.png`
 - `Assets/ui/moregbutton.png`
@@ -63,7 +66,7 @@ Start-screen coordinate system
 The current start-screen layering order is:
 
 1. Base background image
-2. Main clouds and tiny distant cloud sprites
+2. Main clouds and tiny distant clouds
 3. Blimp
 4. Air balloon
 5. Ferris stand and ferris wheel
@@ -79,9 +82,9 @@ Cloud depth system
 The screen uses:
 
 - three main cloud images
-- three tiny cloud sprite layers sourced from `CloudChart.png`
+- four extra distant cloud images from `Assets/ui/Clouds/`
 
-The tiny clouds are meant to add depth. They should stay behind the main decor and feel farther away by:
+The smaller clouds are meant to add depth. They should stay behind the main decor and feel farther away by:
 
 - smaller scale
 - lower opacity

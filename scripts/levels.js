@@ -95,14 +95,15 @@ export const START_SCREEN_BUTTONS = {
 
 export const START_SCREEN_LAYERS = {
   titleBanner: { x1: 260, y1: 38, x2: 1156, y2: 293, color: "purple", src: "Assets/ui/titlebanner.png" },
-  cloud1: { x1: 70, y1: 18, x2: 350, y2: 142, color: "white", src: "Assets/ui/cloud1.png" },
-  cloud2: { x1: 580, y1: -6, x2: 880, y2: 130, color: "white", src: "Assets/ui/cloud2.png" },
-  cloud3: { x1: 1108, y1: -8, x2: 1428, y2: 126, color: "white", src: "Assets/ui/cloud3.png" },
-  blimp: { x1: 257, y1: 18, x2: 373, y2: 61, color: "skyblue", src: "Assets/ui/Blimp.png" },
+  cloud1: { x1: 70, y1: 24, x2: 350, y2: 148, color: "white", src: "Assets/ui/cloud1.png" },
+  cloud2: { x1: 580, y1: 18, x2: 880, y2: 154, color: "white", src: "Assets/ui/cloud2.png" },
+  cloud3: { x1: 1108, y1: 16, x2: 1428, y2: 150, color: "white", src: "Assets/ui/cloud3.png" },
+  blimp: { x1: 238, y1: 12, x2: 404, y2: 78, rotation: -1, color: "skyblue", src: "Assets/ui/Blimp.png" },
   airball: { x1: 123, y1: 94, x2: 245, y2: 256, color: "cyan", src: "Assets/ui/airball.png" },
-  cloudTiny1: { x1: 212, y1: 118, x2: 286, y2: 156, color: "white", src: "Assets/ui/CloudChart.png" },
-  cloudTiny2: { x1: 874, y1: 104, x2: 940, y2: 136, color: "white", src: "Assets/ui/CloudChart.png" },
-  cloudTiny3: { x1: 1368, y1: 96, x2: 1458, y2: 140, color: "white", src: "Assets/ui/CloudChart.png" },
+  cloudTiny1: { x1: 196, y1: 84, x2: 286, y2: 126, color: "white", src: "Assets/ui/Clouds/stringycloud1.png" },
+  cloudTiny2: { x1: 448, y1: 56, x2: 520, y2: 92, color: "white", src: "Assets/ui/Clouds/tinycloud1.png" },
+  cloudTiny3: { x1: 912, y1: 74, x2: 988, y2: 114, color: "white", src: "Assets/ui/Clouds/tinycloud3.png" },
+  cloudTiny4: { x1: 1310, y1: 44, x2: 1362, y2: 74, color: "white", src: "Assets/ui/Clouds/tinytiny2.png" },
   wheelStand: { x1: 1055, y1: 171, x2: 1189, y2: 271, color: "orange", src: "Assets/ui/WheelStand.png" },
   wheel: { x1: 1042, y1: 72, x2: 1214, y2: 234, color: "blue", src: "Assets/ui/Wheel.png" },
   magnifierDecor: { x1: 242, y1: 266, x2: 1018, y2: 783, rotation: -6, color: "red", src: "Assets/ui/mglassempty.png" },
@@ -259,7 +260,7 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-10-a", "ep12", { type: "rect", x1: 680, y1: 302, x2: 656, y2: 273 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 1021, y1: 286, x2: 991, y2: 251 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Cruisin' Balcony",
+    name: "Cruisin'\u00A0\u00A0Balcony",
   }),
   // Advanced Level 11: Narrow Pursuit              
   makeAdvancedLevel(11, [
@@ -354,11 +355,11 @@ const ADVANCED_LEVELS_RAW = [
     needsSetup: false,
   }),
   makeAdvancedBonusLevel(4, [
-    makeTarget("advanced-bonus-04-a", "di1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-04-b", "ep12", { type: "rect", x1: 440, y1: 260, x2: 520, y2: 360 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-04-a", "di1", { type: "rect", x1: 363, y1: 376, x2: 380, y2: 403 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-04-b", "ep12", { type: "rect", x1: 1501, y1: 311, x2: 1528, y2: 345 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Advanced Bonus 4",
-    needsSetup: true,
+    name: "Hell Castle",
+    needsSetup: false,
   }),
   makeAdvancedBonusLevel(5, [
     makeTarget("advanced-bonus-05-a", "di6", { type: "rect", x1: 31, y1: 220, x2: 39, y2: 228 }, "Assets/Waldos/advanced"),
@@ -386,10 +387,17 @@ export const BONUS_LEVELS = BONUS_LEVELS_RAW.map(normalizeLevel);
 export const ADVANCED_LEVELS = ADVANCED_LEVELS_RAW.map(normalizeLevel);
 const SPECIAL_LEVELS_RAW = [
   makeSpecialLevel(1, [
-    makeTarget("special-01-a", "kju1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
+    makeTarget("special-01-a", "kju1", { type: "rect", x1: 1328, y1: 447, x2: 1356, y2: 479 }, "Assets/Waldos/Special"),
   ], {
     name: "Special 1",
     needsSetup: false,
+  }),
+  makeSpecialLevel(2, [
+    makeTarget("special-02-a", "mus1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
+    makeTarget("special-02-b", "mb1", { type: "rect", x1: 420, y1: 260, x2: 500, y2: 350 }, "Assets/Waldos/Special"),
+  ], {
+    name: "Special 2",
+    needsSetup: true,
   }),
 ];
 

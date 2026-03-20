@@ -503,6 +503,7 @@ function getHomeElement(game, key) {
     cloudTiny1: game.elements.cloudTiny1Layer,
     cloudTiny2: game.elements.cloudTiny2Layer,
     cloudTiny3: game.elements.cloudTiny3Layer,
+    cloudTiny4: game.elements.cloudTiny4Layer,
     blimp: game.elements.blimpLayer,
     airball: game.elements.airballLayer,
     wheelStand: game.elements.wheelStandLayer,
