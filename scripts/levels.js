@@ -348,8 +348,8 @@ const ADVANCED_LEVELS_RAW = [
     needsSetup: false,
   }),
   makeAdvancedBonusLevel(3, [
-    makeTarget("advanced-bonus-03-a", "tru8", { type: "rect", x1: 792, y1: 117, x2: 785, y2: 109 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 779, y1: 511, x2: 783, y2: 512 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-03-a", "tru8", { type: "rect", x1: 834, y1: 118, x2: 829, y2: 123 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 792, y1: 497, x2: 821, y2: 538 }, "Assets/Waldos/advanced"),
   ], {
     name: "Celebrity Overmash",
     needsSetup: false,
