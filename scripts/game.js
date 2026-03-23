@@ -22,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Alpha Version 0.0.0.1.2.5.0.5";
+const VERSION_LABEL = "Beta Version 0.0.0.1.2.7";
 const HOME_BUTTON_STAGGER_MS = 520;
 const HOME_BUTTON_ANIMATION_MS = 2550;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -43,12 +43,10 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Start screen polish now feels more layered, with smoother staging, better cloud depth, and cleaner one-time intro timing.",
-  "Level select pages now read more clearly, with stronger page identity, cleaner route grouping, and smoother page navigation.",
-  "Page three has a tighter extras layout, clearer variant routes, and a more intentional special-level section.",
-  "Settings spacing, button hierarchy, and info panels were polished to feel more like a proper game control room.",
-  "Magnifier presentation, route labeling, and UI text were cleaned up so variant runs and level cards read more clearly.",
-  "Transitions, hover states, and menu polish were refined across the frontend without changing the core game rules.",
+  "Public beta build: the app shell is now split into frontend fragments so the main HTML stays lighter and easier to manage.",
+  "Page Three was cleaned up with clearer grouping, larger variant controls, and a visible work-in-progress note for special content.",
+  "Settings spacing, level-card readability, and shared UI labels were tightened up for the beta presentation.",
+  "Start-screen decor and home-button polish were smoothed so the menu feels more intentional without changing how the game works.",
 ];
 
 const UI_DEFAULT_SETTINGS = {
@@ -240,6 +238,7 @@ export class HiddenObjectGame {
     this.state = {
       levelIndex: 0,
       levelSelectPage: 1,
+      completionUnlockPage: 0,
       totalScore: 0,
       runMode: "standard",
       mirrorSelectArmed: false,
@@ -841,8 +840,27 @@ export class HiddenObjectGame {
     this.elements.resultPrimaryButton.addEventListener("click", () => this.handleResultPrimary());
     this.elements.resultRetryButton.addEventListener("click", () => this.retryCurrentLevel());
     this.elements.resultSecondaryButton.addEventListener("click", () => this.returnToLevelSelect(true));
-    this.elements.playAgainButton.addEventListener("click", () => this.startCampaignFromLevel(0));
-    this.elements.completionLevelSelectButton.addEventListener("click", () => this.returnToLevelSelect(true));
+    this.elements.playAgainButton.addEventListener("click", () => {
+      if (this.state.completionUnlockPage) {
+        const page = this.state.completionUnlockPage;
+        this.state.completionUnlockPage = 0;
+        this.elements.completionOverlay.classList.add("hidden");
+        this.state.levelSelectPage = page;
+        this.showScreen("levelSelect");
+        this.renderLevelSelect();
+        return;
+      }
+      this.startCampaignFromLevel(0);
+    });
+    this.elements.completionLevelSelectButton.addEventListener("click", () => {
+      if (this.state.completionUnlockPage) {
+        this.state.completionUnlockPage = 0;
+        this.elements.completionOverlay.classList.add("hidden");
+        this.startCampaignFromLevel(0);
+        return;
+      }
+      this.returnToLevelSelect(true);
+    });
     this.elements.hudLevelText.addEventListener("dblclick", () => this.returnToLevelSelect(true));
     this.elements.hudLevelText.addEventListener("click", () => this.returnToLevelSelect(true));
 
@@ -1164,7 +1182,7 @@ export class HiddenObjectGame {
     this.elements.homeTotalTime.textContent = formatTime(totalTimeMs);
     this.elements.mainProgressText.textContent = `${mainCleared} / ${MAIN_LEVELS.length} cleared`;
     this.elements.bonusUnlockText.textContent = this.isBonusUnlocked() ? "Unlocked" : "Locked";
-    this.elements.bonusRuleText.textContent = `Bonuses unlock after normal level 10 or 20 total stars. Current stars: ${starCount}.`;
+    this.elements.bonusRuleText.textContent = `Bonuses unlock after clearing level 10 or collecting 20 total stars. Current stars: ${starCount}.`;
     this.elements.advancedRevealText.textContent = this.getAdvancedUnlockText();
     this.elements.speedrunRoundsText.textContent = String(speedrun.roundsPlayed ?? 0);
     this.elements.speedrunAverageScoreText.textContent = formatScore(averageOrZero(speedrun.totalScore ?? 0, speedrun.roundsPlayed ?? 0));
@@ -1177,7 +1195,7 @@ export class HiddenObjectGame {
     if (this.elements.specialLevelsStatusText) {
       this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
         ? `${playableSpecials.length}/${SPECIAL_LEVELS.length} special slots are ready.`
-        : "No special slots are authored yet.";
+        : "Special Levels are still a work in progress.";
     }
     this.syncSpecialPlaceholderCards();
     this.elements.settingsMainClearsText.textContent = `${mainCleared} / ${MAIN_LEVELS.length}`;
@@ -1229,7 +1247,7 @@ export class HiddenObjectGame {
           title.textContent = `Special ${index + 1}`;
         }
         if (lock) {
-          lock.textContent = "Needs setup";
+          lock.textContent = "Coming Soon";
         }
         card.disabled = true;
         card.classList.add("locked");
@@ -1242,7 +1260,7 @@ export class HiddenObjectGame {
       }
       if (level.needsSetup) {
         if (lock) {
-          lock.textContent = "Needs setup";
+          lock.textContent = "Coming Soon";
         }
         card.disabled = true;
         card.classList.add("locked");
@@ -1290,7 +1308,7 @@ export class HiddenObjectGame {
       const cardLabel = this.getLevelCardLabel(level, options.kind);
       const button = document.createElement("button");
       const setupMarkup = level.needsSetup
-        ? '<p class="level-setup-note">Needs setup</p>'
+        ? '<p class="level-setup-note">Coming Soon</p>'
         : "";
       const scoreMarkup = bestScoreValue !== firstScoreValue
         ? `<div class="level-meta level-best-score"><span>Best ${bestScore}</span><span>First ${firstScore}</span></div>`
@@ -1349,7 +1367,7 @@ export class HiddenObjectGame {
     }
 
     if (level.needsSetup) {
-      lines.push("Needs setup");
+      lines.push("Coming Soon");
     }
 
     return lines.join(" | ");
@@ -1463,11 +1481,11 @@ export class HiddenObjectGame {
     this.state.levelSelectPage = nextPage;
     if (nextPage === 2 && this.isAdvancedUnlocked() && !this.save.meta.advancedPageSeen) {
       this.save = saveMeta({ advancedPageSeen: true });
-      this.showMenuToast("Page Two unlocked: Advanced Levels now hold the tougher multi-target route.");
+      this.showMenuToast("Page Two unlocked: Advanced Levels are now available.");
     }
     if (nextPage === 3 && this.isSpeedrunUnlocked() && !this.save.meta.speedrunPageSeen) {
       this.save = saveMeta({ speedrunPageSeen: true });
-      this.showMenuToast("Page Three unlocked: Extras holds speedrun routes, mirror mode, and future special levels.");
+      this.showMenuToast("Page Three unlocked: Extras now holds speedrun routes, variants, and special levels.");
     }
     this.syncLevelSelectPage();
   }
@@ -1799,9 +1817,7 @@ export class HiddenObjectGame {
         : "Loading level art...";
     }
     this.elements.levelImage.removeAttribute("src");
-    this.elements.levelImage.setAttribute("src", "");
-    this.elements.levelImage.src = "";
-    this.elements.sceneContent.style.width = "1px";
+        this.elements.sceneContent.style.width = "1px";
     this.elements.sceneContent.style.height = "1px";
     this.elements.hitboxOverlay.style.width = "1px";
     this.elements.hitboxOverlay.style.height = "1px";
@@ -2283,6 +2299,10 @@ export class HiddenObjectGame {
           this.showMagnifier(event.clientX, event.clientY, true);
         }
       } else if (!this.state.magnifier.persistent) {
+        const point = this.clientToImage(event.clientX, event.clientY);
+        if (point) {
+          this.handleSceneSelection(point);
+        }
         this.hideMagnifier();
       }
       this.state.magnifier.pointerId = null;
@@ -3000,8 +3020,11 @@ export class HiddenObjectGame {
     this.renderLevelSelect();
 
     if (!wasSpeedrun && !isVariantRun && !level.isBonus && !level.isAdvanced && mainIndex === MAIN_LEVELS.length - 1 && !this.state.runCheated) {
+      this.state.completionUnlockPage = 2;
+      this.elements.playAgainButton.textContent = "Open Page Two";
+      this.elements.completionLevelSelectButton.textContent = "Play Again";
       this.elements.completionBody.textContent = this.isAdvancedUnlocked()
-        ? "You cleared the main route and unlocked Page Two: Advanced Levels. That page holds the tougher multi-target route."
+        ? "You cleared the main route and unlocked Page Two: Advanced Levels. Jump in now or start the campaign over from level one."
         : this.getAdvancedUnlockText();
       this.elements.completionScore.textContent = formatScore(this.save.legit.bestScore);
       this.elements.completionStars.textContent = String(getTotalStars(this.save.legit));
@@ -3010,8 +3033,11 @@ export class HiddenObjectGame {
     }
 
     if (!wasSpeedrun && !isVariantRun && authoredAdvancedIndex === AUTHORED_ADVANCED_MAIN_LEVELS.length - 1 && !this.state.runCheated) {
+      this.state.completionUnlockPage = 3;
+      this.elements.playAgainButton.textContent = "Open Page Three";
+      this.elements.completionLevelSelectButton.textContent = "Play Again";
       this.elements.completionBody.textContent = this.isSpeedrunUnlocked()
-        ? "You cleared the Advanced route and unlocked Page Three: Extras. That page holds speedrun routes, mirror mode, and special-level slots."
+        ? "You cleared the Advanced route and unlocked Page Three: Extras. That page holds speedrun routes, variants, and special-level slots."
         : "You cleared the Advanced route.";
       this.elements.completionScore.textContent = formatScore(this.save.legit.bestScore);
       this.elements.completionStars.textContent = String(getTotalStars(this.save.legit));
@@ -3076,6 +3102,7 @@ export class HiddenObjectGame {
 
   handleResultPrimary() {
     this.elements.resultOverlay.classList.add("hidden");
+    this.state.completionUnlockPage = 0;
     const nextIndex = this.getNextLevelIndex();
     if (nextIndex === null) {
       this.showScreen("levelSelect");
@@ -3222,7 +3249,7 @@ export class HiddenObjectGame {
   }
 
   triggerHomeWheelRush() {
-    this.homeWheelBoost += 1.45 + (this.homeWheelBoost * 0.12);
+    this.homeWheelBoost += 4.35 + (this.homeWheelBoost * 0.34);
     this.elements.homeViewport.style.setProperty("--home-wheel-boost", String(this.homeWheelBoost));
     this.ensureHomeWheelLoop();
   }
@@ -3244,7 +3271,7 @@ export class HiddenObjectGame {
         const baseDegreesPerMs = 360 / 42000;
         this.homeWheelAngle -= baseDegreesPerMs * this.homeWheelBoost * dt;
         this.elements.homeViewport.style.setProperty("--home-wheel-angle", `${this.homeWheelAngle}deg`);
-        const decayStrength = Math.min(1, dt * 0.0018);
+        const decayStrength = Math.min(1, dt * 0.00105);
         this.homeWheelBoost += (1 - this.homeWheelBoost) * decayStrength;
         if (Math.abs(this.homeWheelBoost - 1) < 0.002) {
           this.homeWheelBoost = 1;

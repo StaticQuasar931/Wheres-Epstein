@@ -1,11 +1,13 @@
 # Where's Epstein?
 
-Where's Epstein? is a browser hidden-object game built with plain HTML, CSS, and JavaScript. The game includes a cinematic start screen, main levels, bonus levels, advanced multi-target levels, mirrored runs, Upside Down runs, speedrun routes, and special-level slots for future event content.
+Where's Epstein? is a browser hidden-object collection inspired by Where's Waldo style games. Players search crowded scenes for different meme-famous people across story, bonus, advanced, special, mirrored, and Upside Down routes.
 
 Frontend structure
 
 - `index.html`
-  Main document shell, metadata, SEO, and core screen layout
+  Main document shell, metadata, SEO, body dataset defaults, and fragment mount points
+- `fragments/screens.html`
+  Home, level select, settings, and gameplay screen markup
 - `fragments/ui-shell.html`
   Shared page arrows, overlays, changelog shell, and toast UI
 - `styles/main.css`
@@ -13,7 +15,7 @@ Frontend structure
 - `styles/effects.css`
   Motion, hover states, layered home animation, and visual polish
 - `scripts/ui-shell.js`
-  Loads the shared UI fragment before the game starts
+  Loads the screen and UI fragments before the game starts
 
 ## What the game includes
 

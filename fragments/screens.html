@@ -1,0 +1,551 @@
+<main class="screen-shell">
+
+    <!-- =====================================================
+         HOME SCREEN
+         ===================================================== -->
+    <section id="homeScreen" class="screen screen-active hero-screen">
+      <div id="homeViewport" class="home-viewport">
+
+        <div class="home-ambient" aria-hidden="true"></div>
+
+        <!-- Boot loading overlay -->
+        <div id="homeBootOverlay" class="home-boot-overlay">
+          <div class="home-boot-card">
+            <div class="home-boot-logo" aria-hidden="true">
+              <img src="https://cdn.jsdelivr.net/gh/StaticQuasar931/Images@main/squarestaticquasar931logo.jpg" alt="" loading="eager" decoding="async">
+            </div>
+            <div class="home-boot-spinner-wrap">
+              <div class="home-boot-spinner" aria-hidden="true"></div>
+            </div>
+            <p class="eyebrow">Initializing</p>
+            <h2>Where's Epstein?</h2>
+      <p id="homeBootStatus" class="subtle-text">Loading menu art and button assets.</p>
+      <p class="subtle-text">Start screen UI help by Cheese_Cat.</p>
+            <div class="boot-progress-bar" aria-hidden="true">
+              <div class="boot-progress-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="homeBackgroundFill" class="home-background-fill" aria-hidden="true">
+          <div id="homeFillLeft" class="home-side-fill home-side-fill-left"></div>
+          <div id="homeFillRight" class="home-side-fill home-side-fill-right"></div>
+          <div id="homeFillTop" class="home-side-fill home-side-fill-top"></div>
+          <div id="homeFillBottom" class="home-side-fill home-side-fill-bottom"></div>
+        </div>
+
+        <img id="startScreenImage" class="hero-background" src="Assets/ui/backgroundplain.png" alt="Start screen artwork" draggable="false">
+
+        <div id="homeLayerOverlay" class="home-layer-overlay" aria-hidden="true">
+          <img id="cloud1Layer" class="home-decor-layer" src="Assets/ui/cloud1.png" alt="" aria-hidden="true">
+          <img id="cloud2Layer" class="home-decor-layer" src="Assets/ui/cloud2.png" alt="" aria-hidden="true">
+          <img id="cloud3Layer" class="home-decor-layer" src="Assets/ui/cloud3.png" alt="" aria-hidden="true">
+          <img id="blimpLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/Blimp.png" alt="" aria-hidden="true">
+          <img id="cloudTiny1Layer" class="home-decor-layer" src="Assets/ui/Clouds/stringycloud1.png" alt="" aria-hidden="true">
+          <img id="cloudTiny2Layer" class="home-decor-layer" src="Assets/ui/Clouds/tinycloud1.png" alt="" aria-hidden="true">
+          <img id="cloudTiny3Layer" class="home-decor-layer" src="Assets/ui/Clouds/tinycloud3.png" alt="" aria-hidden="true">
+          <img id="cloudTiny4Layer" class="home-decor-layer" src="Assets/ui/Clouds/tinytiny2.png" alt="" aria-hidden="true">
+          <img id="airballLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/airball.png" alt="" aria-hidden="true">
+          <img id="wheelStandLayer" class="home-decor-layer" src="Assets/ui/WheelStand.png" alt="" aria-hidden="true">
+          <img id="wheelLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/Wheel.png" alt="" aria-hidden="true">
+          <img id="titleBannerLayer" class="home-decor-layer" src="Assets/ui/titlebanner.png" alt="" aria-hidden="true">
+          <img id="magnifierDecorLayer" class="home-decor-layer" src="Assets/ui/mglassempty.png" alt="" aria-hidden="true">
+          <img id="magnifierFacesLayer" class="home-decor-layer home-decor-clickable" src="Assets/ui/startscreenfaces.png" alt="" aria-hidden="true">
+        </div>
+
+        <!-- Invisible button overlay positioned by home-ui.js -->
+        <div id="homeButtonOverlay" class="home-button-overlay">
+          <img id="startButtonArt"    class="home-button-art" src="Assets/ui/startbutton.png"    alt="" aria-hidden="true">
+          <div id="startButtonSheen"  class="home-button-sheen" aria-hidden="true"></div>
+          <img id="settingsButtonArt" class="home-button-art" src="Assets/ui/settingsbutton.png" alt="" aria-hidden="true">
+          <div id="settingsButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
+          <img id="moreGamesButtonArt"  class="home-button-art" src="Assets/ui/moregbutton.png"  alt="" aria-hidden="true">
+          <div id="moreGamesButtonSheen" class="home-button-sheen" aria-hidden="true"></div>
+          <button id="startGameButton"    class="image-button" type="button" aria-label="Start game"></button>
+          <button id="openSettingsButton" class="image-button" type="button" aria-label="Open settings"></button>
+          <button id="moreGamesButton"    class="image-button" type="button" aria-label="Open more games"></button>
+        </div>
+
+        <div id="homeDebugOverlay" class="home-debug-overlay hidden" aria-hidden="true"></div>
+
+        <div id="startScreenFallback" class="hero-fallback hidden">
+          <p class="eyebrow">Missing Start Screen Art</p>
+          <h2>Add Assets/ui/backgroundplain.png</h2>
+          <p id="startScreenErrorText">The home screen will use that exact file path.</p>
+        </div>
+
+        <div id="homeDebugReadout" class="home-debug-readout hidden" aria-live="polite"></div>
+        <div id="homeEditorPanel" class="home-editor-panel hidden" aria-live="polite">
+          <div class="home-editor-header">
+            <p class="eyebrow">Home Editor</p>
+            <strong id="homeEditorSelectionLabel">start</strong>
+          </div>
+          <p id="homeEditorCoords" class="home-editor-coords">x1: 0, y1: 0, x2: 0, y2: 0</p>
+          <div class="button-row home-editor-actions">
+            <button id="homeEditorToggleButton" class="secondary-button" type="button">Editor Off</button>
+            <button id="homeEditorPrevButton" class="ghost-button" type="button">Prev</button>
+            <button id="homeEditorNextButton" class="ghost-button" type="button">Next</button>
+          </div>
+          <div class="button-row home-editor-actions">
+            <button id="homeEditorCopySelectedButton" class="ghost-button" type="button">Copy Selected</button>
+            <button id="homeEditorCopyAllButton" class="secondary-button" type="button">Copy All</button>
+          </div>
+          <div class="button-row home-editor-actions home-editor-actions-triple">
+            <button id="homeEditorToggleBoxesButton" class="ghost-button" type="button">Boxes On</button>
+            <button id="homeEditorLockButton" class="ghost-button" type="button">Unlocked</button>
+            <button id="homeEditorZoomButton" class="ghost-button" type="button">Zoom Out</button>
+          </div>
+          <p class="subtle-text home-editor-help">Drag a box to move. Drag the corner to resize. Use arrows to move and Shift plus arrows to resize.</p>
+        </div>
+
+        <!-- homeNameButton — game title badge on the home screen; game.js attaches its click handler -->
+        <button id="homeNameButton" class="home-name-button" type="button" aria-label="Where's Epstein?">
+          <span class="home-name-text">Where's Epstein?</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         LEVEL SELECT
+         ===================================================== -->
+    <section id="levelSelectScreen" class="screen" aria-hidden="true">
+      <div class="menu-shell">
+        <div class="menu-header">
+          <div>
+            <p class="eyebrow">Level Select</p>
+            <h2 id="levelSelectPageLabel">Main Levels</h2>
+          </div>
+          <div class="button-row">
+            <button id="closeLevelSelectButton" class="ghost-button" type="button">Back</button>
+          </div>
+        </div>
+
+        <div class="level-select-groups">
+
+          <section id="mainRouteSection" class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Main Route</p>
+                <h3>Story Levels</h3>
+              </div>
+              <span id="mainProgressText" class="chip-label">0 / 20 cleared</span>
+            </div>
+            <div id="mainLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section id="bonusRouteSection" class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Bonus Route</p>
+                <h3>Extra Levels</h3>
+              </div>
+              <span id="bonusUnlockText" class="chip-label">Locked</span>
+            </div>
+            <div id="bonusLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section id="advancedRouteSection" class="menu-card hidden">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Advanced Route</p>
+                <h3>Harder Scenes</h3>
+              </div>
+              <!-- levelSelectPrevPageButton moved to body level for fixed positioning -->
+            </div>
+            <div id="advancedLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section id="advancedBonusSection" class="menu-card hidden">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Advanced Bonus</p>
+                <h3>Extra Challenge</h3>
+              </div>
+            </div>
+            <div id="advancedBonusLevelGrid" class="level-grid"></div>
+          </section>
+
+          <section id="speedrunRouteSection" class="menu-card hidden">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Page Three</p>
+                <h3>Extras</h3>
+              </div>
+            </div>
+            <p class="subtle-text page-three-note">Work in progress. These routes are playable, but this page is still being polished.</p>
+            <div class="speedrun-grid">
+              <div class="speedrun-card speedrun-card-primary">
+                <p class="subtle-text">Pick a route and jump into a focused challenge run.</p>
+                <div class="speedrun-bubble-grid speedrun-bubble-grid-wide">
+                  <button id="startSpeedrunButton" class="primary-button speedrun-bubble speedrun-bubble-primary" type="button">
+                    Mixed Speedrun
+                    <small>Every existing level</small>
+                  </button>
+                  <button id="startMainSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
+                    Main Only
+                    <small>Page one route</small>
+                  </button>
+                  <button id="startAdvancedSpeedrunButton" class="secondary-button speedrun-bubble" type="button">
+                    Advanced Only
+                    <small>Page two route</small>
+                  </button>
+                  <button id="startBonusSpeedrunButton" class="ghost-button speedrun-bubble" type="button">
+                    Bonus Blitz
+                    <small>Bonus pools only</small>
+                  </button>
+                </div>
+                <div class="stat-grid speedrun-stats">
+                  <div class="stat-card"><span>Rounds</span><strong id="speedrunRoundsText">0</strong></div>
+                  <div class="stat-card"><span>Avg Score</span><strong id="speedrunAverageScoreText">0</strong></div>
+                  <div class="stat-card"><span>Avg Time</span><strong id="speedrunAverageTimeText">0.0s</strong></div>
+                  <div class="stat-card"><span>Fastest</span><strong id="speedrunFastestText">0.0s</strong></div>
+                </div>
+                <div class="speedrun-recent-block">
+                  <p class="eyebrow">Recently Played</p>
+                  <div id="speedrunRecentStrip" class="speedrun-recent-strip">
+                    <span class="speedrun-recent-empty">No recent speedrun picks yet.</span>
+                  </div>
+                </div>
+                <p id="speedrunLastPickText" class="subtle-text">Last random pick: none yet.</p>
+              </div>
+              <section class="menu-card speedrun-specials-card">
+                <div class="menu-card-header">
+                  <div>
+                    <p class="eyebrow">Variant Runs</p>
+                    <h4>Twist Modes</h4>
+                  </div>
+                </div>
+                <p class="subtle-text">These variant routes keep their own look and their own results, so your standard clears stay untouched.</p>
+                <div class="speedrun-bubble-grid">
+                  <button id="startMirrorModeButton" class="secondary-button speedrun-bubble speedrun-mode-bubble speedrun-mode-mirror" type="button">
+                    Mirror Mode
+                    <small>Flip scenes sideways</small>
+                  </button>
+                  <button id="startUpsideDownModeButton" class="secondary-button speedrun-bubble speedrun-mode-bubble speedrun-mode-upside" type="button">
+                    Upside Down
+                    <small>Turn every route upside down</small>
+                  </button>
+                </div>
+              </section>
+              <section class="menu-card speedrun-specials-card">
+                <div class="menu-card-header">
+                  <div>
+                    <p class="eyebrow">Special Levels</p>
+                    <h4>Special Route</h4>
+                  </div>
+                </div>
+                <button id="startSpecialLevelsButton" class="ghost-button speedrun-bubble speedrun-mode-bubble" type="button">
+                  Special Levels
+                  <small>Custom scenes, event packs, and future weird stuff</small>
+                </button>
+                <p id="specialLevelsStatusText" class="subtle-text speedrun-status-line">No special levels authored yet.</p>
+                <div class="special-placeholder-grid">
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 1</h4><span class="level-number">SL 1</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 2</h4><span class="level-number">SL 2</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 3</h4><span class="level-number">SL 3</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 4</h4><span class="level-number">SL 4</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 5</h4><span class="level-number">SL 5</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 6</h4><span class="level-number">SL 6</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 7</h4><span class="level-number">SL 7</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 8</h4><span class="level-number">SL 8</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 9</h4><span class="level-number">SL 9</span></div><p class="level-lock">Coming Soon</p></button>
+                  <button class="level-card locked special-placeholder-card" type="button" disabled><div class="level-card-top"><h4>Special 10</h4><span class="level-number">SL 10</span></div><p class="level-lock">Coming Soon</p></button>
+                </div>
+              </section>
+            </div>
+          </section>
+
+
+          <section id="progressRouteSection" class="menu-card">
+            <div class="menu-card-header">
+              <div>
+                <p class="eyebrow">Progress</p>
+                <h3>Run Summary</h3>
+              </div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat-card"><span>Total Levels</span><strong id="homeLevelCount">0 / 20</strong></div>
+              <div class="stat-card"><span>Unlocked</span><strong id="homeUnlockedText">1</strong></div>
+              <div class="stat-card"><span>Best Score</span><strong id="homeBestScore">0</strong></div>
+              <div class="stat-card"><span>Total Time</span><strong id="homeTotalTime">0.0s</strong></div>
+            </div>
+            <p id="bonusRuleText" class="subtle-text">Bonuses unlock after clearing level 10 or collecting 20 stars.</p>
+            <p id="advancedRevealText" class="subtle-text">Surprise unlock info appears here.</p>
+          </section>
+
+        </div><!-- /.level-select-groups -->
+      </div><!-- /.menu-shell -->
+    </section>
+
+    <!-- =====================================================
+         SETTINGS
+         ===================================================== -->
+    <section id="settingsScreen" class="screen" aria-hidden="true">
+      <div class="menu-shell">
+        <div class="menu-header">
+          <div>
+            <p class="eyebrow">Settings</p>
+            <h2>Look, Feel &amp; Quality of Life</h2>
+          </div>
+          <div class="button-row settings-header-actions">
+            <button id="closeSettingsButton" class="ghost-button" type="button">Back</button>
+            <button id="resetSettingsButton" class="ghost-button settings-reset-button" type="button">Revert to Default Settings</button>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <label class="setting-card">
+            <span>Theme</span>
+            <select id="themeSelect">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+              <option value="ocean">Ocean</option>
+              <option value="sunset">Sunset</option>
+              <option value="forest">Forest</option>
+              <option value="dusk">Dusk</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>UI Density</span>
+            <select id="densitySelect">
+              <option value="comfortable">Comfortable</option>
+              <option value="compact">Compact</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Motion</span>
+            <select id="motionSelect">
+              <option value="full">Full</option>
+              <option value="reduced">Reduced</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Target Card Size</span>
+            <select id="previewSizeSelect">
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Level Preview</span>
+            <select id="levelIntroSelect">
+              <option value="on">Show</option>
+              <option value="off">Skip</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Pan Tip</span>
+            <select id="panTipSelect">
+              <option value="on">Show</option>
+              <option value="off">Hide</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Quit Prompt</span>
+            <select id="confirmQuitSelect">
+              <option value="on">Ask First</option>
+              <option value="off">Instant</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Preview Default</span>
+            <select id="previewDefaultSelect">
+              <option value="shown">Shown</option>
+              <option value="hidden">Hidden</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Found Target FX</span>
+            <select id="foundFxSelect">
+              <option value="strong">Strong</option>
+              <option value="subtle">Subtle</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Magnifier Shape</span>
+            <select id="magnifierShapeSelect">
+              <option value="circle">Circle</option>
+              <option value="square">Square</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Magnifier Size</span>
+            <select id="magnifierSizeSelect">
+              <option value="small">Small</option>
+              <option value="normal">Normal</option>
+              <option value="big">Big</option>
+              <option value="huge">Huge</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Magnifier Zoom Speed</span>
+            <select id="magnifierZoomSpeedSelect">
+              <option value="slow">Slow</option>
+              <option value="normal">Normal</option>
+              <option value="fast">Fast</option>
+            </select>
+          </label>
+          <label class="setting-card">
+            <span>Preload Depth</span>
+            <select id="renderAheadSelect">
+              <option value="1">Lean</option>
+              <option value="3">Balanced</option>
+              <option value="5">High</option>
+              <option value="8">Aggressive</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="level-select-groups">
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div><p class="eyebrow">Controls</p><h3>Play Shortcuts</h3></div>
+            </div>
+            <ul class="control-list">
+              <li>Mouse wheel or <kbd>+</kbd> / <kbd>-</kbd> buttons to zoom</li>
+              <li>Drag, <kbd>WASD</kbd>, or arrow keys to pan</li>
+              <li>Hold <kbd>Shift</kbd> to pan slower and <kbd>Ctrl</kbd> to pan faster</li>
+              <li><kbd>Space</kbd> pauses and resumes</li>
+              <li><kbd>Esc</kbd> backs out of menus and prompts</li>
+              <li><kbd>N</kbd> starts the level intro or next level</li>
+              <li><kbd>Enter</kbd> confirms main actions on popups</li>
+              <li><kbd>R</kbd> retries when available</li>
+              <li><kbd>L</kbd> opens level select</li>
+              <li>Home screen: <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd> trigger the menu buttons</li>
+              <li>Home screen: <kbd>Space</kbd> skips the intro, then starts the game</li>
+              <li>Click the level badge to open level select</li>
+            </ul>
+          </section>
+
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div><p class="eyebrow">Scoring &amp; Content</p><h3>How This Build Works</h3></div>
+            </div>
+            <ul class="control-list">
+              <li>No fail timer. Search as long as you need.</li>
+              <li>Faster clears earn more score and stars.</li>
+              <li>Wrong clicks reduce score but never reveal the target.</li>
+            </ul>
+            <p class="subtle-text settings-content-heading"><strong>Content and context</strong></p>
+            <ul class="control-list">
+              <li>Most visuals were made with AI assistance.</li>
+              <li>This game is not meant to make fun of anyone, victims, or included people. It is for fun and entertainment only.</li>
+              <li>Bonuses open after level 10 or 20 total stars.</li>
+            </ul>
+          </section>
+
+          <section class="menu-card">
+            <div class="menu-card-header">
+              <div><p class="eyebrow">Stats</p><h3>Local Progress</h3></div>
+            </div>
+            <div class="stat-grid settings-stats-grid">
+              <div class="stat-card"><span>Main Cleared</span><strong id="settingsMainClearsText">0 / 20</strong></div>
+              <div class="stat-card"><span>Advanced Cleared</span><strong id="settingsAdvancedClearsText">0 / 20</strong></div>
+              <div class="stat-card"><span>Total Views</span><strong id="settingsTotalViewsText">0</strong></div>
+              <div class="stat-card"><span>Best Clear</span><strong id="settingsFastestClearText">0.0s</strong></div>
+              <div class="stat-card"><span>Speedrun Avg</span><strong id="settingsSpeedrunAverageText">0.0s</strong></div>
+              <div class="stat-card"><span>Speedrun Best</span><strong id="settingsSpeedrunBestText">0.0s</strong></div>
+            </div>
+          </section>
+
+          <div class="version-line">
+            <div class="button-row settings-links-row">
+              <button id="settingsDiscordButton" class="secondary-button settings-discord-button" type="button" title="Opens in a new tab">Join Our Discord Server</button>
+              <button id="settingsChangelogButton" class="ghost-button settings-changelog-button" type="button">Changelog</button>
+              <button id="settingsMoreGamesButton" class="ghost-button settings-moregames-button" type="button" title="Opens in a new tab">Play More Games by StaticQuasar931</button>
+            </div>
+            <p id="settingsLinkHint" class="subtle-text">Report mistakes and suggestions in Discord.</p>
+          <p id="versionTapTarget" class="version-label">Beta Version 0.0.0.1.2.7</p>
+            <div id="diagnosticUnlock" class="diagnostic-unlock hidden" aria-hidden="true">
+              <div class="diagnostic-row">
+                <input id="diagnosticCodeInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
+                <button id="unlockDiagnosticButton" class="secondary-button" type="button">Open</button>
+              </div>
+              <p id="diagnosticMessage" class="subtle-text"></p>
+              <div id="diagnosticCheatPanel" class="diagnostic-cheat-panel hidden" aria-hidden="true">
+                <div class="button-row diagnostic-cheat-grid">
+                  <button id="cheatLevelsButton" class="ghost-button" type="button">Level Hitboxes</button>
+                  <button id="cheatLevelClearanceButton" class="ghost-button" type="button">Level Clearance</button>
+                  <button id="cheatHomeBoxesButton" class="ghost-button" type="button">Start Hitboxes</button>
+                  <button id="cheatHomeEditorButton" class="ghost-button" type="button">Screen Editor</button>
+                  <button id="cheatRunToolsButton" class="ghost-button" type="button">Run Cheats</button>
+                </div>
+                <div class="button-row diagnostic-cheat-actions">
+                  <button id="cheatDisableAllButton" class="danger-button" type="button">Disable Cheats</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.level-select-groups -->
+      </div><!-- /.menu-shell -->
+    </section>
+
+    <!-- =====================================================
+         GAME SCREEN
+         ===================================================== -->
+    <section id="gameScreen" class="screen game-screen" aria-hidden="true">
+      <div id="sceneViewport" class="scene-viewport">
+        <div id="sceneContent" class="scene-content">
+          <img id="levelImage" class="level-image" alt="Hidden object level scene" draggable="false">
+          <div id="sceneLoadingText" class="scene-loading-text hidden" aria-live="polite">Loading level art...</div>
+          <div id="hitboxOverlay" class="hitbox-overlay hidden" aria-hidden="true"></div>
+        </div>
+
+        <div id="sceneFallback" class="scene-fallback hidden">
+          <p class="eyebrow">Missing Level Art</p>
+          <h3 id="sceneFallbackTitle">Unable to load level background</h3>
+          <p id="sceneFallbackText">Check the image path and filename.</p>
+        </div>
+        <div id="magnifierLens" class="magnifier-lens hidden" aria-hidden="true"></div>
+
+        <div class="play-topbar">
+          <div class="play-hud-row">
+            <div class="play-hud-info">
+              <span id="hudLevelText" class="overlay-pill hud-level-badge" title="Click to open level select">Level 1</span>
+              <span id="hudLevelName" class="overlay-pill">Welcome Party</span>
+              <span id="panTipText" class="overlay-pill">Pan: drag or WASD</span>
+            </div>
+            <div class="play-hud-right-col">
+              <div class="play-top-actions">
+                <button id="skipLevelButton"  class="overlay-button hidden"        type="button">Skip</button>
+                <button id="pauseButton"      class="overlay-button"               type="button">Pause</button>
+                <button id="returnHomeButton" class="overlay-button danger-button"  type="button">Quit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Target preview card -->
+        <aside class="target-card">
+          <div class="target-card-header">
+            <p id="targetPreviewLabel" class="eyebrow">Find This Person</p>
+            <button id="togglePreviewButton" class="overlay-button preview-toggle" type="button">Hide</button>
+          </div>
+          <div id="targetPreviewList" class="target-preview-list"></div>
+          <p id="previewErrorText" class="asset-error hidden"></p>
+          <p id="panTipText" class="target-pan-tip">Pan: drag or WASD</p>
+        </aside>
+
+        <!-- Stats HUD -->
+        <div class="play-stats">
+          <div class="overlay-pill stat-pill">
+            <span>Stars</span>
+            <strong id="hudStarsText">&#9734;&#9734;&#9734;</strong>
+          </div>
+          <div class="overlay-pill stat-pill">
+            <span>Score</span>
+            <strong id="hudScoreText">0</strong>
+          </div>
+          <div class="overlay-pill stat-pill">
+            <span>Time</span>
+            <strong id="hudTimeText">0.0s</strong>
+          </div>
+        </div>
+
+        <div id="sceneFeedback" class="scene-feedback" aria-live="polite"></div>
+        <div id="debugReadout"  class="debug-readout hidden" aria-live="polite"></div>
+      </div>
+    </section>
+
+  </main>

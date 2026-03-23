@@ -119,7 +119,7 @@ const MAIN_LEVELS_RAW = [
   // Level 3: Medieval Beer
   makeLevel(3, "trum1", { name: "Medieval Beer", targets: [makeTarget("level-03-a", "trum1", { type: "rect", x1: 944, y1: 223, x2: 965, y2: 250 })] }),
   // Level 4: Big Party
-  makeLevel(4, "eps3", { name: "Big Party", targets: [makeTarget("level-04-a", "eps3", { type: "rect", x1: 35, y1: 126, x2: 69, y2: 159 })] }),
+  makeLevel(4, "eps3", { name: "Big Party", targets: [makeTarget("level-04-a", "eps3", { type: "rect", x1: 35, y1: 126, x2: 68, y2: 169 })] }),
   // Level 5: July 4th
   makeLevel(5, "eps5", { name: "July 4th", targets: [makeTarget("level-05-a", "eps5", { type: "rect", x1: 593, y1: 278, x2: 614, y2: 306 })] }),
   // Level 6: Waldo's Beach
@@ -204,7 +204,7 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-02-a", "ep1", { type: "rect", x1: 1103, y1: 400, x2: 1070, y2: 369 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-02-b", "tru6", { type: "rect", x1: 473, y1: 378, x2: 498, y2: 405 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Double Exposure",
+    name: "Double Elephant",
   }),
   // Advanced Level 3: Crowd Split
   makeAdvancedLevel(3, [
@@ -218,7 +218,7 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-04-a", "di5", { type: "rect", x1: 384, y1: 287, x2: 425, y2: 321 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-04-b", "ep6", { type: "rect", x1: 929, y1: 278, x2: 917, y2: 255 }, "Assets/Waldos/advanced"),
   ], {
-    name: "TECHover",
+    name: "Tech Over",
   }),
   // Advanced Level 5: Harder Reads
   makeAdvancedLevel(5, [
@@ -260,7 +260,7 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-10-a", "ep12", { type: "rect", x1: 680, y1: 302, x2: 656, y2: 273 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-10-b", "tru6", { type: "rect", x1: 1021, y1: 286, x2: 991, y2: 251 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Cruisin'\u00A0\u00A0Balcony",
+    name: "Cruisin' Balcony",
   }),
   // Advanced Level 11: Narrow Pursuit              
   makeAdvancedLevel(11, [
@@ -281,7 +281,7 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-13-a", "ep4", { type: "rect", x1: 16, y1: 255, x2: 0, y2: 221 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-13-b", "tru4", { type: "rect", x1: 894, y1: 258, x2: 869, y2: 230 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Bookoff",
+    name: "Book Off",
   }),
   // Advanced Level 14: Crimson Route              
   makeAdvancedLevel(14, [
@@ -302,14 +302,14 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-16-a", "di6", { type: "rect", x1: 501, y1: 401, x2: 518, y2: 423 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-16-b", "tru2", { type: "rect", x1: 1122, y1: 424, x2: 1102, y2: 402 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Swimoff",
+    name: "Swim Off",
     needsSetup: false,
   }),
   makeAdvancedLevel(17, [            
     makeTarget("advanced-17-a", "sh1", { type: "rect", x1: 705, y1: 212, x2: 693, y2: 197 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-17-b", "ep3", { type: "rect", x1: 1266, y1: 211, x2: 1246, y2: 188 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Chessoff",
+    name: "Chess Off",
     needsSetup: false,
   }),
   makeAdvancedLevel(18, [
@@ -344,12 +344,12 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-bonus-02-a", "tru1", { type: "rect", x1: 1086, y1: 224, x2: 1075, y2: 210 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-bonus-02-b", "sh1", { type: "rect", x1: 813, y1: 338, x2: 788, y2: 307 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Déjà Vu",
+    name: "Deja Vu",
     needsSetup: false,
   }),
   makeAdvancedBonusLevel(3, [
     makeTarget("advanced-bonus-03-a", "tru8", { type: "rect", x1: 792, y1: 117, x2: 785, y2: 109 }, "Assets/Waldos/advanced"),
-    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 779, y1: 511, x2: 752, y2: 465 }, "Assets/Waldos/advanced"),
+    makeTarget("advanced-bonus-03-b", "ep9", { type: "rect", x1: 779, y1: 511, x2: 783, y2: 512 }, "Assets/Waldos/advanced"),
   ], {
     name: "Celebrity Overmash",
     needsSetup: false,
@@ -365,7 +365,7 @@ const ADVANCED_LEVELS_RAW = [
     makeTarget("advanced-bonus-05-a", "di6", { type: "rect", x1: 31, y1: 220, x2: 39, y2: 228 }, "Assets/Waldos/advanced"),
     makeTarget("advanced-bonus-05-b", "tru4", { type: "rect", x1: 1447, y1: 64, x2: 1454, y2: 70 }, "Assets/Waldos/advanced"),
   ], {
-    name: "Wizzards and Creeps",
+    name: "Wizards and Creeps",
     needsSetup: false,
   }),
 ];

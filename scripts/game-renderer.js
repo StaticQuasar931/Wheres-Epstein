@@ -17,7 +17,7 @@ export function renderPreviewList(container, errorElement, targets) {
   errorElement.classList.add("hidden");
   errorElement.textContent = "";
   if (!targets.length) {
-    errorElement.textContent = "Tried to load: [empty preview path]";
+    errorElement.textContent = "Preview image path is empty.";
     errorElement.classList.remove("hidden");
     return;
   }
@@ -37,7 +37,7 @@ export function renderPreviewList(container, errorElement, targets) {
       image.removeAttribute("src");
       image.classList.remove("asset-loading");
       missing.push(target.preview || "[empty preview path]");
-      errorElement.textContent = `Tried to load: ${missing.join(" | ")}`;
+      errorElement.textContent = `Preview could not load: ${missing.join(" | ")}`;
       errorElement.classList.remove("hidden");
     });
     if (target.preview) {
@@ -54,7 +54,7 @@ export function renderPreviewList(container, errorElement, targets) {
   });
 
   if (missing.length) {
-    errorElement.textContent = `Tried to load: ${missing.join(" | ")}`;
+    errorElement.textContent = `Preview could not load: ${missing.join(" | ")}`;
     errorElement.classList.remove("hidden");
   }
 }
