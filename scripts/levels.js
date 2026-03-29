@@ -389,14 +389,14 @@ const SPECIAL_LEVELS_RAW = [
   makeSpecialLevel(1, [
     makeTarget("special-01-a", "kju1", { type: "rect", x1: 1328, y1: 447, x2: 1356, y2: 479 }, "Assets/Waldos/Special"),
   ], {
-    name: "Special 1",
+    name: "World War III",
     needsSetup: false,
   }),
   makeSpecialLevel(2, [
     makeTarget("special-02-a", "mus1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
     makeTarget("special-02-b", "mb1", { type: "rect", x1: 420, y1: 260, x2: 500, y2: 350 }, "Assets/Waldos/Special"),
   ], {
-    name: "Special 2",
+    name: "Good Rich vs Bad Rich",
     needsSetup: true,
   }),
   makeSpecialLevel(3, [

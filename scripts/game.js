@@ -22,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Beta Version 0.0.0.1.3.0";
+const VERSION_LABEL = "Beta Version 0.0.0.1.3.0.0.1";
 const HOME_BUTTON_STAGGER_MS = 520;
 const HOME_BUTTON_ANIMATION_MS = 2550;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -1259,6 +1259,29 @@ export class HiddenObjectGame {
         title.textContent = level.name;
       }
       if (level.needsSetup) {
+        if (this.sessionTestingUnlocked) {
+          if (lock) {
+            lock.textContent = "Testing Only";
+          }
+          card.disabled = false;
+          card.classList.remove("locked");
+          card.classList.add("is-unplayed");
+          card.classList.remove("is-played");
+          card.onclick = () => {
+            const levelIndex = LEVELS.findIndex((item) => item.id === level.id);
+            if (levelIndex >= 0) {
+              this.state.runMode = this.state.mirrorSelectArmed
+                ? "mirror"
+                : this.state.upsideDownSelectArmed
+                  ? "upside"
+                  : "standard";
+              this.state.mirrorSelectArmed = false;
+              this.state.upsideDownSelectArmed = false;
+              this.startCampaignFromLevel(levelIndex);
+            }
+          };
+          return;
+        }
         if (lock) {
           lock.textContent = "Coming Soon";
         }
@@ -1516,15 +1539,17 @@ export class HiddenObjectGame {
     this.elements.levelSelectThirdPageButton.classList.toggle("hidden", !levelSelectActive || !this.isSpeedrunUnlocked() || !onAdvancedPage);
     this.elements.levelSelectBackFromSpeedrunButton.classList.toggle("hidden", !levelSelectActive || !onSpeedrunPage);
     if (this.elements.startSpecialLevelsButton) {
-      this.elements.startSpecialLevelsButton.disabled = !SPECIAL_LEVELS.some((level) => !level.needsSetup);
+      this.elements.startSpecialLevelsButton.disabled = !(SPECIAL_LEVELS.some((level) => !level.needsSetup) || this.sessionTestingUnlocked);
     }
     if (this.elements.specialLevelsStatusText) {
       const playableSpecials = SPECIAL_LEVELS.filter((level) => !level.needsSetup).length;
       this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
-        ? `${playableSpecials}/${SPECIAL_LEVELS.length} special slots ready.`
+        ? this.sessionTestingUnlocked
+          ? `${playableSpecials}/${SPECIAL_LEVELS.length} special levels public, testing unlock lets you open the rest.`
+          : `${playableSpecials}/${SPECIAL_LEVELS.length} special levels ready.`
         : "Ten special slots are reserved here. Current entries still need setup.";
     }
-    if (this.elements.startSpecialLevelsButton && SPECIAL_LEVELS.some((level) => !level.needsSetup)) {
+    if (this.elements.startSpecialLevelsButton && (SPECIAL_LEVELS.some((level) => !level.needsSetup) || this.sessionTestingUnlocked)) {
       this.elements.startSpecialLevelsButton.disabled = false;
     }
     this.syncSpecialPlaceholderCards();
@@ -1569,7 +1594,7 @@ export class HiddenObjectGame {
   }
 
   startSpecialLevelsRoute() {
-    const firstReady = SPECIAL_LEVELS.find((level) => !level.needsSetup);
+    const firstReady = SPECIAL_LEVELS.find((level) => !level.needsSetup) || (this.sessionTestingUnlocked ? SPECIAL_LEVELS[0] : null);
     if (!firstReady) {
       this.showMenuToast("Special levels are reserved here, but they still need setup.", true);
       return;

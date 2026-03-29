@@ -198,3 +198,10 @@ Beta 0.0.0.1.3.0 notes
 - Special levels now include authored slots through `SL6`.
 - `SL3` through `SL6` currently have preview art and names, but they stay `Coming Soon` until final hitbox coordinates are provided.
 - Page three status text now refers to special levels instead of special slots.
+
+
+Beta 0.0.0.1.3.0.0.1 notes
+
+- With session testing unlocked, page-three special levels marked `needsSetup` can still be opened for local testing.
+- Public players still see those unfinished special levels as `Coming Soon`.
+- `SL1` and `SL2` now use authored names instead of generic placeholders.
