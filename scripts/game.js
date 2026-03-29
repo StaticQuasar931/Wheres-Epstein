@@ -22,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Beta Version 0.0.0.1.3.0.0.1";
+const VERSION_LABEL = "Beta Version 0.0.0.1.3.1";
 const HOME_BUTTON_STAGGER_MS = 520;
 const HOME_BUTTON_ANIMATION_MS = 2550;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -43,10 +43,9 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Public beta update: page three now carries a larger special-level lineup so the extras page feels more alive.",
-  "Special Levels can now preview more upcoming authored routes, even when their final hitboxes are still being set up.",
-  "Frontend structure, settings readability, and page grouping remain cleaned up from the last beta polish pass.",
-  "The release-week momentum is real, so this build keeps focusing on making the extras page easier to grow.",
+  "Special Levels 1 through 6 are now fully playable on page three instead of sitting in testing-only limbo.",
+  "Page-three special cards now read more clearly at a glance, with playable routes looking active and upcoming content staying muted.",
+  "The extras page keeps growing without touching the now-stable index shell, so future special updates are easier to slot in.",
 ];
 
 const UI_DEFAULT_SETTINGS = {
@@ -1194,7 +1193,7 @@ export class HiddenObjectGame {
     this.renderSpeedrunRecentStrip(speedrun.recentLevelIds ?? []);
     if (this.elements.specialLevelsStatusText) {
       this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
-        ? `${playableSpecials.length}/${SPECIAL_LEVELS.length} special slots are ready.`
+        ? `${playableSpecials.length}/${SPECIAL_LEVELS.length} special levels are ready.`
         : "Special Levels are still a work in progress.";
     }
     this.syncSpecialPlaceholderCards();
@@ -1261,7 +1260,7 @@ export class HiddenObjectGame {
       if (level.needsSetup) {
         if (this.sessionTestingUnlocked) {
           if (lock) {
-            lock.textContent = "Testing Only";
+            lock.textContent = "Playable";
           }
           card.disabled = false;
           card.classList.remove("locked");
@@ -1545,7 +1544,7 @@ export class HiddenObjectGame {
       const playableSpecials = SPECIAL_LEVELS.filter((level) => !level.needsSetup).length;
       this.elements.specialLevelsStatusText.textContent = SPECIAL_LEVELS.length
         ? this.sessionTestingUnlocked
-          ? `${playableSpecials}/${SPECIAL_LEVELS.length} special levels public, testing unlock lets you open the rest.`
+          ? `${playableSpecials}/${SPECIAL_LEVELS.length} special levels ready.`
           : `${playableSpecials}/${SPECIAL_LEVELS.length} special levels ready.`
         : "Ten special slots are reserved here. Current entries still need setup.";
     }

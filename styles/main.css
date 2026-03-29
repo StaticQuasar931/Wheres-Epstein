@@ -2559,3 +2559,11 @@ body[data-preview="large"] .target-card { width: min(250px, 34vw); }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* Beta 0.0.0.1.3.1 special-state polish */
+.level-card .level-lock { color: rgba(255, 115, 115, 0.9); }
+.level-card.locked .level-lock { color: rgba(189, 198, 214, 0.7); }
+.level-card:not(.locked) .level-lock { color: rgba(110, 228, 153, 0.92); text-shadow: 0 0 18px rgba(78, 211, 129, 0.18); }
+.special-placeholder-card:not(.locked) { background: linear-gradient(160deg, rgba(82, 204, 130, 0.1), rgba(255,255,255,0.03)), radial-gradient(circle at top center, rgba(112, 255, 179, 0.12), transparent 56%); border-color: rgba(101, 217, 146, 0.3); }
+.special-placeholder-card.locked { opacity: 0.82; filter: saturate(0.66); }

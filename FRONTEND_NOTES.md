@@ -205,3 +205,10 @@ Beta 0.0.0.1.3.0.0.1 notes
 - With session testing unlocked, page-three special levels marked `needsSetup` can still be opened for local testing.
 - Public players still see those unfinished special levels as `Coming Soon`.
 - `SL1` and `SL2` now use authored names instead of generic placeholders.
+
+
+Beta 0.0.0.1.3.1 notes
+
+- `SL1` through `SL6` are now public-playable instead of testing-only.
+- The special-level card state styling now separates playable and coming-soon entries more clearly.
+- Future special levels should keep using the same pattern: add art, add previews, mark `needsSetup: false` only when hitboxes are ready.
