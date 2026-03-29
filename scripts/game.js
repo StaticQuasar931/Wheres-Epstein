@@ -22,7 +22,7 @@ const KEYBOARD_PAN_SLOW_MULTIPLIER = 0.45;
 const KEYBOARD_PAN_FAST_MULTIPLIER = 2.2;
 const PAN_MARGIN = 360;
 const DIAGNOSTIC_CODE = "5278";
-const VERSION_LABEL = "Beta Version 0.0.0.1.2.7";
+const VERSION_LABEL = "Beta Version 0.0.0.1.3.0";
 const HOME_BUTTON_STAGGER_MS = 520;
 const HOME_BUTTON_ANIMATION_MS = 2550;
 const HOME_BUTTON_X_OFFSET = 0;
@@ -43,10 +43,10 @@ const GLASS_SEQUENCE = ["g", "l", "a", "s", "s"];
 // y83nfjA9023jfKsl09vna0sdf908aslkdfj23098df
 
 const CHANGELOG_PUBLIC_NOTES = [
-  "Public beta build: the app shell is now split into frontend fragments so the main HTML stays lighter and easier to manage.",
-  "Page Three was cleaned up with clearer grouping, larger variant controls, and a visible work-in-progress note for special content.",
-  "Settings spacing, level-card readability, and shared UI labels were tightened up for the beta presentation.",
-  "Start-screen decor and home-button polish were smoothed so the menu feels more intentional without changing how the game works.",
+  "Public beta update: page three now carries a larger special-level lineup so the extras page feels more alive.",
+  "Special Levels can now preview more upcoming authored routes, even when their final hitboxes are still being set up.",
+  "Frontend structure, settings readability, and page grouping remain cleaned up from the last beta polish pass.",
+  "The release-week momentum is real, so this build keeps focusing on making the extras page easier to grow.",
 ];
 
 const UI_DEFAULT_SETTINGS = {

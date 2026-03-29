@@ -191,3 +191,10 @@ Good future frontend targets
 - Replace some of the current typed easter eggs with more interactive visual secrets
 - Add per-route art accents for mirror, Upside Down, and future special categories
 - Give the settings screen even better density without making it feel crowded
+
+
+Beta 0.0.0.1.3.0 notes
+
+- Special levels now include authored slots through `SL6`.
+- `SL3` through `SL6` currently have preview art and names, but they stay `Coming Soon` until final hitbox coordinates are provided.
+- Page three status text now refers to special levels instead of special slots.

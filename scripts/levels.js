@@ -399,6 +399,37 @@ const SPECIAL_LEVELS_RAW = [
     name: "Special 2",
     needsSetup: true,
   }),
+  makeSpecialLevel(3, [
+    makeTarget("special-03-a", "trum1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
+    makeTarget("special-03-b", "job4", { type: "rect", x1: 420, y1: 260, x2: 500, y2: 350 }, "Assets/Waldos/Special"),
+    makeTarget("special-03-c", "oba1", { type: "rect", x1: 540, y1: 260, x2: 620, y2: 350 }, "Assets/Waldos/Special"),
+  ], {
+    name: "President Protest",
+    needsSetup: true,
+  }),
+  makeSpecialLevel(4, [
+    makeTarget("special-04-a", "gat2", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
+    makeTarget("special-04-b", "mac1", { type: "rect", x1: 420, y1: 260, x2: 500, y2: 350 }, "Assets/Waldos/Special"),
+    makeTarget("special-04-c", "bez1", { type: "rect", x1: 540, y1: 260, x2: 620, y2: 350 }, "Assets/Waldos/Special"),
+  ], {
+    name: "Tech Summit",
+    needsSetup: true,
+  }),
+  makeSpecialLevel(5, [
+    makeTarget("special-05-a", "kyl1", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
+    makeTarget("special-05-b", "tay3", { type: "rect", x1: 420, y1: 260, x2: 500, y2: 350 }, "Assets/Waldos/Special"),
+    makeTarget("special-05-c", "kimk1", { type: "rect", x1: 540, y1: 260, x2: 620, y2: 350 }, "Assets/Waldos/Special"),
+  ], {
+    name: "Runway Clash",
+    needsSetup: true,
+  }),
+  makeSpecialLevel(6, [
+    makeTarget("special-06-a", "tat2", { type: "rect", x1: 300, y1: 220, x2: 390, y2: 370 }, "Assets/Waldos/Special"),
+    makeTarget("special-06-b", "log2", { type: "rect", x1: 420, y1: 260, x2: 500, y2: 350 }, "Assets/Waldos/Special"),
+  ], {
+    name: "Celebrity Fight Night",
+    needsSetup: true,
+  }),
 ];
 
 export const SPECIAL_LEVELS = SPECIAL_LEVELS_RAW.map(normalizeLevel);
